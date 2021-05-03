@@ -274,3 +274,12 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
+
+
+
+# own stuff
+*/target/
+*.war
+*/.idea/
+tmp/
+
