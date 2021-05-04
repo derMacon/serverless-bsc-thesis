@@ -1,0 +1,19 @@
+
+B
+java:S1948",Make "connection" transient or serializable.(ÿ›ÅÒ
+E
+java:S1948"*Make "producer" transient or serializable.(Ãé şÿÿÿÿ
+Y
+java:S1128"7Remove this unused import 'java.security.SecureRandom'.(›éè™úÿÿÿÿ8˜›ë³“/
+B
+java:S1128"-Remove this unused import 'org.slf4j.Logger'.(íØ®6
+J
+java:S1128"4Remove this unused import 'org.slf4j.LoggerFactory'.(–ÿÚŞ
+N
+java:S1128"1Remove this unused import 'java.math.BigInteger'.(»Çâ€8˜›ë³“/
+]
+java:S1128	"GRemove this unused import 'javax.enterprise.context.ApplicationScoped'.(—ò¸ì
+Å
+java:S5301 "®Secure this "ActiveMQConnectionFactory" by whitelisting the trusted packages using the "setTrustedPackages" method and make sure the "setTrustAllPackages" is not set to true.(·Ûåá
+D
+java:S1948")Make "session" transient or serializable.(ÔÂòáÿÿÿÿÿ
