@@ -283,5 +283,6 @@ TSWLatexianTemp*
 */.idea/
 .idea/
 tmp/
-*.jar
-*.class
+*/*.jar
+*/*.class
+*.iml
