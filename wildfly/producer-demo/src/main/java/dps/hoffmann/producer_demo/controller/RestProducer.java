@@ -1,6 +1,6 @@
-package dps.hoffmann.queue_demo.controller;
+package dps.hoffmann.producer_demo.controller;
 
-import dps.hoffmann.queue_demo.service.ProducerService;
+import dps.hoffmann.producer_demo.service.ProducerService;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
