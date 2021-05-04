@@ -281,6 +281,7 @@ TSWLatexianTemp*
 */target/
 *.war
 */.idea/
+.idea/
 tmp/
 *.jar
 *.class
