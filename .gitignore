@@ -278,7 +278,7 @@ TSWLatexianTemp*
 
 
 # own stuff
-*\target\
+*/target/
 *.war
 */.idea/
 .idea/
