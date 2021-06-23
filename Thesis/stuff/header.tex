@@ -44,6 +44,14 @@
 \usepackage{tabularx}               % Tabellen mit fester Breite
 \usepackage{lipsum}                 % für Blindtexte
 
+\usepackage{makecell} % fuer Zeilenumbrueche in Tabellenzellen
+\usepackage[normalem]{ulem}
+\usepackage{tabularx}
+\usepackage{calc}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
 % Layout
 \pagestyle{scrheadings}
 %\pagestyle{empty}
@@ -56,8 +64,8 @@
 \makeatother
 
 %% Document properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\projname}{Serverless Vergleich Applicationserver}
-\newcommand{\titel}{Vergleich eines Usecases mit Serverless Technologie gegen\"uber Java Enterprise Technologie}
+\newcommand{\projname}{Serverless Vergleich Spring}
+\newcommand{\titel}{Vergleich eines Usecases mit Serverless Technologie gegen\"uber Spring Boot Technologie}
 \newcommand{\authorname}{Silas Hoffmann}
 \newcommand{\thesisname}{Bachelor Thesis}
 \newcommand{\untertitel}{am Beispiel von Instant Payments}

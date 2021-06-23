@@ -8,6 +8,96 @@
   \item Prototypen im Detail erlaeutern
 \end{itemize}
 
+% \begin{center}
+%   \begin{tabular}{ c || c | c | c }
+%     - & makecell{CL0 \\ 1} & makecell{CL1 \\ 2 - 5} & makecell{asdf} \\
+%     cell1 & cell2 & cell3 \\
+%     \hline
+%     \hline
+%     cell4 & cell5 & cell6 \\  
+%     cell7 & cell8 & cell9    
+%   \end{tabular}
+% \end{center}
+
+
+
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand\cellgape{\Gape[4pt]}
+
+
+\begin{lstlisting}[language=bash]
+cat .env
+
+# qbn: queue bound (level) n
+# cbn: container bound (level) n
+
+QB0=15
+QB1=30
+QB2=100
+CB0=1
+CB1=5
+CB2=10
+CB3=30
+\end{lstlisting}
+
+
+\begin{tabularx}
+  {\textwidth}
+  { X | X | X | X | X }
+  % {p{0.2\textwidth} | X | X | X | X }
+  % {
+  %   |p{0.32\textwidth-2\tabcolsep}
+  %   |p{0.17\textwidth-2\tabcolsep}
+  %   |p{0.17\textwidth-2\tabcolsep}
+  %   |p{0.17\textwidth-2\tabcolsep}
+  %   |p{0.17\textwidth-2\tabcolsep}|}
+  % }
+  \toprule
+      \centering \hspace{4mm} \uline{QL3} \newline \footnotesize \textit{QB2 \textless{} MC} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB3)} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB1 -- CB3)} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB2 -- CB3)} 
+    & \centering \hspace{4mm} OK \newline -- 
+    \tabularnewline
+  \hline
+      \centering \hspace{4mm} \uline{QL2} \newline \footnotesize \textit{QB1 \textless{} MC $\leq$ QB2} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB2)} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB1 -- CB2)} 
+    & \centering \hspace{4mm} OK \newline -- 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB2 -- CB3)} 
+    \tabularnewline
+  \hline
+      \centering \hspace{4mm} \uline{QL1} \newline \footnotesize \textit{QB0 \textless{} MC $\leq$ QB1} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB1)} 
+    & \centering \hspace{4mm} OK \newline -- 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB2)} 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB3)} 
+    \tabularnewline
+  \hline
+      \centering \hspace{4mm} \uline{QL1} \newline \footnotesize \textit{QB0 \textless{} MC $\leq$ QB1} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB1)} 
+    & \centering \hspace{4mm} OK \newline -- 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB2)} 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB3)} 
+    \tabularnewline
+  \hline
+      \centering \hspace{4mm} \uline{QL0} \newline \footnotesize \textit{QB0 == MC} 
+    & \centering \hspace{4mm} OK \newline -- 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB1)} 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB2)} 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB3)} 
+    \tabularnewline
+  \hline
+    & \centering \hspace{4mm} \uline{CL0} \newline \footnotesize \textit{CB0 == MC} 
+    & \centering \hspace{4mm} \uline{CL1} \newline \footnotesize \textit{CB0 \textless{} MC $\leq$ CB1} 
+    & \centering \hspace{4mm} \uline{CL1} \newline \footnotesize \textit{CB1 \textless{} MC $\leq$ CB2} 
+    & \centering \hspace{4mm} \uline{CL1} \newline \footnotesize \textit{CB2 \textless{} MC $\leq$ CB3} \tabularnewline
+  \bottomrule
+\end{tabularx}
+
+
 \section{Erstellen von Mock-Services}
 \begin{itemize}
   \item Verschiedenen Varianten erklaeren
@@ -24,3 +114,23 @@
   \item auf welcher Hardware werden Tests durchgefuehrt?
   \item chaos monkey / Stoerfaelle erlaeutern
 \end{itemize}
+
+
+\subsection{Server Specs}
+
+\begin{table}
+  \centering
+  \caption{Server Specs}
+  \bigskip
+  \begin{tabular}{ c l }
+    \toprule
+    Prozessor & Intel(R) Xeon(R) Gold 6226R CPU @ 2.90GHz \\
+    \midrule
+    Kerne & 6 Prozessoren á 16 Kerne \\
+    \midrule
+    RAM & 16 GB \\
+    \midrule
+    Storage & 150 GB \\
+    \bottomrule
+  \end{tabular}
+\end{table}
