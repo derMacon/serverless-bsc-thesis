@@ -2,7 +2,7 @@
 % This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian)
 % Replaced "include" with "input" to make it work.
 
-\input{stuff/header}
+\input{config/header}
 
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
@@ -19,7 +19,7 @@
 
 
 % Titelseite
-\include{stuff/Titelseite}
+\include{config/Titelseite}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,17 +35,17 @@
 
 \pagenumbering{arabic}
 
-\include{kapitel/Einleitung}
-\include{kapitel/Zielsetzung}
-\include{kapitel/Ist_Analyse}
-\include{kapitel/Vorgehensmodell}
-\include{kapitel/Entwicklungsanalyse}
-\include{kapitel/Problemloesung}
-\include{kapitel/Auswertung}
-\include{kapitel/Zusammenfassung}
-\include{kapitel/Ausblick}
-\include{kapitel/Literaturverzeichnis}
+\include{kapitel/einleitung/Einleitung}
+\include{kapitel/zielsetzung/Zielsetzung}
+\include{kapitel/ist-analyse/Ist_Analyse}
+\include{kapitel/vorgehensmodell/Vorgehensmodell}
+\include{kapitel/entwicklungsanalyse/Entwicklungsanalyse}
+\include{kapitel/problemloesung/Problemloesung}
+\include{kapitel/ergebnisanalyse/Ergebnisanalyse}
+\include{kapitel/zusammenfassung/Zusammenfassung}
+\include{kapitel/ausblick/Ausblick}
+\include{kapitel/literaturverzeichnis/Literaturverzeichnis}
 
-\include{stuff/footer}
+\include{config/footer}
 
 \end{document}

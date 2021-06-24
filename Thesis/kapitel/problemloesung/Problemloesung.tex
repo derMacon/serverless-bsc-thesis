@@ -1,18 +1,29 @@
 \chapter{Probleml\"osung}
 
-\section{Festlegung konkreter Implementierung}
-\subsection{Containerisierung}
-\subsubsection{Docker Swarm}
-\subsubsection{Container Lifecycle}
+\section{Bestimmung von Daten zur Messung des Startup-Verhaltens von Containern}
+\subsection{Kriterienkatalog}
+\begin{itemize}
+  \item Vorallem Skalierbarkeit und Performance
+  \item Transaktionen - Durchsatz wichtig
+  \item Deployment egal, da bereits im Container deployed wird
+  \item Generell sagen, warum einige Aspekte egal sind
+  \item Wartbarkeit nicht so wichtig
+  \item Ressourcennutzung
+  \item St\"orungsf\"alle (Chaos Monkey)
+  \item Non Functionals - Kai hat PDF geschickt
+\end{itemize}
+
+\section{Implementierung Prototyp}
+\subsection{Node.js}
+\subsection{Spring Boot}
+
+\section{Implementierung mittels Containerisierungsplattform}
+\subsection{Container Lifecycle}
 \begin{itemize}
   \item Auf verschiedene Schichten eingehen
   \item Auf Ergebnisse beziehen
 \end{itemize}
-
-\subsection{Business Logik}
-\subsubsection{Node.js}
-\subsubsection{Spring Boot}
-
+\subsection{Docker Swarm}
 
 \begin{itemize}
   \item Prototypen im Detail erlaeutern
@@ -95,9 +106,8 @@ CB3=30
   \bottomrule
 \end{tabularx}
 
-\subsection{Durchf\"uhrung Lasttest}
+\section{Implementierung Lasttest}
 \subsection{Timeline}
-
 \subsection{Testbedingungen}
 \begin{itemize}
   \item Kommt in den Anhang
@@ -105,9 +115,6 @@ CB3=30
   \item auf welcher Hardware werden Tests durchgefuehrt?
   \item chaos monkey / Stoerfaelle erlaeutern
 \end{itemize}
-
-
-\subsubsection{Server Specs}
 
 \begin{table}
   \centering
@@ -125,3 +132,65 @@ CB3=30
     \bottomrule
   \end{tabular}
 \end{table}
+
+
+\begin{filecontents*}{test.csv}
+  a,b,c,d
+  1,4,5,1
+  2,3,1,5
+  3,5,6,1
+  4,1,4,9
+  5,3,4,7
+  \end{filecontents*}
+
+
+\begin{tikzpicture}
+\begin{axis}
+\addplot table [x=a, y=c, col sep=comma] {test.csv};
+\end{axis}
+\end{tikzpicture}
+
+% \begin{filecontents}{\jobname Data.csv}
+%   Jahr;CD;MC
+%   1990;298;450
+%   1991;330;370
+%   1992;420;373
+%   1993;485;345
+%   1994;650;355
+%   1995;710;275
+%   1996;770;225
+%   1997;750;170
+%   1998;815;155
+%   1999;925;125
+%   2000;926;75
+%   2001;890;50
+%   2002;825;30
+%   2003;750;20
+%   2004;775;12
+%   2005;700;7
+%   2006;620;5
+%   2007;515;5 
+%   \end{filecontents}
+%   \documentclass[paper=a4,12pt,version=last]{scrartcl}
+%   \usepackage{pgfplots}
+   
+%   \begin{document}
+%   \begin{tikzpicture}
+%         \begin{axis}[ymin=0,
+%   %         xtick={1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007},
+%            x tick label style={/pgf/number format/1000 sep=},
+%            xlabel={Jahr},
+%            y tick label style={/pgf/number format/1000 sep=},
+%            ylabel={in Mio. Stück}
+%            ]
+   
+%      \addplot table [y=CD,col sep=semicolon]  {\jobname Data.csv};
+%      \addlegendentry{CD}
+%      \addplot table [y=MC,col sep=semicolon]  {\jobname Data.csv};
+%      \addlegendentry{MC}
+  
+%         \end{axis}
+%      \end{tikzpicture}
+
+
+\section{Implementierung Visualierung und Monitoring zur Unterst\"utzung der Auswertung}
