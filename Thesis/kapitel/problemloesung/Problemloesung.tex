@@ -134,19 +134,22 @@ CB3=30
 \end{table}
 
 
-\begin{filecontents*}{test.csv}
-  a,b,c,d
-  1,4,5,1
-  2,3,1,5
-  3,5,6,1
-  4,1,4,9
-  5,3,4,7
-  \end{filecontents*}
+% \begin{filecontents*}{test.csv}
+%   a,b,c,d
+%   1,4,5,1
+%   2,3,1,5
+%   3,5,6,1
+%   4,1,4,9
+%   5,3,4,7
+%   \end{filecontents*}
 
 
 \begin{tikzpicture}
-\begin{axis}
-\addplot table [x=a, y=c, col sep=comma] {test.csv};
+\begin{axis}[xlabel={Container Anzahl}, ylabel={Startzeit}]
+\addplot table [x=id, y=value, col sep=comma] {test.csv};
+\addlegendentry{Spring Boot}
+\addplot table [x=id, y=value, col sep=comma] {test2.csv};
+\addlegendentry{Node.js}
 \end{axis}
 \end{tikzpicture}
 
