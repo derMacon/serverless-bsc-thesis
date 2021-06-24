@@ -197,3 +197,46 @@ CB3=30
 
 
 \section{Implementierung Visualierung und Monitoring zur Unterst\"utzung der Auswertung}
+
+
+% \begin{lstlisting}[style=CodeHighlighting,float,caption=Bank - Konstruktor,label=lst:bank_konstruktor]
+\begin{lstlisting}[style=CodeHighlighting]
+  // standard constructor 
+  public Bank(int playerCnt) {
+      this.entries = new Entry[playerCnt];
+      this.bankSize = playerCnt;
+          this.rand = new Random();
+  }
+  
+  // testing constructor - no fileIO
+  public Bank(Entry[] entries, Random pseudoRandom) {
+      this.entries = entries;
+      this.rand = pseudoRandom;
+      this.bankSize = entries.length;
+  }
+  
+  // testing constructor - with fileIO
+  public Bank(String preallocation, List<Player> players, Random rand) {
+      assert null != preallocation && null != players && null != rand;
+      this.bankSize = players.size();
+      this.entries = new Entry[this.bankSize];
+      if (0 < preallocation.length()) {
+          String[] singleEntries = preallocation.split(SEPERATOR_STRING_REPRESENTATION);
+          int offset = this.bankSize - singleEntries.length;
+          for (int i = singleEntries.length - 1; i >= 0; i--) {
+              this.entries[i + offset] = new Entry(singleEntries[i], players);
+          }
+      }
+  }
+\end{lstlisting}
+
+
+\begin{lstlisting}[style=CodeHighlighting]
+#!/bin/bash
+
+# Add two numeric value
+((sum=25+35))
+
+#Print the result
+echo $sum
+\end{lstlisting}

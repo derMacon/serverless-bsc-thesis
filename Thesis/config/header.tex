@@ -52,7 +52,11 @@
 \usepackage{array}
 \usepackage{pgfplots}
 \usepackage{filecontents}
+\usepackage{color}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+
+
 
 
 % Layout
@@ -125,4 +129,56 @@
 \begin{spacing}{1}
 \lstinputlisting[frame=lines,aboveskip=2\bigskipamount,#1]{#2}
 \end{spacing}
+}
+
+
+
+% --------------- eigene Einstellungen --------------- %
+
+%Quellcodestyle Spezifikationen
+\definecolor{DarkPurple}{rgb}{0.4,0.1,0.4}
+\definecolor{DarkCyan}{rgb}{0.0,0.5,0.4}
+\definecolor{LightLime}{rgb}{0.3,0.5,0.4}
+\definecolor{Blue}{rgb}{0.0,0.0,1.0}
+
+% Java Syntaxhighlighting festgelegt
+\lstdefinestyle{javaStyle} {
+  language=Java, %mit mehreren Sprachen moeglich, ermoeglicht Syntaxhighlighting
+  columns=flexible,
+  numbers=left,
+  frame=single,
+  frameround=tttt,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{DarkPurple},
+  commentstyle=\itshape\color{LightLime},
+  stringstyle=\color{Blue}
+}
+
+% XML Syntaxhighlighting festgelegt
+\lstdefinestyle{xmlStyle} {
+  language=XML, %mit mehreren Sprachen moeglich, ermoeglicht Syntaxhighlighting
+  columns=flexible,
+  numbers=left,
+  frame=single,
+  frameround=tttt,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{DarkPurple},
+  commentstyle=\itshape\color{LightLime},
+  stringstyle=\color{Blue}
+}
+
+% Bash Syntaxhighlighting festgelegt
+\lstdefinestyle{xmlStyle} {
+  language=bash, %mit mehreren Sprachen moeglich, ermoeglicht Syntaxhighlighting
+  columns=flexible,
+  numbers=left,
+  frame=single,
+  frameround=tttt,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{DarkPurple},
+  commentstyle=\itshape\color{LightLime},
+  stringstyle=\color{Blue}
 }
