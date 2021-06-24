@@ -44,6 +44,9 @@
 \usepackage{tabularx}               % Tabellen mit fester Breite
 \usepackage{lipsum}                 % für Blindtexte
 
+
+% ------------------- eigene packages ------------------- %
+
 \usepackage{makecell} % fuer Zeilenumbrueche in Tabellenzellen
 \usepackage[normalem]{ulem}
 \usepackage{tabularx}
@@ -53,6 +56,10 @@
 \usepackage{pgfplots}
 \usepackage{filecontents}
 \usepackage{color}
+\usepackage{todonotes}
+\usepackage{csquotes}
+\MakeOuterQuote{"} % deutsche Anfuehrungszeichen
+
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 
 
@@ -170,7 +177,7 @@
 }
 
 % Bash Syntaxhighlighting festgelegt
-\lstdefinestyle{xmlStyle} {
+\lstdefinestyle{bashStyle} {
   language=bash, %mit mehreren Sprachen moeglich, ermoeglicht Syntaxhighlighting
   columns=flexible,
   numbers=left,
