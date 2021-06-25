@@ -1,5 +1,7 @@
 \chapter{Zielsetzung}
 
+Nachdem im letzten Kapitel ein kurzer Einblick in die Motivation für die Portierung alter JEE Technologie in neuere IT-Infrastruktur beschrieben wurde, wird im folgenden darauf eingegangen, welcher wesentlichen Problemstellung sich die DPS gegenüber konfrontiert sieht und wie ich versuchen werde dies zu untersuchen.
+
 \section{Problemstellung}
 \begin{itemize}
   \item Vergleich der Startup-Zeit einer containerbasierten Cloudanwendung bei steigender Last. Es soll auf Unterschiede zwischen Spring und Node eingegangen werden.
@@ -7,14 +9,32 @@
   \item da anwendung in spring boot ist nicht cloud-fähig weil zu lange für startup, dadurch riskieren wir timeouts also rejects – das ist die besonderheit der anwendung…- ..neuer container muss sofort verfügbar sein! Eine alternative wird gesucht: serverless vespricht minimale startup zeiten!....
 \end{itemize}
 
+Da das Unternehmen im Banking Bereich tätig ist, stellt eine hohe Verfügbarkeit der Komponenten eines der wesentlichen Kernziele dar. Auf die neuen Technologien bezogen, bedeutet dies, dass es zu ermitteln gilt wie viel Zeit ein Skalierungsprozess in einem orchestrierten Komponentenstack im Detail braucht. Dazu müssen diverse Metriken erhoben werden, welche im Kapitel ... \todo{Kapitel Referenz einbinden} beschrieben werden. Wichtig an dieser Stelle, es soll vorallem untersucht werden, inwiefern eine Java-Anwendung als cloudfähig bezeichnet werden kann. Denn wenn sie zu lange zum Starten braucht, werden timeouts riskiert, was es unter allen Umständen zu vermeiden gilt. Eine Alternative versprechen serverless Technologien, welche sich vorallem durch ihre minimale Startzeit für diesen Usecase qualifizieren. Um einen konkreten Vergleich durchführen zu können, wird im zu implementierenden Prototypen jeweils eine Komponente mit dem Java Backend Framework "\emph{Spring Boot}" und eine weitere Komponente mit dem Javascript Framework "\emph{Node.js}" implementiert. 
 
 
-\section{L\"osungsweg}
+\section{Lösungsweg}
 \begin{itemize}
   \item Prinzip / Ablauf erklären
   \item Grundlegende Struktur des Prototypen erklären
   \item vergleich der startupzeiten zwischen serverless und aktueller springboot variante anhand eines jeweils protypen und fiktiven workflows und fiktiven lastszenarios in einer cloud umgebung und messung des startup verhaltens bei plötzlich auftetenen spitzen oder so….
 \end{itemize}
 
+Um festzustellen wie gut eine Spring- beziehungsweise eine Node.js-Komponente tatsächlich geeignet ist, wird ein fiktiver Workflow mittels eines Komponentenstacks implementiert, der in der Lage ist verschiedene Lastszenarien abarbeiten zu können. Hierbei ist es dem Benutzer möglich dynamisch zwischen der Spring- und Node-Komponente zu wechseln um einen entsprechenden Vergleich anstellen zu können. Es werden diverse Skripte bereitgestellt die es dem Benutzer erlauben beliebig komplexe Lasten zu simulieren. Um eine Auswertung auch grafisch aufarbeiten zu können, wird der Stack ebenfalls mit Komponenten zur Visualisierung ausgestattet. Diese Elemente zur Visualisierung greifen dabei nicht in den Ablauf des restlichen Stacks ein, sondern greifen lediglich auf bereits bestehende Schnittstellen zurück um einen möglichst ungestörten Ablauf und damit unverfälschte Datensätze zu garantieren. 
+
+Der wesentliche Usecase des Systems wird die Verarbeitung von generierten Payments sein, welche nach mehreren  fiktiven Arbeitsschritten Datensätze generieren. Der genaue Gegenstand der Bearbeitung ist allerdings eher nebensächlich, da er so gut wie keinen Einfluss auf die für diesen Usecase interessanten Metriken hat. 
+
+% \todo{Bild einfügen}
+
+% Im Folgenden werde ich grob die Zuständigkeiten der verschiedenen Stack-Komponenten erläutern.
+
+% \begin{enumerate}
+
+%   \item Um verschiedene Metriken bezüglich der Verarbeitungs- sowie Startupgeschwindigkeiten der einzelnen System-Komponenten berechnen zu können, wird ein Stack aus verschiedenen Containern aufgebaut. Der Benutzer ist in der Lage über eine Schnittstelle Lasttests zu starten. Um diese Anfragen nicht selbst ausführen zu müssen greift er hierzu auf diverse Bash-Skripte zurück. 
+%   \item Diese Anfragen werden von einer ersten Komponente "\emph{supplier-backend}" entgegengenommen. Die Komponente generiert aus diesen Benutzeranfragen tatsächliche Nachrichten, die vom System verarbeitet werden können. An diese Nachrichten werden neben dem eigentlichen XML Inhalt auch noch weitere Informationen angeheftet, die es im späteren Verlauf erleichtern die Metrikinformationen zu gewinnen. 
+%   \item Die generierten Nachrichten anschließend an einen Message Broker übergeben, der als ein Verteilerknoten für darauf folgende Komponenten betrachtet werden kann. 
+
+%   \todo{ist noch nicht fertig}
+
+% \end{enumerate}
 
 \cite{Knuth:1998:ACP:280635}
