@@ -1,5 +1,7 @@
 \chapter{Vorgehensmodell}
 
+Nachdem im letzten Kapitel der aktuelle Aufbau der Payment-Anwendungen, sowie die durch die monolithische Struktur hervorgebrachten Probleme, erläutert wurden, werde ich im Folgenden beschreiben wie ich vorgehen werde um den Problemfokus der Startzeit zu untersuchen.
+
 \section{Anforderungen an Daten zur Messung des Startup-Verhaltens von Containern}
 \begin{itemize}
   \item Problem reduzieren
@@ -17,6 +19,21 @@
 \end{itemize}
 
 \subsection{Festlegung fiktiver Workflow}
+Da der Fokus auf der Untersuchung der Startupzeit der Komponenten liegt, wird lediglich eine minimale beispielhafte Implementierung erfolgen, welche die Arbeitsschritte der eigentlichen Applikation in vereinfacht darstellen soll. Allerdings werden im System konkrete Nachrichten im XML Format vermittelt, welche einer XSD-Spezifikation folgen wie sie im realen Umfeld ebenfalls genutzt wird. 
+
+\todo{Auszug aus XML einbinden???}
+
+Sobald eine neue Nachricht eingetroffen ist, soll drei Arbeitsschritte ausgeführt werden:
+
+\begin{enumerate}
+
+  \item Es soll geprüft werden, ob das eingegangene XML der XSD-Spezifikation folgt oder nicht. Wenn dies nicht der Fall sein sollte, wird die Nachricht zwar derartig acknowledged, dass sie zwar aus der Eingangsqueue im Message Broker enfernt wird, allerdings bei der Verarbeitung ignoriert wird.
+
+  \item Falls es sich um valides XML handelt, wird ein Feld aus dem XML-Inhalt ausgelesen.
+
+  \item in einem letzten Schritt wird dieses Element in eine Datenbank geschrieben damit auch eine Persistenz-Operation in die Verarbeitungszeit einfließt.
+
+\end{enumerate}
 
 \subsection{Serverless}
 \begin{itemize}
