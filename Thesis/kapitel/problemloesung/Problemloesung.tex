@@ -1,5 +1,7 @@
 \chapter{Probleml\"osung}
 
+Nachdem im letzten Abschnitt auf mögliche Kriterien zur Messung der relevanten Metrikinformationen eingegangen wurde, erfolgt im folgenden eine spezifische Festlegung auf bestimmte Kriterien, welche auf das zu lösende Problem zugeschnitten werden.
+
 \section{Bestimmung von Daten zur Messung des Startup-Verhaltens von Containern}
 \subsection{Kriterienkatalog}
 \begin{itemize}
@@ -11,6 +13,33 @@
   \item Ressourcennutzung
   \item St\"orungsf\"alle (Chaos Monkey)
   \item Non Functionals - Kai hat PDF geschickt
+\end{itemize}
+
+\subsubsection{Leistungsfähigkeit}
+Die wesentliche Metrik stellt hierbei der Datendurchsatz sowie die Latenzzeit. Die Latenzzeit sollte die komplette Pipeline abdecken, also vom Dateneingang durch den Benutzer, bis hin zur tatsächlichen Abspeicherung der Daten in der Persistenzschicht. Die gesamte Strecke lässt sich allerdings auch in noch kleinere Abschnitte unterteilen um bei unerwarteten Werte festzustellen an welcher Stelle genau es zu einem Engpass kommt. Die Unterteilung der gesamten Pipeline sollte zumindest in zwei Abschnitte erfolgen.
+
+\begin{itemize}
+  \item Hierbei ist vorallem von Interesse ob sich die Zeitenrahmen vom Eingang der Daten bis zum Erhalt der Daten durch die Consumer in irgendeiner Weise verändert. Dies sollte zwar nicht der Fall sein, da beide Arten von Testläufen auf die selbe Eingangsschnittstelle zurückgreifen. Dennoch ist es wichtig festzustellen, falls dies dennoch der Fall sein sollte, denn dann handelt es sich um ein tieferliegendes Problem bei der Orchestrierung des Stacks.
+  \item Außerdem sollte der Zeitrahmen von Erhalt der Daten durch die Consumer bis hin zur Interaktion mit der Persistenz-Schicht gesondert betrachtet werden. Dieser Abschnitt stellt den variablen Teil der Pipeline dar und ist von größtem Interesse. 
+\end{itemize}
+
+\todo{footnote mit link zu gatling und jmeter seite}
+Auf Werkzeuge wie zum Beispiel \emph{Gatling} oder \emph{JMeter} muss hierbei verzichtet werden, da diese nicht in der Lage sind in die Pipeline einzugreifen um die einzelnen Abschnitte gesondert betrachten / messen zu können. Die Metriken müssen sowohl mittels der kompilierten Arbeitsversion als auch der Skript-Version generiert werden um eine Gegenüberstellung anstellen zu können. Hierbei sollte es außerdem möglich sein, den zeitlichen Verlauf der Metriken darzustellen um nachvollziehen zu können, ob es Phasen gibt in denen die Bearbeitung von dem berechneten Durchschnittswert abweicht. Je nach Stärke der Abweichung gilt es zu evaluieren ob weitere statistische Kenngrößen diesbezüglich berechnet werden sollten oder nicht. Ein weiteres mögliches Kriterium wäre in diesem Zusammenhang zum Beispiel die Standardabweichung. Da die Latenzzeit stark mit dem eigentlichen Datendurchsatz zusammenhängt ist es nicht nötig diese noch einmal gesondert zu berechnen um Redundanz zu vermeiden.
+
+
+\subsubsection{Zusammenfassung}
+Der Übersichtlichtkeitshalber hier noch einmal eine stichwortartige Zusammenfassung der zu ermittelnden Metriken hinsichtlich der betrachteten Kriterien.
+
+\begin{itemize}
+  \item Latenzzeit im Durchschnitt sowie als zeitliche Historie
+  \begin{itemize}
+    \item Abschnitt \emph{vor} Datenaufnahme gesondert betrachten
+    \item Abschnitt \emph{nach} Datenaufnahme gesondert betrachten
+    \item Gesamte Pipeline betrachten
+  \end{itemize}
+  \item
+  \item
+  \item
 \end{itemize}
 
 \section{Implementierung Prototyp}
