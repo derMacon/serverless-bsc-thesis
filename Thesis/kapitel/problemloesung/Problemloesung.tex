@@ -23,8 +23,18 @@ Die wesentliche Metrik stellt hierbei der Datendurchsatz sowie die Latenzzeit. D
   \item Außerdem sollte der Zeitrahmen von Erhalt der Daten durch die Consumer bis hin zur Interaktion mit der Persistenz-Schicht gesondert betrachtet werden. Dieser Abschnitt stellt den variablen Teil der Pipeline dar und ist von größtem Interesse. 
 \end{itemize}
 
-\todo{footnote mit link zu gatling und jmeter seite}
+\todo{footnote mit link zu gatling und jmeter download seite}
 Auf Werkzeuge wie zum Beispiel \emph{Gatling} oder \emph{JMeter} muss hierbei verzichtet werden, da diese nicht in der Lage sind in die Pipeline einzugreifen um die einzelnen Abschnitte gesondert betrachten / messen zu können. Die Metriken müssen sowohl mittels der kompilierten Arbeitsversion als auch der Skript-Version generiert werden um eine Gegenüberstellung anstellen zu können. Hierbei sollte es außerdem möglich sein, den zeitlichen Verlauf der Metriken darzustellen um nachvollziehen zu können, ob es Phasen gibt in denen die Bearbeitung von dem berechneten Durchschnittswert abweicht. Je nach Stärke der Abweichung gilt es zu evaluieren ob weitere statistische Kenngrößen diesbezüglich berechnet werden sollten oder nicht. Ein weiteres mögliches Kriterium wäre in diesem Zusammenhang zum Beispiel die Standardabweichung. Da die Latenzzeit stark mit dem eigentlichen Datendurchsatz zusammenhängt ist es nicht nötig diese noch einmal gesondert zu berechnen um Redundanz zu vermeiden.
+
+
+\subsubsection{Skalierbarkeit}
+Da es sich bei dem Projekt um eine containerisierte Cloudanwendung handelt, muss hierbei eine \emph{Vertikale Skalierung} stattfinden. Um möglichst genaue Werte zu erreichen, müssen die zu skalierenden Container in engem Austausch mit dem System stehen. Es muss festgehalten werden, wann genau der Befehl zum Skalieren getätigt wird, und wann genau ein entsprechender Container gestartet ist. Als vollkommen initialisiert gilt ein Container, wenn neben dem eigenen Filesystem auch sämtliche relevante Kommunikationsschnittstellen gestartet und benötigte Datenverbindungen bestehen. Generell gilt, die erhobenen Metriken sollen jeweils getrennt pro Backend-Technologie erhoben werden um eine Gegenüberstellung zu gewährleisten.
+
+Bezüglich der Skalierung gilt vorallem es soll ein vorausschauendes Regelmodell entworfen werden, welches die Container stufenweise erst dann skaliert, wenn eine Vielzahl von Nachrichten eine gewisse Latenzzeit überschreitet oder der Message Broker eine entsprechende Menge an unbeantworteten Nachrichten hält. Hierbei soll eine sinnvolle Festlegung gefunden werden. Um im Nachhinein genaue Vergleichswerte ermitteln zu können sollen lediglich die Konsumenten Container skaliert werden. Die restlichen Stackkomponenten laufen jeweils mit einer einzigen Instanz.\todo{Im Ausblick erwähnen, dass es möglich ist Datenbanken, Broker etc. zu skalieren, Gegenstand der nächsten Arbeit...} Der Skalierungsprozess soll sowohl mittels eingegangener Nachrichten, als auch durch spezifische Benutzeranfrage, gestartet werden können. Diese Unterteilung soll in den persistierten Datensätzen erkennbar sein.
+
+Die hierbei generierten Metriken sollen sich bezüglich der vom Nachrichteneingang generierten Skalierungen anhand des festgelegten Stufenmodels ausgegeben werden. Hierbei wird der Durchschnitt aller in dieser Stufe / Gruppe enthaltenen Skalierungen gebildet und dargestellt. Es soll allerdings auch möglich sein die durchschnittlichen Werte sowohl für einzelne Containeranzahlen als auch für alle durchlaufen Skalierungen geben. Ähnlich zu den Metriken der \emph{Leistungsfähigkeit} gilt, sie sollen ebenfalls zeitlich aufbereitet werden. Falls sich hierbei ungewöhnlich Auschweifungen hinsichlich der zeitlichen Entwicklung abzeichnen lassen sollten, können weitere statistische Metriken hinzugezogen werden. 
+
+\todo{am Ende schauen ob genügend Zeit um noch die Verlässlichkeit des Systems zu testen. Stichwort Chaos Monkey}
 
 
 \subsubsection{Zusammenfassung}
@@ -37,9 +47,16 @@ Der Übersichtlichtkeitshalber hier noch einmal eine stichwortartige Zusammenfas
     \item Abschnitt \emph{nach} Datenaufnahme gesondert betrachten
     \item Gesamte Pipeline betrachten
   \end{itemize}
-  \item
-  \item
-  \item
+  \item Skalierungsdauer jeweils pro verwendeter Backend-Technologie festzuhalten
+  \begin{itemize}
+    \item Skalierung anhand eingehender Nachrichten mittels Stufenmodell
+    \item Skalierung mittels direkter Benutzeranfrage (ohne eingehende Nachrichten)
+    \item Metriken als Datensätze in einer Datenbank hinterlegt
+    \item Durchschnittliche Startzeit pro Containeranzahl 
+    \item Durchschnittliche Startzeit pro Skalierungsstufe 
+    \item Gesamtdurchschnittliche Startzeit als einzelner Messwert
+    \item Metriken als zeitlicher visualisiert
+  \end{itemize}
 \end{itemize}
 
 \section{Implementierung Prototyp}
