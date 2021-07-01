@@ -1,7 +1,7 @@
 \chapter{Ergebnisanalyse}
 
-\todo{nochmal schauen ob Überleitung noch stimmt wenn Implementierungsteil geschriebten wurde...}
-Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Komponentenstack im Detail implementiert wurde, werden im Folgenden auf die erhaltenen Metriken erläutert. Es wird insbesondere auf die Bedeutung einzelner Messwerte, sowie die auf mögliche Begründungen dieser eingangen.
+\todo{nochmal schauen ob Überleitung noch stimmt wenn Implementierungsteil geschrieben wurde...}
+Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Komponentenstack im Detail implementiert wurde, werden im Folgenden auf die erhaltenen Metriken erläutert. Es wird insbesondere auf die Bedeutung einzelner Messwerte, sowie auf mögliche Begründungen dieser eingangen.
 
 
 \todo{folgende Stichpunkte entfernen}
@@ -34,25 +34,60 @@ Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Ko
 \end{itemize}
 
 \subsection{Latenzzeit}
+Die wichtigsten Messdaten bezüglich der Leistungsfähigkeit des Systems beziehen sich auf den Datendurchsatz beziehungsweise die entsprechende Latenzzeit. In der Tabelle \ref{tab:latency} wurden diese für die beiden betrachteten Backendtechnologien gegenübergestellt. Alle Angaben wurden in Millisekunden erfasst. Ein im System eingegangene Nachricht verweilt bei Bearbeitung durch einen Node.js Konsumenten im Schnitt 38 Sekunden, während sich dieser Wert bei Spring Boot auf über eine Minute beläuft. Diese Werte bilden lediglich einen Durchschnitt aller erhaltenen Metriken ab, eine genauere Aufteilung bezüglich des Zusammenhangs zu den Skalierungsgrößen erfolgt im nächsten Abschnitt (siehe \todo{Ref einfuegen}). Der Gesamtdurchschnitt setzt sich aus zwei Zeitangaben der Pipeline zusammen: 
+
+\begin{enumerate}
+  \item Den Nachrichteneingang: Diese Metrik beschreibt den Zeitraum zwischen erhaltener Anfrage im System und Acknowledgement durch die Konsumer-Komponente, dass die Nachricht nun bearbeitet wird. Sie beläuft sich bei der Node.js Komponente auf ungefähr 34 Sekunden und 58 Sekunden bei der Spring-Boot-Komponente. 
+  \item Die Verarbeitungsdauer: Diese Metrik beschreibt den Zeitraum zwischen Acknowledgement durch den Konsumer, dass die Nachricht erhalten wurde, sowie dem Abspeichern des extrahierten Wertes durch den Konsumenten in der Datenbank. Dieser Werte beläuft sich bei beiden Implementierung auf etwas über drei Sekunden. Bei dieser Metrik liegt der Fokus allerdings auf dem minimalen Zeitunterschied im Millisekundenbereich, da in beide Implementierungen eine künstliche Verlangsamung (\emph{Sleep-Funktion}) eingebaut wurde um die erhaltenen Messwerte besser nachvollziehen zu können. Bei Node.js liegt die tatsächliche Verarbeitungsdauer bei 388 Millisekunden \emph{(total 3388)}, während sie bei Spring Boot bei 29 Millisekunden liegt \emph{(total 3029)}.
+\end{enumerate}
+
+\begin{table}[ht!]
+	\centering
+	\caption[Latenzzeit - Vergleich]{Gegenüberstellung der Latenzzeiten}
+  \label{tab:latency}
+  \hspace{5mm}
+  \begin{tabular}{@{}lc@{}}
+    \toprule
+    Metrik & Dauer \\
+    \midrule
+    Node.js \\
+    \hspace{3mm}Gesamtdurchschnitt & 38416 \\
+    \hspace{3mm}Nachrichteneingang & 35027 \\
+    \hspace{3mm}Verarbeitungsdauer & 3388 \\
+    \midrule
+    Spring Boot \\
+    \hspace{3mm}Gesamtdurchschnitt & 61800 \\
+    \hspace{3mm}Nachrichteneingang & 58771 \\
+    \hspace{3mm}Verarbeitungsdauer & 3029 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 
-\begin{tikzpicture}
-  \begin{axis}[xlabel={Zusätzlich hochgefahrende Container}, ylabel={Startzeit}]
-    \addplot table [x=additionalCnt, y=startupTime, col sep=comma] {kapitel/ergebnisanalyse/_data/springSpecificBenchmarks.csv};
-    \addlegendentry{Spring Boot}
-    \addplot table [x=additionalCnt, y=startupTime, col sep=comma] {kapitel/ergebnisanalyse/_data/nodeSpecificBenchmarks.csv};
-    \addlegendentry{Node.js}
-  \end{axis}
-\end{tikzpicture}
+\subsection{Skalierungsdauer}
+Diese Gruppe an Metriken bezieht sich auf die genauen Zeiträume, welche benötigt werden, um einen Container mit der entsprechenden Implementierung hochzufahren. 
 
-\begin{tikzpicture}
-  \begin{axis}[xlabel={Zusätzlich hochgefahrende Containerrrrr}, ylabel={Startzeit}]
-    \addplot table [xbar, x=additionalCnt, y=startupTime, col sep=comma] {kapitel/ergebnisanalyse/_data/springSpecificBenchmarks.csv};
-    \addlegendentry{Spring Boot}
-    \addplot table [x=additionalCnt, y=startupTime, col sep=comma] {kapitel/ergebnisanalyse/_data/nodeSpecificBenchmarks.csv};
-    \addlegendentry{Node.js}
-  \end{axis}
-\end{tikzpicture}
+\paragraph{Aufschlüsselung nach Containeranzahl}
+Die grundlegendste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gleichzeitig hochfahrender Container (siehe \ref{fig:specContainers}). Wie im Graphen erkennbar, handelt es sich um ein lineares Wachstum. Mit jedem zusätzlichen Container, der zeitgleich erstellt werden soll, dauert der Initialisierungsprozess bei der Spring-Implementierung im Schnitt 1611 Millisekunden länger. Bei der Node Implementierung liegt dieser Wert bei 194 Millisekunden. So dauert das Initialisieren eines einzelnen neuen Containers bei der Spring-Boot-Komponente 4,8 Sekunden während sich dieser Wert bei der Node.js-Koponente lediglich 2,6 Sekunden beläuft. Um diese nach Containeranzahl aufgeschlüsselten Werte zu erhalten, wurde nicht wie bei den anderen Skalierungstests auf die öffentliche Schnittstelle mittels Nachrichtengenerierung zurückgegriffen, es wurde stattdessen eine interne Schnittstelle mittels dediziertem Skript verwendet um möglichst Störungsfrei direkt auf die Komponente welche das Skalieren orchestriert zuzugreifen. Die nachfolgenden Metriken wurden allerdings durch die öffentliche Schnittstelle generiert.
+
+\begin{figure}
+  \centering
+  \caption[Startzeit Container - Anzahl spezifisch]{Startzeit Container - Anzahl spezifisch}
+  \label{fig:specContainers}
+  \begin{tikzpicture}
+    \begin{axis}[xlabel={Zusätzlich hochgefahrende Container}, ylabel={Startzeit}]
+      \addplot table [x=additionalCnt, y=startupTime, col sep=comma] {kapitel/ergebnisanalyse/_data/springSpecificBenchmarks.csv};
+      \addlegendentry{Spring Boot}
+      \addplot table [x=additionalCnt, y=startupTime, col sep=comma] {kapitel/ergebnisanalyse/_data/nodeSpecificBenchmarks.csv};
+      \addlegendentry{Node.js}
+    \end{axis}
+  \end{tikzpicture}
+\end{figure}
+
+\paragraph{Aufschlüsselung nach Skalierungsstufe}
+Um einen beispielhaften Skalierngsalgorithmus zu implementieren wurde ein Regelsatz verfasst welcher vom Alert-Manager zur Laufzeit automatisch in einem festgelegten Interval ausgewertet wird. Um diesen Regelsatz zu Vorführungszwecken nicht unnötig ausführlich zu gestalten, wurde das Hinzufügen neuer Instanzen in Stufen organisiert. Im folgenden werden die Messwerte dieser Stufen näher erläutert. 
+
+
 
 % \begin{tikzpicture}
  
@@ -79,21 +114,6 @@ Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Ko
 %   \label{tab:multicol}
 %   \end{table}
 
-\begin{tabular}{@{}lc@{}}
-  \toprule
-  Metrik & Dauer \\
-  \midrule
-  Node.js \\
-  \hspace{3mm}Gesamtdurchschnitt & 12312 \\
-  \hspace{3mm}Nachrichteneingang & 12312 \\
-  \hspace{3mm}Verarbeitungsdauer & 12312 \\
-  \midrule
-  Spring Boot \\
-  \hspace{3mm}Gesamtdurchschnitt & 12312 \\
-  \hspace{3mm}Nachrichteneingang & 12312 \\
-  \hspace{3mm}Verarbeitungsdauer & 12312 \\
-  \bottomrule
-  \end{tabular}
 
 \begin{figure}
 	\centering
@@ -167,7 +187,6 @@ Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Ko
 % \end{figure}
 
 
-\subsection{Skalierungsdauer}
 
 
 
