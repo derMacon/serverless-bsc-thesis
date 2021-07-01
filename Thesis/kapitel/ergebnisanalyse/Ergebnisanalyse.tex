@@ -65,6 +65,36 @@ Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Ko
    
   % \end{tikzpicture}
 
+% \begin{table}[ht]
+%   \caption{Partial horizontal line}
+%   \begin{tabular}{lll}
+%       \hline
+%       \multicolumn{2}{c}{Multi-column}&234234\\
+%       \cline{1-2}
+%       &Nachrichteneingang&213123\\
+%       &Verarbeitungsdauer&324324\\
+%       \hline
+%   \end{tabular}
+%   % \end{center}
+%   \label{tab:multicol}
+%   \end{table}
+
+\begin{tabular}{@{}lc@{}}
+  \toprule
+  Metrik & Dauer \\
+  \midrule
+  Node.js \\
+  \hspace{3mm}Gesamtdurchschnitt & 12312 \\
+  \hspace{3mm}Nachrichteneingang & 12312 \\
+  \hspace{3mm}Verarbeitungsdauer & 12312 \\
+  \midrule
+  Spring Boot \\
+  \hspace{3mm}Gesamtdurchschnitt & 12312 \\
+  \hspace{3mm}Nachrichteneingang & 12312 \\
+  \hspace{3mm}Verarbeitungsdauer & 12312 \\
+  \bottomrule
+  \end{tabular}
+
 \begin{figure}
 	\centering
 	\caption[Startzeit Services]{Durchschnittliche Startzeit pro Service}
@@ -81,6 +111,25 @@ Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Ko
     \end{axis}
   \end{tikzpicture}
 \end{figure}
+
+\begin{figure}
+	\centering
+	\caption[Startzeit Stufenübersicht]{Durchschnittliche Startzeit stufenweise - Node}
+  \begin{tikzpicture}
+    \begin{axis}[
+        symbolic x coords={Node.js,Spring Boot},
+        width=4cm,
+        height=8cm,
+        xtick=data]
+        \addplot[ybar,fill=blue] coordinates {
+            (Node.js,6610)
+            (Spring Boot,35336)
+        };
+    \end{axis}
+  \end{tikzpicture}
+\end{figure}
+
+
 
 
 % \begin{tikzpicture}
