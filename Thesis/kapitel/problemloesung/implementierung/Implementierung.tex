@@ -1,19 +1,79 @@
 \section{Implementierung Prototyp}
 
+Nachdem im letzten Abschnitt auf mögliche Kriterien zur Messung der relevanten Metrikinformationen eingegangen wurde, erfolgt im folgenden eine spezifische Festlegung auf bestimmte Kriterien, welche auf das zu lösende Problem zugeschnitten werden.
+
+\subsection{Komponentenmodell}
+
+\paragraph{Schichtenmodell}
+Der Arbeitsfluss der Anwendung wurde in Abbildung \ref{fig:stackOverview} visuell dargestellt. Die unterschiedlichen Komponenten wurden dabei in vier verschiedene Schichten eingeteilt: 
+
+\begin{itemize}
+  \item Persistenzschicht (engl. \emph{Persistence layer}): Beinhaltet sämtliche Komponenten, welche für das Abspeichern gegebener Datensätze in dazugehörige Datenbanken zuständig sind. Um Nebenläufigkeit zu ermöglichen wird hier ebenfalls auf Schnittstellen mittels Message-Broker zurückgegriffen. Eine manipulation der Daten findet auf dieser Ebene nicht statt.
+  \item Verarbeitungsschicht (engl. \emph{processing layer}): Beinhaltet sämtliche Komponenten, welche für die direkte Verarbeitung der Business-Logik zuständig sind. Die Kommunikation zwischen den Komponenten findet über eine REST-Schnittstelle sowie einen Message-Broker statt. Der Message-Broker stellt hierbei vorallem eine nebenläufige Verarbeitung der konsumierenden Komponenten sicher. Allerdings bietet dieser ebenfalls die Schnittstelle zur Skalierungsschicht (engl. \emph{scaling layer}).
+  \item Skalierungsschicht (engl. \emph{scaling layer}): Beinhaltet sämtliche Komponenten zum Skalieren der konsumierenden Komponenten. Hierbei wird auf eine universelle Schnittstelle des Message Broker zurückgegriffen um entsprechende Metriken abzugreifen, die für die Evaluierung hinterlegter Regeln zur Skalierung verwendet werden. Ansonsten wird in Komponenten dieser Schicht das Zeitverhalten des Initialisierungsprozesses der konsumierenden Komponenten überwacht und an Schnittstellen der Persistenzschicht weitergeleitet.
+  \item Monitoring Ebene: Diese Schicht besteht aus einer einzigen Komponente, deren einzige Aufgabe es ist erhaltene Daten visuell darzustellen. Um einen zeitlichen Überblick zu geben, werden die Daten intern vom Werkzeug gespeichert. Da es sich um lokal verwaltete Datensätze handelt, die für den Rest der Applikation keinerlei Bedeutung darstellen wurde verzichtet eine Lösung zu finden, in der diese ebenfalls in einer Komponente der Persistenzschicht unterzubringen.
+\end{itemize}
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/overview-bw}
+	\caption[Komponenten-Stack im Überblick]{Komponenten-Stack im Überblick}
+	\label{fig:stackOverview}
+\end{figure}
+
+
+
+\paragraph{Komponenten im Überblick}
+Es folgt eine kurze Zusammenfassung der Funktionalität sowie der Anforderungen an die jeweligen Komponenten.
+
+\subparagraph{Input}
+Um es dem Benutzer zu ermöglichen gezielte Messwerte zu erfassen, wird eine REST-Schnittstelle vom System bereitgestellt. Es ist zwar möglich, dass der Benutzer selbstständig Anfragen für diese Schnittstelle generiert und absendet, es ist allerdings beabsichtigt, dass der Benutzer auf vordefinierte Skript oder eine entsprechende Benutzeroberfläche zurückgreift. Die Benutzeroberfläche ist sehr funktional gehalten, sodass es zwar möglich ist hierüber Anfragen an das System zu stellen, dennoch empfiehlt sich gerade für komplexere Anfrageszenarien der Gebrauch von bereitgestellten Bash-Skripten. Bezüglich der Skripte gibt es ebenfalls eine diverse Abstraktionsschichten. So ist es zum Beispiel möglich mittels einer definierten Grammatik Anforderungen zu definieren welche sich beliebig kombinieren lassen. Hierzu wurden mehrere vordefinierte Dateien angelegt, welche über ein entsprechendes Skript an das Backend geschickt werden kann. Allerdings gibt es Skripte die auf diesem Prozess aufsetzen, sodass der Endbenutzer sich hiermit nicht auseinandersetzen muss. 
+
+
+\subparagraph{Supplier}
+Diese Komponente ist in der Lage die vereinfachten Anfragen des Benutzers zu interpretieren und in Nachrichten umzuwandeln, die vom System verarbeitet werden können. Hierbei werden bereits an dieser Stelle diverse Informationen an die ursprüngliche Nachricht angehängt um im späteren Verlauf entsprechende Metriken zu berechnen. Außerdem erfolgt eine erste Kommunikation mit der Persistenzschicht, in der die übersetzten Benutzeranfragen abgespeichert werden. Hierbei wird direkt auf die Datenbank zugegriffen, da es im System stets nur diese eine Instanz des \emph{Suppliers} gibt. Zwar unterstützt die verwendete Postgres-Datenbank mehrere Klienten zur gleichen Zeit, nativ ist diese Anzahl jedoch begrenzt und muss angemessen konfiguriert werden. Desweiteren stellt die Supplier-Komponente zwei Modi hinsichtlich der Geschwindigkeit in der Nachrichten an den Broker übermittelt werden. So ist es zum Beispiel möglich Nachrichten über einen gewissen Zeitraum hinweg abzuschicken oder aber eine Transaktion zu bilden in der alle auf einmal geschickt werden.
+
+
+\subparagraph{Broker}
+Dieser Activemq Broker stellt die Funktionalität bereit Nachrichten an mehere Konsumenten zu vermitteln. Dabei gibt es zwei Betriebsmodi, einmal das Arbeiten mit einer \emph{topic} sowie mit einer \emph{queue}. Eine Topic stellt ein \emph{Publisher-Subscriber-Muster} bereit in dem alle eingehenden Nachrichten an alle eingeschriebenen Konsumenten verschickt werden \todo{Quelle verlinken}. Demgegenüber steht eine \emph{queue} (Warteschlange), welche eingehende Nachrichten lediglich an einen einzelnen Konsumenten übermittelt, wobei er hierbei als eine Art Loadbalancer agiert. Bevor die Nachrichten jedoch aus einer der beiden Datenstrukturen entfernt wird, muss der betreffende Konsument eine \emph{Acknowledgement-Nachricht} an den Broker schicken um zu signalisieren, dass die Nachricht nicht nur angenommen sondern auch korrekt verarbeitet werden konnte. Es gilt auch noch hervorzuheben, dass die eingeschriebenen Konsumenten bei neuen Nachrichten stets benachrichtigt werden und es clientseitig keine Logik benötigt um zum Beispiel event- oder intervallbasiert eine Abfrage an den Broker zu steuern. Da diese Komponente ebenfalls vom ... \emph{Prometheus erklären, Links raussuchen}. 
+
+\subparagraph{Consumer}
+Die konsumierenden Komponenten können beliebig skaliert werden und implementieren den in Abschnitt \ref{ss:fiktiverWorkflow} definierten Workflow. Hierbei wird auf diverse Libraries zurückgegriffen, wobei die restliche Logik eher schlicht gehalten wurde. Die Komponenten kommunizieren lediglich über den Message-Broker mit dem Nachrichten-Supplier und über einen weiteren Nachrichten-Broker mit der Persistenzschicht um die extrahierten Elemente abzulegen.
+
+\subparagraph{Prometheus}
+\todo{Quellen raussuchen}
+
+\subparagraph{Alert Manager}
+\todo{Quellen raussuchen}
+
+\subparagraph{Scaler Proxy}
+Diese Komponente bietet eine REST-Schnittstelle, welche im Alert-Manager hinterlegt wird. Sobald eine der Regeln anschlägt wird der Aufruf an diese Komponente weitergeleitet. Im Endeffekt dient diese Kompoonente nur als Proxy-Service, da sie diese Nachricht lediglich an eine weitere Komponente weiterleitet. In einer produktiven Umgebung würde diese Komponente komplett enfallen, da es möglich ist den Alert-Manager derartig zu konfigurieren, dass er direkt die öffentlichen Schnittstellen der Scaler-API anspricht. Es wurde sich dennoch für das Zwischenschalten eines solchen Proxy-Services entschieden um genauere Messewerte zu erhalten. Gerade hinsichtliche der Initialisierungsphasen von Containern ist es angebracht so kurz vorher wie möglich einen Timestamp zu setzen. Da es nicht möglich ist direkt in die Konfiguration der Scaler-Api einzugreifen ist diese Lösung der nächstbeste Ansatz. Sobald eine Skalierungsanfrage weitergeleitet wurde, wird diese noch unbeantwortete Anfrage intern in einer Datenstruktur abgelegt. Sobald ein entsprechender Container komplett initialisiert wurde, ruft dieser eine weitere Schnittstelle des Proxy-Services auf. Daraufhin wird ein \emph{Acknowledgement-Timestamp} in der hinterlegten Anfrage gesetzt und an die Persistenzschicht weitergeleitet. 
+
+Außerdem bietet diese Komponente die Möglichkeit für den Benutzer direkt Exemplare eines Consumers hochzufahren. Die Verwendete Schnittstelle dient als Umgehung des herkömmlichen Programmflusses und wird zur Generierung der Skalierungsschichtenunabhängigen Metrikberechnung verwendet (siehe Abschnitt \ref{par:specContainer}). Über dedizierte Endpunkte können diese Metriken als .csv Datei ausgelesen werden. 
+
+
+\subparagraph{Scaler}
+\todo{fill out}
+\todo{Github Link}
+die Zugriff auf den Docker-Daemon besitzt und dort den Swarm steuern und damit skalieren kann. 
+
+\subparagraph{Grafana}
+\todo{Quellen raussuchen}
+
+
+\subparagraph{Mock scaler API}
+Diese Komponente ist nicht Kernbestandteil des Komponenten-Stacks. Während der Entwicklungszeit dient sie dazu die Scaler-Api zu emulieren. So ist es zum Beispiel möglich lokal eine Instanz des Scaler-Proxy Projekts in einer beliebigen IDE als Standard Spring Projekt auszuführen. Sämtliche Skalierungs-Anfragen können von dieser Komponente angenommen werden, da sie auf dem gleichen Port wie der "\emph{echte}" Scaler läuft, wobei sie dabei ebenfalls in der Lage ist diverse Rückgabenachrichten an den Klienten zu übergeben.
+
+
+
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/grafana-dashboard-01}
 	\caption[]{Grafana Dashboard}
-	\label{fig:stackoverview}
+	\label{fig:grafanaOverview}
 \end{figure}
 
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/overview-bw}
-	\caption[Komponenten-Stack im Überblick]{Komponenten-Stack im Überblick}
-	\label{fig:stackoverview}
-\end{figure}
 
 
 \subsection{Node.js}

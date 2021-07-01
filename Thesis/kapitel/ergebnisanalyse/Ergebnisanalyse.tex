@@ -1,6 +1,8 @@
 \chapter{Ergebnisanalyse}
 
 \todo{nochmal schauen ob Überleitung noch stimmt wenn Implementierungsteil geschrieben wurde...}
+\todo{Verweis auf Anhang mit allen Tabellen für Metrikinformationen}
+
 Nachdem im letzten Abschnitt ausführlich beschrieben wurde wie der komplette Komponentenstack im Detail implementiert wurde, werden im Folgenden auf die erhaltenen Metriken erläutert. Es wird insbesondere auf die Bedeutung einzelner Messwerte, sowie auf mögliche Begründungen dieser eingangen.
 
 
@@ -65,7 +67,7 @@ Die wichtigsten Messdaten bezüglich der Leistungsfähigkeit des Systems beziehe
 
 
 \subsection{Skalierungsdauer}
-Diese Gruppe an Metriken bezieht sich auf die genauen Zeiträume, welche benötigt werden, um einen Container mit der entsprechenden Implementierung hochzufahren. Die ermittelten Zeiten stellen im Folgenden die durchschnittlichen Initialisierungszeiten eines einzelnen Containers dar. Sie beziehen sich nicht auf auf die Gesamtdauer der Initialisierungsphase aller beteiligten Container.
+Diese Gruppe von Metriken bezieht sich auf die genauen Zeiträume, welche benötigt werden, um einen Container mit der entsprechenden Implementierung hochzufahren. Die ermittelten Zeiten stellen im Folgenden die durchschnittlichen Initialisierungszeiten eines einzelnen Containers dar. Sie beziehen sich nicht auf auf die Gesamtdauer der Initialisierungsphase aller beteiligten Container.
 
 \paragraph{Aufschlüsselung nach Services}
 Die abstrakteste Metrik bezieht sich auf den durchschnittlichen Zeitraum zum Initialisieren der Container eines bestimmten Services. Hierbei wird zwischen der Node.js sowie Spring-Boot-Komponente zum konsumieren der Eingangsnachrichten unterschieden. Die Container, welche eine Node.js Instanz beinhalten, benötigen im Schnitt 6.6 Sekunden zum Hochfahren, während diejenigen mit einer Spring-Instanz 35.3 Sekunden brauchen. Diese relativ großen Zeiträume lassen sich unter anderem auf die Anzahl der hochgefahrenen Instanzen zurückführen. Eine genauere Aufschlüsselung dieses Prozesses erfolgt in den nächsten Abschnitten. 
@@ -182,6 +184,15 @@ Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurde diverse Panels zur Zei
   \item Interpretation / Analyse der Daten
   \item Begruendung fuer Verhalten suchen
 \end{itemize}
+
+\subsection{Latenzzeit}
+Hinsichtlich der Latenzzeit überrascht vorallem die deutliche Diskrepanz zwischen der Initialisierungsdauer der unterschiedlichen Technologien. Durch die Unterteilung der Pipeline in die zwei Messwerte ist erkennbar, dass diese auf die zeitliche Dauer bis zum Nachrichteneingang zurückzuführen ist. Hierbei läuft die Dauer der Initialisierungsphasen weit auseinander (siehe \ref{ss:skalierungsdauer}).
+
+Bezüglich der Verarbeitungsgeschwindigkeit ist die Spring-Boot Komponente jedoch im Vergleich schneller. Dies ist auf die Natur einer kompilierten Sprache zurückzuführen. Java Code wird im Vorwege in entsprechenden Bytecode übersetzt, während eine Skriptsprache wie Javascript innerhalb der Node.js-Komponente zur Laufzeit übersetzt wird. Da in den Komponenten nur minimale Logik verbaut wurde, ist der festgestellte zeitliche Unterschied in der Bearbeitungsdauer mit 359  Millisekunden zwar nicht so gravierend wie der Unterschied hinsichtlich der Initialisierungsphase der Container, allerdings drastischer als vorher angenommen. Da der Prototyp eine sehr einfache Ausführungslogik implementiert, ist dieser Messwert doch relativ hoch. In Anbetracht der Komplexität der realen Banking-Anwendung gilt es ein spezifisches Konzept für das Regelwerk zum Starten der Container zu entwerfen. Hierbei muss eine Untersuchung bezüglich der Rentabilität eines neuen startenden Containers gegenüber eines laufenden Containers evaluiert werden.
+
+
+\subsection{Skalierungsdauer}
+\label{ss:skalierungsdauer}
 
 
 
