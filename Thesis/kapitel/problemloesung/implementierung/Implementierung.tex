@@ -37,16 +37,24 @@ Diese Komponente ist in der Lage die vereinfachten Anfragen des Benutzers zu int
 \subparagraph{Broker}
 Dieser Activemq Broker stellt die Funktionalität bereit Nachrichten an mehere Konsumenten zu vermitteln. Dabei gibt es zwei Betriebsmodi, einmal das Arbeiten mit einer \emph{topic} sowie mit einer \emph{queue}. Eine Topic stellt ein \emph{Publisher-Subscriber-Muster} bereit in dem alle eingehenden Nachrichten an alle eingeschriebenen Konsumenten verschickt werden \todo{Quelle verlinken}. Demgegenüber steht eine \emph{queue} (Warteschlange), welche eingehende Nachrichten lediglich an einen einzelnen Konsumenten übermittelt, wobei er hierbei als eine Art Loadbalancer agiert. Bevor die Nachrichten jedoch aus einer der beiden Datenstrukturen entfernt wird, muss der betreffende Konsument eine \emph{Acknowledgement-Nachricht} an den Broker schicken um zu signalisieren, dass die Nachricht nicht nur angenommen sondern auch korrekt verarbeitet werden konnte. Es gilt auch noch hervorzuheben, dass die eingeschriebenen Konsumenten bei neuen Nachrichten stets benachrichtigt werden und es clientseitig keine Logik benötigt um zum Beispiel event- oder intervallbasiert eine Abfrage an den Broker zu steuern. Da diese Komponente ebenfalls vom ... \emph{Prometheus erklären, Links raussuchen}. 
 
+
 \subparagraph{Consumer}
 Die konsumierenden Komponenten können beliebig skaliert werden und implementieren den in Abschnitt \ref{ss:fiktiverWorkflow} definierten Workflow. Hierbei wird auf diverse Libraries zurückgegriffen, wobei die restliche Logik eher schlicht gehalten wurde. Die Komponenten kommunizieren lediglich über den Message-Broker mit dem Nachrichten-Supplier und über einen weiteren Nachrichten-Broker mit der Persistenzschicht um die extrahierten Elemente abzulegen.
 
+
 \subparagraph{Prometheus}
-\cite{oreillyPrometheus}
-\todo{Quellen raussuchen}
+"Bei diesem Projekt handelt es sich um ein \emph{Open Source} auf Metriken basierendes Monitoring System" \cite{oreillyPrometheus}. Es ist möglich über eine definierte Anfragensprache Daten Dritter zu verarbeiten. Diese Daten können über ein einfaches Textformat von den Komponenten ausgegeben werden. Es ist möglich dieses Textformat händisch zu schreiben, allerdings wird in der Praxis vermehrt auf Libraries, die auf den Client zugeschnitten wurden, gesetzt. Prometheus ist unter der Apache 2.0 Lizenz veröffentlicht \footnote{https://github.com/prometheus/prometheus}, und ist primär in der Programmiersprache Go implementiert worden. Das Scrapen der Metriken wird von der Prometheus Komponente selbst durchgeführt, die zu überwachenden Komponenten müssen sich selbst nicht darum kümmern Daten an Prometheus zu übermitteln.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=.8\linewidth]{kapitel/problemloesung/implementierung/_img/alert-man-p307}
+	\caption[Alert Manager - Übersicht]{Alert Manager - Übersicht \cite[Seite~307]{oreillyPrometheus}}
+	\label{fig:alertManOverview}
+\end{figure}
 
 \subparagraph{Alert Manager}
-\cite{oreillyPrometheus}
-\todo{Quellen raussuchen}
+"Unter \emph{Alerting} versteht man das in Kenntnis setzen eines Admins, wenn es im System zu Problemen kommen sollte" \cite[Kapitel~18]{oreillyPrometheus}. Prometheus bietet hierbei die Möglichkeit mittels der funktionalen Anfragesprache \emph{PromQl} diverse Bedingungen zu definieren unter denen dies geschehen soll. Da es in einer produktiven Containerumgebung durchaus vorkommen kann, dass mehrere Prometheus-Instanzen parallel arbeiten, wurde das Benachrichtigen in eine weitere Komponente (den \emph{Alert Manger}) ausgelagert. Dieser synchronisiert, sammelt und gruppiert die Alerts der verschiedenen Prometheus-Instanzen und sendet Benachrichtigungen an definierte Nachrichtenkanäle, die sich zum Beispiel aus einem Emailpostfach, einer Pagernachricht oder Chatnachricht auf Plattformen wie zum Beispiel Slack zusammensetzen können (siehe Abbildung \ref{fig:alertManOverview}).
+
 
 \subparagraph{Scaler Proxy}
 Diese Komponente bietet eine REST-Schnittstelle, welche im Alert-Manager hinterlegt wird. Sobald eine der Regeln anschlägt wird der Aufruf an diese Komponente weitergeleitet. Im Endeffekt dient diese Kompoonente nur als Proxy-Service, da sie diese Nachricht lediglich an eine weitere Komponente weiterleitet. In einer produktiven Umgebung würde diese Komponente komplett enfallen, da es möglich ist den Alert-Manager derartig zu konfigurieren, dass er direkt die öffentlichen Schnittstellen der Scaler-API anspricht. Es wurde sich dennoch für das Zwischenschalten eines solchen Proxy-Services entschieden um genauere Messewerte zu erhalten. Gerade hinsichtliche der Initialisierungsphasen von Containern ist es angebracht so kurz vorher wie möglich einen Timestamp zu setzen. Da es nicht möglich ist direkt in die Konfiguration der Scaler-Api einzugreifen ist diese Lösung der nächstbeste Ansatz. Sobald eine Skalierungsanfrage weitergeleitet wurde, wird diese noch unbeantwortete Anfrage intern in einer Datenstruktur abgelegt. Sobald ein entsprechender Container komplett initialisiert wurde, ruft dieser eine weitere Schnittstelle des Proxy-Services auf. Daraufhin wird ein \emph{Acknowledgement-Timestamp} in der hinterlegten Anfrage gesetzt und an die Persistenzschicht weitergeleitet. 
@@ -55,14 +63,11 @@ Außerdem bietet diese Komponente die Möglichkeit für den Benutzer direkt Exem
 
 
 \subparagraph{Scaler}
-\todo{fill out}
-\todo{Github Link}
-\cite{docker-scaler}
-die Zugriff auf den Docker-Daemon besitzt und dort den Swarm steuern und damit skalieren kann. 
+"\emph{Das Ziel des Docker Scaler-Projekts ist es eine REST-Http-Schnittstelle zum Skalieren von Services und Nodes bereitzustellen}"\cite{docker-scaler}. Außerdem werden mit jeder Skalierungsanfrage Statusinformationen über die aktuelle sowie zukünftige Anzahl von Nodes des zu skalierenden Services zurückgegeben, die es dem proxy-Service ermöglichen davon ausgehend einen Skalierungsstop für neue Anfragen beizubehalten oder aufzuheben. Dieser ist nötig damit das System keine weiteren Skalierungen vornimmt, wenn bereits welche am laufen sind.
+
 
 \subparagraph{Grafana}
-\cite{oreillyPrometheus}
-\todo{Quellen raussuchen}
+"Wenn es zum Alert durch den Alert Manager kommt, wird in einer Produktivumgebung der Erste Schritt sein die Performanz des Systems durch dedizierte Dashboard zu überprüfen" \cite[Kapitel~6]{oreillyPrometheus}. Grafana ist ein Werkzeug, das dies über eine Weboberfläche direkt im Browser ermöglicht. Es bietet die Möglichkeit Graphen, Tabellen und weitere Visualisierungskomponenten zu erstellen um zum Beispiel die Latenzzeit oder CPU Auslastung zu überprüfen. Diese Metriken können für das ganze Sytem oder nur einen Teil generiert werden. Es ist das bevorzugte Visualisierungswerkzeug für Prometheus, bietet allerdings ebenfalls Unterstützung für verschiedene weitere Systeme wie zum Beispiel \emph{Graphite}, \emph{Elasticsearch} oder \emph{PostgreSQL}.
 
 
 \subparagraph{Mock scaler API}
