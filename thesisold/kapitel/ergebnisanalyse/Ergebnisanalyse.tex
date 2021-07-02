@@ -193,7 +193,8 @@ Bezüglich der Verarbeitungsgeschwindigkeit ist die Spring-Boot Komponente jedoc
 
 \subsection{Skalierungsdauer}
 \label{ss:skalierungsdauer}
-
+Die erheblich abweichende Initialisierungsgeschwindigkeit der beiden unterschiedlichen Komponenten lässt sich im Kern auf auf die Initialisierungs des Spring-Containers sowie des dazugehörgien Application-Contexts zurückführen. Das Framework bietet durch die ... \todo{Weiterschreiben, schauen ob es diese Erklärung schon irgendwo in der Thesis gibt.}
+Kern des Spring Frameworks ist der \emph{Spring Container}. Dieser verwaltet fachliche und nichtfachliche Objekte, die eine Anwendung ausmachen. Die verwalteten Objekte werden als \emph{Beans} bezeichnet. "Eine Bean ist ein Objekt, das vom Spring-Container instanziiert und konfiguriert wurde und dessen Lebenszyklus vom Container verwaltet wird. Die Abhängigkeiten zwischen Beans sind als Metadaten im Container verfügbar" \cite[Kapitel~3.1.1]{simons-spring}. 
 
 
 \section{Diskussion}
