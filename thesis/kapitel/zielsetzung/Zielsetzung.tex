@@ -29,8 +29,8 @@ Dieser Begriff bezieht sich auf das Verwalten von Komponenten eines Systems. Hie
 \paragraph{Backend-Technologie}
 Serverseitige Komponenten basieren auf bestimmten Technologien. Dies können einzelne Programmiersprachen sein, in der Regel sind jedoch unterschiedliche Frameworks gemeint, die verwendet werden, können um die geforderte Business-Logik zu implementieren.
 
-\paragraph{Serverless-Technologie}
-
+\paragraph{Serverless Functions}
+Serverless Umgebungen bilden eine weitere Abstraktionsstufe zu IaaS Plattformen und werden auch als "\emph{Function-as-a-Service}" Technologien bezeichnet. Genau wie schon bei IaaS Plattformen gibt es eine Aufteilung zwischen der tatsächlichen Infrastruktur und der virtualisierten Umgebung. Zusätzlich wird jedoch die Funktionalität des automatischen Verwalten von benötigten Instanzen ermöglicht, hierbei werden also Instanzen je nach Bedarf hoch oder heruntergefahren \cite[Seite~70 ff.]{continuous-delivery}.
 
 \subsection{Kernziele \checkmark}
 Da das Unternehmen im Banking Bereich tätig ist, stellt eine hohe Verfügbarkeit der Komponenten eines der wesentlichen Kernziele dar. Auf die neuen Technologien bezogen, bedeutet dies, dass es zu ermitteln gilt, wie viel Zeit ein Skalierungsprozess in einem orchestrierten Komponentenstack im Detail braucht. Dazu müssen diverse Metriken erhoben werden, welche im Kapitel \ref{sec:startupAnforderungen} beschrieben werden. Wichtig an dieser Stelle, es soll vor allem untersucht werden, inwiefern eine Java-Anwendung als cloudfähig bezeichnet werden kann. Denn wenn die Initialisierungsphase zu viel Zeit in Anspruch nimmt, werden Timeouts riskiert, was es unter allen Umständen zu vermeiden gilt. Eine Alternative versprechen serverless Technologien, welche sich vorallem durch ihre minimale Startzeit für diesen Usecase qualifizieren.
