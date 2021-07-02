@@ -1,38 +1,49 @@
-\chapter{Zielsetzung}
+\chapter{Zielsetzung \checkmark}
 
-Nachdem im letzten Kapitel ein kurzer Einblick in die Motivation für die Portierung alter JEE Technologie in neuere IT-Infrastruktur beschrieben wurde, wird im folgenden darauf eingegangen, welcher wesentlichen Problemstellung sich die DPS gegenüber konfrontiert sieht und wie ich versuchen werde dies zu untersuchen.
+Nachdem im letzten Kapitel ein kurzer Einblick in die Motivation für die Portierung alter JEE Technologie in neuere IT-Infrastruktur beschrieben wurde, wird im Folgenden darauf eingegangen, welcher wesentlichen Problemstellung sich die DPS gegenüber konfrontiert sieht und wie ich versuchen werde dies zu untersuchen.
 
-\section{Problemstellung}
-\begin{itemize}
-  \item Vergleich der Startup-Zeit einer containerbasierten Cloudanwendung bei steigender Last. Es soll auf Unterschiede zwischen Spring und Node eingegangen werden.
-  \item insbesondere auf Durchsatz der Instant Payments eingehen
-  \item da anwendung in spring boot ist nicht cloud-fähig weil zu lange für startup, dadurch riskieren wir timeouts also rejects – das ist die besonderheit der anwendung…- ..neuer container muss sofort verfügbar sein! Eine alternative wird gesucht: serverless vespricht minimale startup zeiten!....
-\end{itemize}
+% \section{Problemstellung}
+% \begin{itemize}
+%   \item Vergleich der Startup-Zeit einer containerbasierten Cloudanwendung bei steigender Last. Es soll auf Unterschiede zwischen Spring und Node eingegangen werden.
+%   \item insbesondere auf Durchsatz der Instant Payments eingehen
+%   \item da anwendung in spring boot ist nicht cloud-fähig weil zu lange für startup, dadurch riskieren wir timeouts also rejects – das ist die besonderheit der anwendung…- ..neuer container muss sofort verfügbar sein! Eine alternative wird gesucht: serverless vespricht minimale startup zeiten!....
+% \end{itemize}
 
-Da das Unternehmen im Banking Bereich tätig ist, stellt eine hohe Verfügbarkeit der Komponenten eines der wesentlichen Kernziele dar. Auf die neuen Technologien bezogen, bedeutet dies, dass es zu ermitteln gilt wie viel Zeit ein Skalierungsprozess in einem orchestrierten Komponentenstack im Detail braucht. Dazu müssen diverse Metriken erhoben werden, welche im Kapitel ... \todo{Kapitel Referenz einbinden} beschrieben werden. Wichtig an dieser Stelle, es soll vorallem untersucht werden, inwiefern eine Java-Anwendung als cloudfähig bezeichnet werden kann. Denn wenn sie zu lange zum Starten braucht, werden timeouts riskiert, was es unter allen Umständen zu vermeiden gilt. Eine Alternative versprechen serverless Technologien, welche sich vorallem durch ihre minimale Startzeit für diesen Usecase qualifizieren. Um einen konkreten Vergleich durchführen zu können, wird im zu implementierenden Prototypen jeweils eine Komponente mit dem Java Backend Framework "\emph{Spring Boot}" und eine weitere Komponente mit dem Javascript Framework "\emph{Node.js}" implementiert. 
+\subsection{Begriffserklärung \checkmark}
+
+\paragraph{Cloudtechnologie}
+Der Begriff "\emph{Cloud-Infrastruktur}" wird oft auch unter dem Namen "\emph{Infrastructure-as-a-service (IaaS)}" vermarktet. Er bezieht sich auf das Abstrahieren der Unternehmensinfrastruktur von konkreter Hardware. Es wird generell in drei verschiedene Kategorien unterschieden \cite[Seite~54]{continuous-delivery}:
+
+\begin{enumerate}
+  \item \emph{Private Cloud:} hauseigene Hardware wird virtualisiert in eigenen Rechenzentren betrieben. Hierbei werden die Server bespielsweise als Virtuelle Maschine eingerichtet, anstatt auf einer "\emph{Baremetal-Lösung}" zu basieren, bei der keinerlei Abstrahierung verbaut wurde. Die Grenze zur traditionellen Infrastruktur wird hierbei dadurch gezogen, wie diese Infrastruktur verwaltet wird. Wenn dies durch API-Schnittstellen oder SDKs wie zum Beispiel VMware oder vSphere geschieht, spricht man von der \emph{Cloud}. 
+  \item \emph{Public Cloud:} Bei der privaten Cloud ist das Unternehmen allerdings noch selbst für die Wartung und Instandhaltung der tatsächlich involvierten Hardware zuständig. Bei der Public-Cloud wird dies an externe Dienstleister wie zum Beispiel Amazon (AWS) oder Microsoft (Azure) ausgelagert. Hierbei kommt insbesondere der Begriff \emph{IaaS} zum tragen, da diese Dienstleistung als ein Service betrachtet wird, welcher vom Benutzer nur noch verwendet wird, dessen Ausführung allerdings völlig irrelevant ist.
+  \item \emph{Hybrid Cloud:} dieser Begriff beschreibt eine Mischung der beiden Varianten.
+\end{enumerate}
+
+\paragraph{Komponentenstack}
+Dieser Begriff beschreibt eine Anwendung, die sich aus einer Ansammlung von Komponenten zusammensetzen. Diese einzelnen Komponenten laufen typischerweise jeweils in einem Container, der wiederum von einer Containerisierungsplattform verwaltet wird.
+
+\paragraph{Orchestrierung}
+Dieser Begriff bezieht sich auf das Verwalten von Komponenten eines Systems. Hierbei ist der komplette Lebenszyklus einer Anwendung zu betrachten. Es wird sowohl die Initialisierung, die Ressourcennutzung zur Laufzeit als auch das kontrollierte Herunterfahren der Komponente betrachtet. Obwohl dieser Begriff oftmals im Kontext einer containerisierten Anwendung beziehungsweise eines Komponentenstacks verwendet wird, trifft er ebenfalls auf andere Bereiche. Beispielsweise verwaltet / orchestriert ein IoC Container ebenfalls die betreffenden System-Komponenten.
+
+\paragraph{Backend-Technologie}
+Serverseitige Komponenten basieren auf bestimmten Technologien. Dies können einzelne Programmiersprachen sein, in der Regel sind jedoch unterschiedliche Frameworks gemeint, die verwendet werden, können um die geforderte Business-Logik zu implementieren.
+
+\paragraph{Serverless-Technologie}
 
 
-\section{Lösungsweg}
-\begin{itemize}
-  \item Prinzip / Ablauf erklären
-  \item Grundlegende Struktur des Prototypen erklären
-  \item vergleich der startupzeiten zwischen serverless und aktueller springboot variante anhand eines jeweils protypen und fiktiven workflows und fiktiven lastszenarios in einer cloud umgebung und messung des startup verhaltens bei plötzlich auftetenen spitzen oder so….
-\end{itemize}
+\subsection{Kernziele \checkmark}
+Da das Unternehmen im Banking Bereich tätig ist, stellt eine hohe Verfügbarkeit der Komponenten eines der wesentlichen Kernziele dar. Auf die neuen Technologien bezogen, bedeutet dies, dass es zu ermitteln gilt, wie viel Zeit ein Skalierungsprozess in einem orchestrierten Komponentenstack im Detail braucht. Dazu müssen diverse Metriken erhoben werden, welche im Kapitel \ref{sec:startupAnforderungen} beschrieben werden. Wichtig an dieser Stelle, es soll vor allem untersucht werden, inwiefern eine Java-Anwendung als cloudfähig bezeichnet werden kann. Denn wenn die Initialisierungsphase zu viel Zeit in Anspruch nimmt, werden Timeouts riskiert, was es unter allen Umständen zu vermeiden gilt. Eine Alternative versprechen serverless Technologien, welche sich vorallem durch ihre minimale Startzeit für diesen Usecase qualifizieren.
 
-Um festzustellen wie gut eine Spring- beziehungsweise eine Node.js-Komponente tatsächlich geeignet ist, wird ein fiktiver Workflow mittels eines Komponentenstacks implementiert, der in der Lage ist verschiedene Lastszenarien abarbeiten zu können. Hierbei ist es dem Benutzer möglich dynamisch zwischen der Spring- und Node-Komponente zu wechseln um einen entsprechenden Vergleich anstellen zu können. Es werden diverse Skripte bereitgestellt die es dem Benutzer erlauben beliebig komplexe Lasten zu simulieren. Um eine Auswertung auch grafisch aufarbeiten zu können, wird der Stack ebenfalls mit Komponenten zur Visualisierung ausgestattet. Diese Elemente zur Visualisierung greifen dabei nicht in den Ablauf des restlichen Stacks ein, sondern greifen lediglich auf bereits bestehende Schnittstellen zurück um einen möglichst ungestörten Ablauf und damit unverfälschte Datensätze zu garantieren. 
 
-Der wesentliche Usecase des Systems wird die Verarbeitung von generierten Payments sein, welche nach mehreren  fiktiven Arbeitsschritten Datensätze generieren. Der genaue Gegenstand der Bearbeitung ist allerdings eher nebensächlich, da er so gut wie keinen Einfluss auf die für diesen Usecase interessanten Metriken hat. 
+\section{Lösungsweg \checkmark}
 
-% \todo{Bild einfügen}
+% \begin{itemize}
+%   \item Prinzip / Ablauf erklären
+%   \item Grundlegende Struktur des Prototypen erklären
+%   \item vergleich der startupzeiten zwischen serverless und aktueller springboot variante anhand eines jeweils protypen und fiktiven workflows und fiktiven lastszenarios in einer cloud umgebung und messung des startup verhaltens bei plötzlich auftetenen spitzen oder so….
+% \end{itemize}
 
-% Im Folgenden werde ich grob die Zuständigkeiten der verschiedenen Stack-Komponenten erläutern.
+Um festzustellen, wie gut die jeweils betrachtete Backend-Technologie im Endeffekt für den Betrieb in einer containerbasierten Anwendung tatsächlich geeignet ist, wird ein fiktiver Workflow mit Hilfe eines Komponentenstacks implementiert, der in der Lage ist, verschiedene Lastszenarien abarbeiten zu können. Hierbei ist es dem Benutzer möglich, testweise zur Laufzeit zwischen den verwendeten Backend-Technologien zu wechseln, um einen entsprechenden Vergleich anstellen zu können. Es werden diverse Skripte bereitgestellt, die es dem Benutzer erlauben, beliebig komplexe Lasten zu simulieren. Um eine Auswertung auch grafisch aufarbeiten zu können, wird der Stack ebenfalls mit Komponenten zur Visualisierung ausgestattet. Diese Visualisierungs-Elemente greifen dabei nicht in den Ablauf des restlichen Stacks ein, sondern kommunizieren lediglich mit bereits bestehende Schnittstellen um einen möglichst ungestörten Ablauf und damit unverfälschte Datensätze zu garantieren. 
 
-% \begin{enumerate}
-
-%   \item Um verschiedene Metriken bezüglich der Verarbeitungs- sowie Startupgeschwindigkeiten der einzelnen System-Komponenten berechnen zu können, wird ein Stack aus verschiedenen Containern aufgebaut. Der Benutzer ist in der Lage über eine Schnittstelle Lasttests zu starten. Um diese Anfragen nicht selbst ausführen zu müssen greift er hierzu auf diverse Bash-Skripte zurück. 
-%   \item Diese Anfragen werden von einer ersten Komponente "\emph{supplier-backend}" entgegengenommen. Die Komponente generiert aus diesen Benutzeranfragen tatsächliche Nachrichten, die vom System verarbeitet werden können. An diese Nachrichten werden neben dem eigentlichen XML Inhalt auch noch weitere Informationen angeheftet, die es im späteren Verlauf erleichtern die Metrikinformationen zu gewinnen. 
-%   \item Die generierten Nachrichten anschließend an einen Message Broker übergeben, der als ein Verteilerknoten für darauf folgende Komponenten betrachtet werden kann. 
-
-%   \todo{ist noch nicht fertig}
-
-% \end{enumerate}
+Der wesentliche Usecase des Systems besteht in der Verarbeitung von generierten Payments, welche nach mehreren fiktiven Arbeitsschritten verschiedenste Datensätze generieren. Der genaue Gegenstand der Bearbeitung ist allerdings eher nebensächlich, da er so gut wie keinen Einfluss auf die für diesen Usecase interessanten Metriken besitzt. 
