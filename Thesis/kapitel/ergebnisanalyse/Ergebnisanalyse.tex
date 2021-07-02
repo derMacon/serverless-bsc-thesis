@@ -72,35 +72,74 @@ Diese Gruppe von Metriken bezieht sich auf die genauen Zeiträume, welche benöt
 \paragraph{Aufschlüsselung nach Services}
 Die abstrakteste Metrik bezieht sich auf den durchschnittlichen Zeitraum zum Initialisieren der Container eines bestimmten Services. Hierbei wird zwischen der Node.js sowie Spring-Boot-Komponente zum konsumieren der Eingangsnachrichten unterschieden. Die Container, welche eine Node.js Instanz beinhalten, benötigen im Schnitt 6.6 Sekunden zum Hochfahren, während diejenigen mit einer Spring-Instanz 35.3 Sekunden brauchen. Diese relativ großen Zeiträume lassen sich unter anderem auf die Anzahl der hochgefahrenen Instanzen zurückführen. Eine genauere Aufschlüsselung dieses Prozesses erfolgt in den nächsten Abschnitten. 
 
+
 \begin{figure}
-  \begin{tikzpicture}
-    \begin{axis}[
-        width  = 0.3*\textwidth,
-        height = 8cm,
-        major x tick style = transparent,
-        ybar=2*\pgflinewidth,
-        bar width=14pt,
-        ymajorgrids = true,
-        ylabel = {{\o} Initialisierungsgeschw.},
-        symbolic x coords={Node.js,Spring Boot},
-        xtick = data,
-        scaled y ticks = false,
-        enlarge x limits=0.25,
-        ymin=0,
-        legend cell align=left,
-        legend style={
-                at={(1,1.05)},
-                anchor=south east,
-                column sep=1ex
-        }
-    ]
-        \addplot[style={bblue,fill=bblue,mark=none}]
-            coordinates {(Node.js,6.610) (Spring Boot,35.336)};
-    \end{axis}
-  \end{tikzpicture}
-  \centering
-  \caption[Startzeit Container - Service]{Startzeit Serviceübersicht}
-  \label{fig:specContainers}
+	\centering
+	\begin{minipage}[b]{0.4\textwidth}
+		\begin{tikzpicture}
+			\begin{axis}[
+					width  = 0.8\textwidth,
+					height = 8cm,
+					major x tick style = transparent,
+					ybar=2*\pgflinewidth,
+					bar width=14pt,
+					ymajorgrids = true,
+					xlabel = {Service},
+					ylabel = {{\o} Initialisierungsgeschw.},
+					symbolic x coords={Node.js,Spring Boot},
+					xtick = data,
+					scaled y ticks = false,
+					enlarge x limits=0.25,
+					ymin=0,
+					legend cell align=left,
+					legend style={
+						at={(1,1.05)},
+						anchor=south east,
+						column sep=1ex
+					}
+				]
+				\addplot[style={bblue,fill=bblue,mark=none}]
+				coordinates {(Node.js,6.610) (Spring Boot,35.336)};
+			\end{axis}
+		\end{tikzpicture}
+		\caption[Startzeit Container - Service]{Serviceübersicht}
+		\label{fig:specContainers}
+	\end{minipage}%
+	\begin{minipage}[b]{0.6\textwidth}
+		\begin{tikzpicture}
+			\begin{axis}[
+					width  = 0.9\textwidth,
+					height = 8cm,
+					major x tick style = transparent,
+					ybar=2*\pgflinewidth,
+					bar width=14pt,
+					ymajorgrids = true,
+					xlabel = {Skalierungsstufe},
+					ylabel = {{\o} Initialisierungsgeschw.},
+					symbolic x coords={Stufe1,Stufe2,Stufe3},
+					xtick = data,
+					scaled y ticks = false,
+					enlarge x limits=0.25,
+					ymin=0,
+					legend cell align=left,
+					legend style={
+						at={(1,1.05)},
+						anchor=south east,
+						column sep=1ex
+					}
+				]
+				\addplot[style={bblue,fill=bblue,mark=none}]
+				coordinates {(Stufe1,2.976) (Stufe2,3.892) (Stufe3,6.898)};
+				
+				\addplot[style={ggreen,fill=ggreen,mark=none}]
+				coordinates {(Stufe1,8.056) (Stufe2,16.019) (Stufe3,36.582)};
+				
+				\legend{Node.js,Spring Boot}
+			\end{axis}
+		\end{tikzpicture}
+		\caption[Startzeit Container - Stufenweise]{Stufenübersicht}
+		\label{fig:specContainers}
+	\end{minipage}
 \end{figure}
 
 
@@ -108,45 +147,6 @@ Die abstrakteste Metrik bezieht sich auf den durchschnittlichen Zeitraum zum Ini
 Um einen beispielhaften Skalierngsalgorithmus zu implementieren wurde ein Regelsatz verfasst welcher vom Alert-Manager zur Laufzeit automatisch in einem festgelegten Interval ausgewertet wird. Um diesen Regelsatz zu Vorführungszwecken nicht unnötig ausführlich zu gestalten, wurde das Hinzufügen neuer Instanzen in Stufen organisiert. 
 
 Im durchgeführten Testszenario betrug die Grenze zum Überschreiten der ersten Stufe 15, für die zweite Stufe 30 und für die Dritte Stufe 100 unbeantwortete Nachrichten in der jeweiligen Warteschlange. Wenn im Folgenden von einem Burst gesprochen wird, ist hiermit das Überschreiten einer dieser Grenzen gemeint. Bei dem kleinst möglichen Burst bezüglich der Warteschlange der Node.js-Komponente, nimmt das System im Schnitt 2.9 Sekunden zum Starten der Container in Anspruch um der Arbeitslast nach Skalierung mit insgesamt 5 Containern zu begegnen. Bei der Spring-Boot-Komponente wurde hierfür ein Wert von 8 Sekunden gemessen. Im mittleren Grenz-Intervall wurde bezüglich Node.js eine Initialisierungsdauer von 3.8 Sekunden und auf Seiten von Spring 16 Sekunden festgestellt um nach der Skalierung mit 10 Instanzen zu arbeiten. Beim höchsten Burst werden kam es zu einer bei Node.js zu einer Initialisierungsphase von 6.9 Sekunden und bezüglich Spring zu 36.6 Sekunden. Hierbei sollen am Ende 30 Containerinstanzen des Konsumenten arbeitsbereit sein. Da beim Skalierungsalgorithmus mit den beschriebenen Stufen gearbeitet wird, kann hierbei nicht genau gesagt werden, wie viele Container genau im Endeffekt initialisiert wurden, da hierbei stets mit den Differenzen zwischen den Stufen gearbeitet wird. Wenn zum Beispiel bereits \emph{n} Container laufen wenn neue Nachrichten einen Burst verursachen, sollen nur die benötigten Instanzen kreiert werden, um genau die fehlende Anzahl zu decken. Die genaue Übersicht nach parallelen Instanziierungen wurde im Paragraphen (siehe Abschnitt \ref{par:specContainer}) genauer beschrieben.
-
-
-\begin{figure}
-  \begin{tikzpicture}
-    \begin{axis}[
-        width  = 0.5*\textwidth,
-        height = 8cm,
-        major x tick style = transparent,
-        ybar=2*\pgflinewidth,
-        bar width=14pt,
-        ymajorgrids = true,
-        xlabel = {Skalierungsstufe},
-        ylabel = {{\o} Initialisierungsgeschw.},
-        symbolic x coords={Stufe1,Stufe2,Stufe3},
-        xtick = data,
-        scaled y ticks = false,
-        enlarge x limits=0.25,
-        ymin=0,
-        legend cell align=left,
-        legend style={
-                at={(1,1.05)},
-                anchor=south east,
-                column sep=1ex
-        }
-    ]
-        \addplot[style={bblue,fill=bblue,mark=none}]
-            coordinates {(Stufe1,2.976) (Stufe2,3.892) (Stufe3,6.898)};
-
-        \addplot[style={ggreen,fill=ggreen,mark=none}]
-            coordinates {(Stufe1,8.056) (Stufe2,16.019) (Stufe3,36.582)};
-
-        \legend{Node.js,Spring Boot}
-    \end{axis}
-  \end{tikzpicture}
-  \centering
-  \caption[Startzeit Container - Stufenweise]{Startzeit Container - Stufenweise}
-  \label{fig:specContainers}
-\end{figure}
-
 
 
 \paragraph{Aufschlüsselung nach Containeranzahl}
@@ -167,6 +167,82 @@ Die grundlegendste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gle
   \end{tikzpicture}
 \end{figure}
 
+
+\begin{figure}
+  \centering
+  % \parbox{10cm}{
+    \begin{minipage}[b]{0.4\textwidth}
+      % \vspace{1cm}
+    \begin{tikzpicture}
+      \begin{axis}[
+          width  = 0.8\textwidth,
+          height = 8cm,
+          major x tick style = transparent,
+          ybar=2*\pgflinewidth,
+          bar width=14pt,
+          ymajorgrids = true,
+          xlabel = {Service},
+          ylabel = {{\o} Initialisierungsgeschw.},
+          symbolic x coords={Node.js,Spring Boot},
+          xtick = data,
+          scaled y ticks = false,
+          enlarge x limits=0.25,
+          ymin=0,
+          legend cell align=left,
+          legend style={
+                  at={(1,1.05)},
+                  anchor=south east,
+                  column sep=1ex
+          }
+      ]
+          \addplot[style={bblue,fill=bblue,mark=none}]
+              coordinates {(Node.js,6.610) (Spring Boot,35.336)};
+      \end{axis}
+    \end{tikzpicture}
+      % \vspace{1cm}
+    \caption[Startzeit Container - Service]{Serviceübersicht}
+    \label{fig:specContainers}
+\end{minipage}%
+    \begin{minipage}[b]{0.6\textwidth}
+      \begin{tikzpicture}
+          \begin{axis}[
+              width  = 0.9\textwidth,
+              height = 8cm,
+              major x tick style = transparent,
+              ybar=2*\pgflinewidth,
+              bar width=14pt,
+              ymajorgrids = true,
+              xlabel = {Skalierungsstufe},
+              ylabel = {{\o} Initialisierungsgeschw.},
+              symbolic x coords={Stufe1,Stufe2,Stufe3},
+              xtick = data,
+              scaled y ticks = false,
+              enlarge x limits=0.25,
+              ymin=0,
+              legend cell align=left,
+              legend style={
+                      at={(1,1.05)},
+                      anchor=south east,
+                      column sep=1ex
+              }
+          ]
+          \addplot[style={bblue,fill=bblue,mark=none}]
+              coordinates {(Stufe1,2.976) (Stufe2,3.892) (Stufe3,6.898)};
+
+          \addplot[style={ggreen,fill=ggreen,mark=none}]
+              coordinates {(Stufe1,8.056) (Stufe2,16.019) (Stufe3,36.582)};
+
+          \legend{Node.js,Spring Boot}
+      \end{axis}
+    \end{tikzpicture}
+    \caption[Startzeit Container - Stufenweise]{Stufenübersicht}
+    \label{fig:specContainers}
+    % }
+  \end{minipage}
+
+\end{figure}
+
+
 \paragraph{Zeitliche Aufschlüsselung}
 Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurde diverse Panels zur Zeitlichen Übersicht bereitgestellt. Diese wurden allerdings vor allem zu Kontrollzwecken implementiert. Diese visuelle Darstellung war während der Entwicklungszeit sehr hilfreich um Fehler frühzeitig zu erkennen und beheben zu können, für die Auswertung der Ergebnisse haben diese allerdings wenig Relevanz. Der Vollständigkeit halber soll an dieser Stelle dennoch eine kurze Zusammenfassung der zeitbasierten Messwerte erfolgen. Für alle bisher behandelten Metriken gibt es Panels im Grafana Dashboard. Da die zeitliche Erfassung in Grafana selbst allerdings intervallbasierte Abfragen stellt, sind diese im Vergleich zu den Werten, welche in der Datenbank durch das System selbst generiert und Abgelegt wurden, sehr ungenau. Selbstverständlich wurde in der bisherigen Analyse ausschließlich auf diese Daten zurückgegriffen. Bezüglich der Konsumenten wurde neben dem insgesamten durchschnittlichen Startverhalten auch der jeweils aktuelle Initialisierungszeitpunkt dargestellt. Hierbei war eine klare Korrelation zwischen der Anzahl der parallel startenden Konsumenten mit der Erhöhten Initialisierungsdauer zu beobachten. Außerdem wurden diverse Metriken aus dem Activemq selbst ausgelesen. So ist es zum Beispiel möglich nachzuvollziehen, wie viele Nachrichten sich zu einem gegebenen Zeitpunkt nicht nur in einer bestimmten Warteschlange sondern auch innerhalb des ganzen Systems befinden. Außerdem wurde die zeitliche Abfolge zwischen einem Burst an unbeantworteten Nachrichten und dem Anstieg der Containerinstanzen in einem Dashboard-Panel dargestellt.
 
@@ -176,7 +252,6 @@ Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurde diverse Panels zur Zei
 	\caption[]{Grafana Dashboard}
 	\label{fig:grafanaScreenshot01}
 \end{figure}
-
 
 
 \section{Analyse}
