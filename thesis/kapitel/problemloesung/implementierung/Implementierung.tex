@@ -284,8 +284,8 @@ Das Muster, nach dem sämtliche Komponenten des Komponenten-Stacks entwickelt wu
 \end{itemize}
 
 
-\subparagraph{Programmfluss}
-In Listing \ref{lst:supplierBenchmarkEndpoint} ist die Definition desjenigen Endpunktes zu erkennen, der als primärer Einstiegspunkt für die eingehenden Anfragen gilt. Sobald der Benutzer eine Eingabe tätigt und der Endpunkt angesprochen wird, übersetzt eine Objectmapper Instanz den erhaltenen String in eine Datenstruktur, welche alle relevanten Informationen enthält. Die Methode wurde außerdem mit einer \emph{Transactional}-Annotation versehen, die es ermöglicht das Übermitteln mehrere Nachrichten an eine Queue in einer Transaktion durchzuführen (siehe \todo{Referenz} einfügen), dies wird im späteren Verlauf von Bedeutung sein. Im Spring-Framework muss jedoch bereits der Einstiegspunkt mit einer solchen Annotation versehen werden, um zu gewährleisten, dass die aufgerufenen Logikbausteine alle im selben Transaktion-Kontext ausgeführt werden \todo{Quelle?}.
+\subparagraph{Programmfluss - Endpunkt Benutzeroberfläche}
+In Listing \ref{lst:supplierBenchmarkEndpoint} ist die Definition desjenigen Endpunktes zu erkennen, der als primärer Einstiegspunkt für die eingehenden Anfragen der Benutzeroberfläche gilt. Sobald der Benutzer eine Eingabe tätigt und der Endpunkt angesprochen wird, übersetzt eine Objectmapper Instanz den erhaltenen String in eine Datenstruktur, welche alle relevanten Informationen enthält. Die Methode wurde außerdem mit einer \emph{Transactional}-Annotation versehen, die es ermöglicht das Übermitteln mehrere Nachrichten an eine Queue in einer Transaktion durchzuführen (siehe \todo{Referenz} einfügen), dies wird im späteren Verlauf von Bedeutung sein. Im Spring-Framework muss jedoch bereits der Einstiegspunkt mit einer solchen Annotation versehen werden, um zu gewährleisten, dass die aufgerufenen Logikbausteine alle im selben Transaktion-Kontext ausgeführt werden \todo{Quelle?}.
 
 \begin{lstlisting}[style=javaStyle,caption={Supplier - Endpunkt},label=lst:supplierBenchmarkEndpoint]
 
@@ -367,17 +367,55 @@ In Listing \ref{lst:supplierServiceImpl} ist zu erkennen, wie die Abarbeitung ei
 
   \item Zeile 15: Diese Callback Funktion gibt den Warteschlangennamen aus zu dem die generierten Nachrichten geschickt werden sollen.
   
-  \item Zeile 16: Abhängig davon, ob es sich um eine Anfrage, die in einer Transaktion durchgeführt werden soll oder nicht, wird für das Callback eine Spring-Bean zur Datenübermittlung zum Message-Broker verwendet, die mit einem Transaction Flag versehen wurde oder nicht. Diese Funktion stellt beim Absenden der Nachrichten die Schnittstelle zum Messagebroker dar.
+  \item Zeile 16: Abhängig davon, ob es sich um eine Anfrage, die in einer Transaktion durchgeführt werden soll oder nicht, wird für das Callback eine Spring-Bean zur Datenübermittlung zum Message-Broker verwendet, die mit einem Transaction Flag versehen wurde oder nicht. In Listing \ref{lst:supplierBiConsumer} ist erkenntlich, dass hierbei je nach gesetztem Flag eine Auswahl eines vorkonfigurierten JmsTemplates erfolgt. Dieses Template stellt eine weitere Abstraktionsstufe zwischen Komponente und Broker dar. Sie wird vom Framework gestellt, die Verbindung muss jedoch über Klassen im \emph{config} Package konfiguriert werden. Diese Funktion stellt beim Absenden der Nachrichten die Schnittstelle zum Messagebroker dar.
 
   \item Zeile 27: Es werden Nachrichten generiert, die von den weiteren Stack-Komponenten verarbeitet werden können.
+
+  \item Zeile 34: Die Nachrichten werden an die Broker-Schnittstelle übergeben.
+
+  \item Zeile 36: Je nachdem ob bei der eingegangenen Nachricht ein Zeitraum angegeben wurde über den die Nachrichten abgeschickt werden soll, wird an dieser Stelle ein entsprechender Sleep-Aufruf durchgeführt.
 
 \end{itemize}
 
 
+\begin{lstlisting}[style=javaStyle,caption={Supplier - Bi Consumer},label=lst:supplierBiConsumer]
+
+  ...
+
+  public BiConsumer<PaymentMessage, Supplier<String>> getConsumer(boolean sessionIsTransacted) {
+    return sessionIsTransacted
+            ? (message, destGen) -> sendObjPaymentQueueMessage(
+            transactedJmsTemplate, message, destGen)
+            : (message, destGen) -> sendObjPaymentQueueMessage(
+            nonTransactedJmsTemplate, message, destGen);
+  }
+
+  ...
+
+\end{lstlisting}
+
+
+\subparagraph{Programmfluss - Endpunkt Eingabedatei}
+Da die Lastentests primär mit Hilfe diverser Bash-Skripte ausgeführt werden, gibt es einen weiteren Endpunkt für diesen Anwendungsfall. Nachdem Textnachrichten auf die Grammatik geprüft und in eine Objektstruktur konvertiert wurden, über die iteriert werden kann, wird allerdings die selbe Schnittstelle wie schon beim Gui-Aufruf angesteuert, da sich die darunter liegende Logik in keinster Weise unterscheidet. In Listing \ref{lst:supplierParserEndpoint} ist der erwähnte Endpunkt zu erkennen.
+
+\begin{lstlisting}[style=javaStyle,caption={Supplier - Bi Consumer},label=lst:supplierParserEndpoint]
+  @Autowired
+  private RequestParserService parserService;
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @RequestMapping(value = "/benchmark",
+          method = POST,
+          consumes = TEXT_PLAIN_VALUE)
+  public void parseBenchmark(@RequestBody String textValue) {
+      new Thread(() -> parserService.runRequest(textValue)).start();
+  }
+\end{lstlisting}
+
+Ähnlich wie bei ersten Endpunkt gibt es wieder ein Transaktion-Context eröffnet. Bezüglich der Http-Anfrage hat sich lediglich geändert, dass nun anstatt eines Json-Wertes eine Textnachricht erwartet wird, da die hinterlegte Grammatik nicht mit einem Json-Format kompatibel ist \todo{schauen ob Grammatik ueberhaupt vorher erklaert wurde}. Um zu ermöglich, dass mehrere Benchmark Dateiinhalte das System direkt hintereinander mit Werten versorgen kann, wird hier mit jeder eingehenden Anfrage ein neuer Thread gestartet. Dies stellt auch sicher, dass die Anfragen direkt hinterlegt werden und alte Anfragen nicht erst abgearbeitet werden müssen bevor neue angenommen werden können. Der Zwischenschritt des Übersetzens der Grammatik in tatsächlich ausführbare Anweisung erfolgt in einer dedizierten Service-Komponente. Damit es zu keiner Verfälschung der Ergebnisse kommt, ist es von größter Bedeutung, dass lediglich nur ein einziger Thread mit der Ausführung der eigentlichen Tests zur Zeit betraut wird. Wenn es hierbei zu einem nebenläufigen Verhalten kommen sollte, würde dies die verfügbaren Resourcen einschränken und die Werte würden Ungenauigkeiten aufweisen, was es unter allen Umständen zu vermeiden gilt. Um diesem Problem entgegenzuwirken, wurde im \emph{Parser-Service} eine Semaphore eingeführt, die sicherstellt, dass stets nur ein Thread arbeitet. Das Ausführen einer Anfrage wird demnach in einem kritischen Abschnitt ausgeführt. \todo{weiterschreiben}
+
 
 \paragraph{Build}
-
-
+Da alle Spring Projekte dieses Stacks mit einem fast identischen Dockerfile versehen wurden, gilt die folgende Beschreibung in gleichem Maß für alle weiteren Spring-Projekte. \todo{Multistage Build erklären / Quelle raussuchen}
 
 
 
