@@ -1,0 +1,48 @@
+\section{Anforderungen an Prototypen}
+% \begin{itemize}
+%   \item einmal als spring boot und einer weiteren variante mit einer cloud-native technologie -> hier wurde vorgegeben mit serverless zu arbeiten.
+% \end{itemize}
+
+Bei diesem Projekt sollen sowohl Orchestrierungsplattformen als auch die tatsächlich laufende Runtime Umgebung beziehungsweise ein entsprechendes Framework verglichen werden. 
+
+Hinsichtlich der Skalierung soll es beispielsweise möglich sein, anhand festgelegter Regeln eine automatische \emph{horizontale} Skalierung stattfinden. Dieses Verhalten soll sowohl in hinterlegten Datensätzen als auch mittels eines eigens dafür eingerichteten Dashboards nachvollziehbar dargestellt werden. Auf welche Technologien sowohl bei der Skalierung sowie der Darstellung beziehungsweise Berechnung der Metriken zurückgegriffen wird, wird vom Arbeitgeber nicht vorgegeben. Lediglich hinsichtlich der Komponenten zur Verarbeitung der Business Logik wurde eine Vorauswahl getroffen. Wie bereits angedeutet, wird die aktuell laufende Java Enterprise Applikation mit dem moderneren Spring Boot Framework ersetzt um einen aktuelleren Vergleichspunkt bezüglich der service-basierten Struktur zu erlagen, da beide Frameworks sehr gut für das Entwerfen von Microservices geeignet sind. Um einen sinnvollen Vergleichspunkt anzusetzen, wird dem eine cloud-native Technologie gegenübergestellt. "Cloud Native beschreibt einen Software-Entwicklungs-Ansatz, bei dem Applikationen von Anfang an für den Einsatz in der Cloud konzipiert werden. Das Ergebnis sind Native-Cloud-Applikationen (NCAs), die die Stärken der Cloud-Computing-Architektur vollständig zu nutzen wissen." \cite{cn-def} Mit dieser doch relativ abstrakt gehaltenen Definition, sind hinsichtlich der verarbeitenden Komponenten allerdings in erster Linie die modernen Skript-Frameworks gemeint. Hierbei gibt es mehrere Alternativen, wo es seitens des Arbeitgebers allerdings ebenfalls keinerlei genaue Vorgaben hinsichtlich des spezifischen Frameworks / Technologie gibt.
+
+\subsection{Festlegung fiktiver Workflow}
+\label{ss:fiktiverWorkflow}
+% Der Prototyp soll als ein Demoprojekt beziehungsweise als ein \emph{Proof of concept} hinsichtlich der Skalierungsalgorithmen gestaltet werden. Um praxisrelevant
+
+Der Prototyp soll eine bereits bestehende Applikation nachbilden, welche die Zahlungsabwicklung sogenannter Echtzeitüberweisungen durchführt. "\emph{Die Echtzeitüberweisung (englisch Instant Payment) ist eine Zahlungsart, bei der Guthaben innerhalb weniger Sekunden dem Empfänger final gutgeschrieben werden. Inzwischen gibt es in zahlreichen Ländern weltweit Echtzeitzahlungssysteme. Im einheitlichen Euro-Zahlungsverkehrsraum, dem sogenannten Sepa-Raum, gibt es seit 21. November 2017 einen entsprechenden Standard: Die Sepa Instant Payments (SCTInst) sind 24 Stunden an 365 Tagen im Jahr verfügbar. Die Gutschrift muss in maximal 10 Sekunden erfolgen, faktisch werden die meisten Transaktionen allerdings in weniger als 3 Sekunden durchgeführt.}" \cite{instpay-def}
+
+Da der Fokus auf der Untersuchung der Startupzeit der Komponenten liegt, wird lediglich eine minimale beispielhafte Implementierung erfolgen, welche die Arbeitsschritte der eigentlichen Applikation vereinfacht darstellen soll. Es soll im Rahmen dieser Arbeit eher als ein \emph{proof of concept} gelten. Allerdings werden im System konkrete Nachrichten im XML Format vermittelt, welche einer XSD-Spezifikation folgen wie sie im realen Umfeld ebenfalls genutzt wird. 
+
+\todo{Auszug aus XML einbinden???}
+
+Sobald eine neue Nachricht eingetroffen ist, sollen drei Arbeitsschritte ausgeführt werden:
+
+\begin{enumerate}
+
+  \item Es soll geprüft werden, ob das eingegangene XML der XSD-Spezifikation folgt oder nicht. Wenn dies nicht der Fall sein sollte, wird die Nachricht zwar derartig acknowledged, dass sie zwar aus der Eingangsqueue im Message Broker enfernt wird, allerdings bei der Verarbeitung ignoriert wird.
+
+  \item Falls es sich um valides XML handelt, wird ein Feld aus dem XML-Inhalt ausgelesen.
+
+  \item in einem letzten Schritt wird dieses Element in eine Datenbank geschrieben damit auch eine Persistenz-Operation in die Verarbeitungszeit einfließt.
+
+\end{enumerate}
+
+\subsection{Spring Boot}
+Wie bereits angedeutet, wird die aktuell laufende Java Enterprise Applikation mit dem moderneren Spring Boot Framework ersetzt. Um einen sinnvollen Vergleichspunkt anzusetzen, wird dem eine cloud-native Technologie gegenübergestellt. Die Komponenten sollen beide die beschriebenen Arbeitsschritte abbilden.
+
+\subsection{Serverless}
+\begin{itemize}
+  \item  4.2.2 spring boot 4.2.3 serverless -> so bekommt der prof schon beim draufgucken auf das inhaltsverzeichnis die story mit….
+\end{itemize}
+Um der kompilierten Spring Boot Anwendung eine Technologie ein auf skalierbare Komponenten ausgelegt Technologie gegenüberzustellen, wird hierbei auf eine cloud-native Technologie gesetzt. "\emph{Cloud Native beschreibt einen Software-Entwicklungs-Ansatz, bei dem Applikationen von Anfang an für den Einsatz in der Cloud konzipiert werden. Das Ergebnis sind Native-Cloud-Applikationen (NCAs), die die Stärken der Cloud-Computing-Architektur vollständig zu nutzen wissen.}" \cite{cn-def} Mit dieser doch relativ abstrakt gehaltenen Definition, sind hinsichtlich der verarbeitenden Komponenten allerdings in erster Linie die modernen Skript-Frameworks gemeint. Hierbei gibt es mehrere Alternativen, wo es seitens des Arbeitgebers allerdings ebenfalls keinerlei genaue Vorgaben hinsichtlich des spezifischen Frameworks / Technologie gibt.
+
+\section{Anfoderungen an Containerisierungsplattform / Orchestrierungsplattform}
+Es gibt zwar diverse Containerisierungsplattformen \todo{continuous delivery zitieren und aufzaehlen} dennoch hat sich vorallem die Technologie "\emph{Docker}" durchgesetzt, die Vorteile und generelle Funktionsweise wurden bereits relativ ausführlich erläutert. Deshalb soll diese auch im Prototypen Verwendung finden. Hinsichtlich der Orchestrierungsplattform (welche auch als \emph{Clustering Werkzeug} dient) werden folgende Anforderungen formuliert. 
+
+\section{Anforderungen an Lasttest}
+Es soll möglich sein, das System in einem einheitlichen Format mit Nachrichten zu versorgen. Hierfür benötigt man eine Benutzerschnittstelle, die es ermöglicht dem Benutzer möglichst aussagekräftige Befehle ohne allzu viel Konfigurationsaufwand zur Verfügung zu stellen. Diese Befehle müssen anschließend intern wiederum in detailierte Nachrichten umgewandelt werden, welche durch das System gereicht werden können. Hierfür gibt es die Möglichkeit einer Benutzeroberfläche im Browser oder der Festlegung eines Formats im Body einer Http-Anfrage an eine REST-Api. Eine Skalierung auf meherere Systeme sollte zwar einmal testweise erfolgen, für die Generierung der Metriken ist dies allerdings eher hinderlich, da es die Ergebnisse verfälschen könnte. Da es dem Design der Orchestrierungsplattform geschuldet ist, dass der Anwender wenig Einfluss auf die Resourcenzuteilung hat, kann es passieren, dass eine leistungsschwächere Maschine deutlich mehr Initialisierungsanfragen zugewiesen bekommt. Dies könnte man zwar dadurch umgehen, dass man zwei exakt gleichbestückte Server für den Lastentest verwendet. Hierbei würden im Nachhinein allerdings die gleichen Ergebnisse erlangt werden, wie bei Testlauf auf einer Maschine.
+
+\section{Anforderungen Visualiserung und Monitoring zur Unterstützung der Auswertung}
+Es muss möglich sein, Metriken automatisch vom System generiern zu lassne. Dazu müssen die Datensätze persistent hinterlegt werden, um auch im Nachhinein nachvollziehen zu können wie die Metriken entstanden sind. Außerdem muss eine grafische Aufarbeitung erfolgen. Diese Visualierung soll in Echtzeit oder einem zeitlich festgelegten Intervall aktualisiert werden können. Bezüglich des genauen Werkzeugs werden keinerlei Vorgaben gegeben, um dem Benuzter jedoch jeglichen Installationsaufwand zu ersparen wäre eine webbasierte Darstellung sicherlich von Vorteil.

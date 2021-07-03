@@ -2,9 +2,7 @@
 
 Nachdem im letzten Abschnitt auf mögliche Kriterien zur Messung der relevanten Metrikinformationen eingegangen wurde, erfolgt im folgenden eine spezifische Festlegung auf bestimmte Kriterien, welche auf das zu lösende Problem zugeschnitten werden.
 
-\subsection{Komponentenmodell}
-
-\paragraph{Schichtenmodell}
+\subsection{Schichtenmodell}
 Der Arbeitsfluss der Anwendung wurde in Abbildung \ref{fig:stackOverview} visuell dargestellt. Die unterschiedlichen Komponenten wurden dabei in vier verschiedene Schichten eingeteilt: 
 
 \begin{itemize}
@@ -23,26 +21,26 @@ Der Arbeitsfluss der Anwendung wurde in Abbildung \ref{fig:stackOverview} visuel
 
 
 
-\paragraph{Komponenten im Überblick}
+\subsection{Komponenten im Überblick}
 Es folgt eine kurze Zusammenfassung der Funktionalität sowie der Anforderungen an die jeweligen Komponenten.
 
-\subparagraph{Input}
+\subsubsection{Input}
 Um es dem Benutzer zu ermöglichen gezielte Messwerte zu erfassen, wird eine REST-Schnittstelle vom System bereitgestellt. Es ist zwar möglich, dass der Benutzer selbstständig Anfragen für diese Schnittstelle generiert und absendet, es ist allerdings beabsichtigt, dass der Benutzer auf vordefinierte Skript oder eine entsprechende Benutzeroberfläche zurückgreift. Die Benutzeroberfläche ist sehr funktional gehalten, sodass es zwar möglich ist hierüber Anfragen an das System zu stellen, dennoch empfiehlt sich gerade für komplexere Anfrageszenarien der Gebrauch von bereitgestellten Bash-Skripten. Bezüglich der Skripte gibt es ebenfalls eine diverse Abstraktionsschichten. So ist es zum Beispiel möglich mittels einer definierten Grammatik Anforderungen zu definieren welche sich beliebig kombinieren lassen. Hierzu wurden mehrere vordefinierte Dateien angelegt, welche über ein entsprechendes Skript an das Backend geschickt werden kann. Allerdings gibt es Skripte die auf diesem Prozess aufsetzen, sodass der Endbenutzer sich hiermit nicht auseinandersetzen muss. 
 
 
-\subparagraph{Supplier}
+\subsubsection{Supplier}
 Diese Komponente ist in der Lage die vereinfachten Anfragen des Benutzers zu interpretieren und in Nachrichten umzuwandeln, die vom System verarbeitet werden können. Hierbei werden bereits an dieser Stelle diverse Informationen an die ursprüngliche Nachricht angehängt um im späteren Verlauf entsprechende Metriken zu berechnen. Außerdem erfolgt eine erste Kommunikation mit der Persistenzschicht, in der die übersetzten Benutzeranfragen abgespeichert werden. Hierbei wird direkt auf die Datenbank zugegriffen, da es im System stets nur diese eine Instanz des \emph{Suppliers} gibt. Zwar unterstützt die verwendete Postgres-Datenbank mehrere Klienten zur gleichen Zeit, nativ ist diese Anzahl jedoch begrenzt und muss angemessen konfiguriert werden. Desweiteren stellt die Supplier-Komponente zwei Modi hinsichtlich der Geschwindigkeit in der Nachrichten an den Broker übermittelt werden. So ist es zum Beispiel möglich Nachrichten über einen gewissen Zeitraum hinweg abzuschicken oder aber eine Transaktion zu bilden in der alle auf einmal geschickt werden.
 
 
-\subparagraph{Broker}
+\subsubsection{Broker}
 Dieser Activemq Broker stellt die Funktionalität bereit Nachrichten an mehere Konsumenten zu vermitteln. Dabei gibt es zwei Betriebsmodi, einmal das Arbeiten mit einer \emph{topic} sowie mit einer \emph{queue}. Eine Topic stellt ein \emph{Publisher-Subscriber-Muster} bereit in dem alle eingehenden Nachrichten an alle eingeschriebenen Konsumenten verschickt werden \todo{Quelle verlinken}. Demgegenüber steht eine \emph{queue} (Warteschlange), welche eingehende Nachrichten lediglich an einen einzelnen Konsumenten übermittelt, wobei er hierbei als eine Art Loadbalancer agiert. Bevor die Nachrichten jedoch aus einer der beiden Datenstrukturen entfernt wird, muss der betreffende Konsument eine \emph{Acknowledgement-Nachricht} an den Broker schicken um zu signalisieren, dass die Nachricht nicht nur angenommen sondern auch korrekt verarbeitet werden konnte. Es gilt auch noch hervorzuheben, dass die eingeschriebenen Konsumenten bei neuen Nachrichten stets benachrichtigt werden und es clientseitig keine Logik benötigt um zum Beispiel event- oder intervallbasiert eine Abfrage an den Broker zu steuern. Da diese Komponente ebenfalls vom ... \emph{Prometheus erklären, Links raussuchen}. 
 
 
-\subparagraph{Consumer}
+\subsubsection{Consumer}
 Die konsumierenden Komponenten können beliebig skaliert werden und implementieren den in Abschnitt \ref{ss:fiktiverWorkflow} definierten Workflow. Hierbei wird auf diverse Libraries zurückgegriffen, wobei die restliche Logik eher schlicht gehalten wurde. Die Komponenten kommunizieren lediglich über den Message-Broker mit dem Nachrichten-Supplier und über einen weiteren Nachrichten-Broker mit der Persistenzschicht um die extrahierten Elemente abzulegen.
 
 
-\subparagraph{Prometheus}
+\subsubsection{Prometheus}
 "Bei diesem Projekt handelt es sich um ein \emph{Open Source} auf Metriken basierendes Monitoring System" \cite{oreillyPrometheus}. Es ist möglich über eine definierte Anfragensprache Daten Dritter zu verarbeiten. Diese Daten können über ein einfaches Textformat von den Komponenten ausgegeben werden. Es ist möglich dieses Textformat händisch zu schreiben, allerdings wird in der Praxis vermehrt auf Libraries, die auf den Client zugeschnitten wurden, gesetzt. Prometheus ist unter der Apache 2.0 Lizenz veröffentlicht \footnote{https://github.com/prometheus/prometheus}, und ist primär in der Programmiersprache Go implementiert worden. Das Scrapen der Metriken wird von der Prometheus Komponente selbst durchgeführt, die zu überwachenden Komponenten müssen sich selbst nicht darum kümmern Daten an Prometheus zu übermitteln.
 
 \todo{checken ob Figure am Ende immer noch nicht unter die folgenden Absatz auf Seite passt, ggf. aendern}
@@ -53,25 +51,25 @@ Die konsumierenden Komponenten können beliebig skaliert werden und implementier
 	\label{fig:alertManOverview}
 \end{figure}
 
-\subparagraph{Alert Manager}
+\subsubsection{Alert Manager}
 "Unter \emph{Alerting} versteht man das in Kenntnis setzen eines Admins, wenn es im System zu Problemen kommen sollte" \cite[Kapitel~18]{oreillyPrometheus}. Prometheus bietet hierbei die Möglichkeit mittels der funktionalen Anfragesprache \emph{PromQl} diverse Bedingungen zu definieren unter denen dies geschehen soll. Da es in einer produktiven Containerumgebung durchaus vorkommen kann, dass mehrere Prometheus-Instanzen parallel arbeiten, wurde das Benachrichtigen in eine weitere Komponente (den \emph{Alert Manger}) ausgelagert. Dieser synchronisiert, sammelt und gruppiert die Alerts der verschiedenen Prometheus-Instanzen und sendet Benachrichtigungen an definierte Nachrichtenkanäle, die sich zum Beispiel aus einem Emailpostfach, einer Pagernachricht oder Chatnachricht auf Plattformen wie zum Beispiel Slack zusammensetzen können (siehe Abbildung \ref{fig:alertManOverview}).
 
 
-\subparagraph{Scaler Proxy}
+\subsubsection{Scaler Proxy}
 Diese Komponente bietet eine REST-Schnittstelle, welche im Alert-Manager hinterlegt wird. Sobald eine der Regeln anschlägt wird der Aufruf an diese Komponente weitergeleitet. Im Endeffekt dient diese Kompoonente nur als Proxy-Service, da sie diese Nachricht lediglich an eine weitere Komponente weiterleitet. In einer produktiven Umgebung würde diese Komponente komplett enfallen, da es möglich ist den Alert-Manager derartig zu konfigurieren, dass er direkt die öffentlichen Schnittstellen der Scaler-API anspricht. Es wurde sich dennoch für das Zwischenschalten eines solchen Proxy-Services entschieden um genauere Messewerte zu erhalten. Gerade hinsichtliche der Initialisierungsphasen von Containern ist es angebracht so kurz vorher wie möglich einen Timestamp zu setzen. Da es nicht möglich ist direkt in die Konfiguration der Scaler-Api einzugreifen ist diese Lösung der nächstbeste Ansatz. Sobald eine Skalierungsanfrage weitergeleitet wurde, wird diese noch unbeantwortete Anfrage intern in einer Datenstruktur abgelegt. Sobald ein entsprechender Container komplett initialisiert wurde, ruft dieser eine weitere Schnittstelle des Proxy-Services auf. Daraufhin wird ein \emph{Acknowledgement-Timestamp} in der hinterlegten Anfrage gesetzt und an die Persistenzschicht weitergeleitet. 
 
 Außerdem bietet diese Komponente die Möglichkeit für den Benutzer direkt Exemplare eines Consumers hochzufahren. Die Verwendete Schnittstelle dient als Umgehung des herkömmlichen Programmflusses und wird zur Generierung der Skalierungsschichtenunabhängigen Metrikberechnung verwendet (siehe Abschnitt \ref{par:specContainer}). Über dedizierte Endpunkte können diese Metriken als .csv Datei ausgelesen werden. 
 
 
-\subparagraph{Scaler}
+\subsubsection{Scaler}
 "\emph{Das Ziel des Docker Scaler-Projekts ist es eine REST-Http-Schnittstelle zum Skalieren von Services und Nodes bereitzustellen}"\cite{docker-scaler}. Außerdem werden mit jeder Skalierungsanfrage Statusinformationen über die aktuelle sowie zukünftige Anzahl von Nodes des zu skalierenden Services zurückgegeben, die es dem proxy-Service ermöglichen davon ausgehend einen Skalierungsstop für neue Anfragen beizubehalten oder aufzuheben. Dieser ist nötig damit das System keine weiteren Skalierungen vornimmt, wenn bereits welche am laufen sind.
 
 
-\subparagraph{Grafana}
+\subsubsection{Grafana}
 "Wenn es zum Alert durch den Alert Manager kommt, wird in einer Produktivumgebung der Erste Schritt sein die Performanz des Systems durch dedizierte Dashboard zu überprüfen" \cite[Kapitel~6]{oreillyPrometheus}. Grafana ist ein Werkzeug, das dies über eine Weboberfläche direkt im Browser ermöglicht. Es bietet die Möglichkeit Graphen, Tabellen und weitere Visualisierungskomponenten zu erstellen um zum Beispiel die Latenzzeit oder CPU Auslastung zu überprüfen. Diese Metriken können für das ganze Sytem oder nur einen Teil generiert werden. Es ist das bevorzugte Visualisierungswerkzeug für Prometheus, bietet allerdings ebenfalls Unterstützung für verschiedene weitere Systeme wie zum Beispiel \emph{Graphite}, \emph{Elasticsearch} oder \emph{PostgreSQL}.
 
 
-\subparagraph{Mock scaler api}
+\subsubsection{Mock scaler api}
 Diese Komponente ist nicht Kernbestandteil des Komponenten-Stacks. Während der Entwicklungszeit dient sie dazu die Scaler-Api zu emulieren. So ist es zum Beispiel möglich lokal eine Instanz des Scaler-Proxy Projekts in einer beliebigen IDE als Standard Spring Projekt auszuführen. Sämtliche Skalierungs-Anfragen können von dieser Komponente angenommen werden, da sie auf dem gleichen Port wie der "\emph{echte}" Scaler läuft, wobei sie dabei ebenfalls in der Lage ist diverse Rückgabenachrichten an den Klienten zu übergeben.
 
 
@@ -84,10 +82,407 @@ Diese Komponente ist nicht Kernbestandteil des Komponenten-Stacks. Während der 
 \end{figure}
 
 
+\subsection{Komponenten im Detail}
+
+\subsubsection{Input}
+Der Benutzer besitzt die Möglichkeit sowohl über eine Benutzeroberfläche als auch über Bash-Skripte Benchmark Anfragen an das System zu stellen. Im folgenden wird beides im Detail erläutert.
+
+\paragraph{Bash}
+Um eine direkte Skalierungsaufforderung an das System zu senden, wird folgender Endpunkt verwendet.
+\begin{verbatim}
+  curl "http://$HOST:$DIRECT_SCALING_PORT/manual-scale
+              ?additionalCnt=$CNT
+              &service=$SERVICE_NAME"
+\end{verbatim}
+
+Es handelt sich hierbei um eine Get-Anfrage an die \emph{Scaler-Proxy} Komponente des Stacks. Über die beiden Parameter "\emph{additionalCnt}" und "\emph{service}" lässt sich steuern wie viele neue Service Instanzen vom Orchestrator bereitgestellt werden sollen. Um dem Benutzer eine schlichtere Einstiegsmöglichkeit zu bieten, wurde das Skript \emph{direct-scaling.sh} bereitgestellt (Inhalt siehe Listing \ref{lst:direct-scaling}). Dieses ist in der Lage automatisch eine Reihe von Anfragen an das System zu stellen. 
+
+\label{verb:scriptStruct}
+\begin{lstlisting}[caption={request-script-structure},style=bashStyle]
+  $ tree request-scripts/ -a -L 3 --charset=ascii
+  request-scripts/
+  |-- curl-benchmark.sh
+  |-- direct-scaling.sh
+  |-- .env
+  |-- generate-traffic.sh
+  |-- README.md
+  `-- requests
+      |-- mixed
+      |   |-- benchmark_large_mixed.benchmark
+      |   |-- benchmark_medium_mixed.benchmark
+      |   `-- benchmark_small_mixed.benchmark
+      ...
+\end{lstlisting}
+
+Das Skript nimmt zwei Parameter entgegen. Der erste beschreibt die Instanzenanzahl zu welcher das System skaliert werden soll, wobei hierbei eine inkrementelle Erhöhung von einer Instanz pro Durchlauf durchgeführt wird. Der Zweite Parameter gibt die Wiederholungen dieser testweisen Skalierung an. Der Aufruf \verb+./direct-scaling.sh 10 20+ resultiert beispielsweise darin, das sowohl für den Node.js als auch Spring Boot Service jeweils 10 Skalierungsschritte durchgeführt werden. Wenn beispielsweise bereits ein Node Container läuft wird im ersten Test eine weitere Instanz angefordert. Sobald die beiden Instanzen verfügbar sind, wird der Alter-Manager durch die Prometheus Komponente angewiesen die überflüssige Instanz zu löschen. Sobald wieder ein einziger Container verfügbar ist, wird dieser Schritt 19 weitere Male wiederholt. Nachdem dieser Schritt abgearbeitet wurde, erfolgt die nächste Skalierung bei der dieses Mal zwei neue Container kreiert werden sollen. Auch hier folgen 20 Wiederholungen. Diese Schritte werden solange durchgeführt bis zehn Container zwanzig Mal instanziiert wurden. 
+
+\label{lst:direct-scaling}
+\begin{lstlisting}[caption={direct-scaling},style=bashStyle]
+...
+
+request() {
+  curl "http://$HOST:$DIRECT_SCALING_PORT/manual-scale?additionalCnt=$1&service=$4"
+}
+
+node_request() {request $1 $2 $3 'NODE'}
+spring_request() {request $1 $2 $3 'SPRING'}
+
+for scalingOffset in $(seq 1 $1)
+do 
+  for curr_rep in $(seq 1 $2)
+	do 
+    node_request $scalingOffset $curr_rep $2
+    spring_request $scalingOffset $curr_rep $2
+  done
+done
+\end{lstlisting}
+
+Das beschriebene Skript sowie die der zugrundeliegende Http-Endpunkt bieten eine Möglichkeit das Skalieren als Reaktion auf unbeantwortete Nachrichten zu umgehen. Um jedoch einen herkömmlichen Testrun zu starten greift der Benutzer auf einen Endpunkt vom \emph{Supplier} zurück: 
+
+\begin{verbatim}
+  curl 
+    -X POST 
+    -H "Content-Type: text/plain" 
+    --data "$REQUEST" 
+    "http://$API_HOST:$API_PORT/api/v1/parser/benchmark"
+\end{verbatim}
+
+Es handelt sich hierbei um eine POST-Anfrage. Im Body wird hierbei der Dateiinhalt eines für diesen Zweck verfassten Skripts angeheftet. Im Projekt wurden diverse Beispielskript verfasst. Diese liegen im Ordner \emph{./requests} und tragen die Dateiendung "\emph{.benchmark}". Der Inhalt korrespondiert zu einer spezifizierten Grammatik (siehe Listing \ref{lst:instruction-grammar}). 
+
+\label{lst:instruction-grammar}
+\begin{verbatim}
+  request     := batch*
+  batch       := serviceName { instruction | instruction,* };
+  serviceName := SPRING | NODE
+  instruction := BENCHMARK ( messageCnt, duration ) | WAIT ( duration )
+  messageCnt  := [0-9]+
+  duration    := [0-9]+
+\end{verbatim}
+
+Es können beliebig viele Batchanfragen den Anfragenbody angeheftet werden. Eine Batch stellt in diesem Zusammenhang eine Gruppe an Skalierungsanfragen an einen bestimmten Service dar, wobei diese mindestens eine Skalierungsinstruktion enhalten muss. In diesem System gibt es zwei wesentliche Skalierunginstruktion: 
+
+\begin{enumerate}
+  \item BENCHMARK: Nimmt zwei Parameter entgegen. Der erste spezifiziert hierbei wie viele neue Instanzen erstellt werden sollen, während der Zweite angibt über welchen Zeitraum dies geschehen soll. Alle numerischen Angaben müssen einen positiven Zahlenwert enthalten. Da das System selbständig in der Lage diese Instanzen wiederum auf ein gesetztes Minimum zu minimieren, wurde sich aktiv dagegen entschieden das Herunterskalieren in die Grammatik aufzunehmen, um dem Benutzer eine möglichst schlicht gehaltene Schnittstelle zur Verfügung zu stellen.
+  \item WAIT: Diese Instruktion erwartet lediglich einen Paramter, der angibt wie viele Millisekunden gewartet werden soll, bevor die nächste Instruktion dem System übergeben wird. 
+\end{enumerate}
+
+
+Damit der Benutzer allerdings direkt Anfragen ausführen kann, ohne sich mit der Grammatik beschäftigen zu müssen, wurde ein weiterer Skript-Aufsatz für 
+für das \emph{curl-benchmark} Skript entwickelt. Dieses trägt den Namen "\emph{generate-traffic.sh}" und sucht rekursiv in der eigenen Directory nach Dateien mit der entsprechenden Endung. Anschließend werden diese Skripte an das \emph{curl-benchmark} der Reihe nach als Parameter übergeben.
+
+
+% \begin{lstlisting}[language=bash]
+%  tree . -L 1
+% .
+% ├── Dockerfile
+% ├── package.json
+% ├── package-lock.json
+% ├── specification.xsd
+% ├── src
+% └── tsconfig.json
+% \end{lstlisting}
+\todo{uncomment}
+
+
+\subsubsection{Supplier Backend}
+Bei dieser Komponente handelt es sich um ein Spring Projekt, das dessen Aufgabe es ist Benutzeranfragen in Nachrichten zu übersetzen, die vom System interpretiert und verarbeitet werden können. Die Schnittstelle für den Benutzer besteht hierbei aus einer REST-Api welche über Tools wie zum Beispiel curl angesprochen werden kann.
+
+\label{verb:supplierStruct}
+\begin{lstlisting}[caption={Supplier Backend - Struktur},style=bashStyle]
+  $ tree stack/supplier-backend/ -a -L 7 --charset=ascii
+  stack/supplier-backend/
+  |-- Dockerfile
+  |-- pom.xml
+  `-- src
+      `-- main
+          |-- java
+          |   `-- dps
+          |       `-- hoffmann
+          |           `-- producer
+          |               |-- config
+          |               |   |-- ActiveMqConfiguration.java
+          |               |   |-- GeneralConfig.java
+          |               |   |-- MapperConfig.java
+          |               |   |-- RestClientConfig.java
+          |               |   `-- RestServiceCorsApplication.java
+          |               |-- controller
+          |               |   |-- BenchmarkingController.java
+          |               |   |-- FetchInitController.java
+          |               |   |-- ParserController.java
+          |               |   |-- RestExceptionHandler.java
+          |               |   `-- StatsController.java
+          |               |-- model
+          |               |   |-- BenchmarkBackendRequest.java
+          |               |   |-- error
+          |               |   |-- instruction
+          |               |   |-- PaymentMessage.java
+          |               |   `-- SpecificationWrapper.java
+          |               |-- properties
+          |               |   `-- ActivemqProperties.java
+          |               |-- repository
+          |               |   `-- BatchInstructionRespository.java
+          |               |-- response
+          |               |   `-- ErrorInfo.java
+          |               |-- service
+          |               |   |-- AmqService.java
+          |               |   |-- BenchmarkService.java
+          |               |   |-- generator
+          |               |   |-- InstructionGenerator.java
+          |               |   |-- PersistenceService.java
+          |               |   `-- RequestParserService.java
+          |               |-- SupplierBackendApplication.java
+          |               `-- utils
+          |                   |-- BiFunction.java
+          |                   |-- InstructionFactory.java
+          |                   `-- ResourceUtils.java
+          `-- resources
+              |-- application-dev.properties
+              |-- application-prod.properties
+              |-- application.properties
+              |-- docs
+              |   |-- sample-payment-short2.xml
+              |   |-- sample-payment-short3.xml
+              |   |-- sample-payment-short.xml
+              |   `-- sample-payment.xml
+              `-- schema.sql
+
+\end{lstlisting}
+
+
+\paragraph{Implementierung}
+
+\subparagraph{Generelle Spring Projektübersicht}
+Da diese Komponente bezüglich der Struktur eines Spring-Projekts alle wesentlichen Merkmale besitzt, wird die genutzte Projektstruktur an dieser Stelle etwas näher erläutert. 
+
+% Der Einstiegspunkt einer jeden Spring-Anwendung besteht aus einer Main-Klasse, welche ... \todo{im Spring-Buch nachschlagen}
+
+Das Muster, nach dem sämtliche Komponenten des Komponenten-Stacks entwickelt wurden, wird als \emph{Layered Architecture Pattern} oder \emph{n-tier pattern} bezeichnet \cite{oreilly-layered-arch}. Es stellt einen weitverbreiteten Standard in Java Enterprise Applikationen dar und zeichnet sich durch die klare Unterteilung der verschiedenen Hierarchien aus (siehe Abbildung \ref{fig:layeredArchitecture}). Sämtliche Packages innerhalb der Spring-Projekte finden sich innerhalb einer der Layer wieder. Es sei ebenfalls hervorzuheben, dass sämtliche Layer stets nur mit ihren direkt angrenzenden Schichten kommunizieren. Dies stellt ein weitaus übersichtlicheres Design sicher.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=.7\linewidth]{kapitel/problemloesung/implementierung/_img/dataflow-overview-01}
+	\caption[Layered Architecture]{Layered Architecture \cite{oreilly-layered-arch}}
+	\label{fig:layeredArchitecture}
+\end{figure}
+
+
+\begin{itemize}
+  \item \emph{controller}: Dieses Package stellt alle Klassen bereit, welche direkt vom Benutzer angesprochen werden. Typischerweise handelt es sich zumindest im implementierten Stack um Rest-Schnittstellen, aber auch andere Typen (Soap, etc.) bieten entsprechende Implementierung. Klassen dieses Packages werden allgemeinhin als Controller bezeichnet und bilden eine erste Interaktionsschicht, welche keinerlei Business-Logik enthält. Bei diesem Package handelt es sich um einen Teil des Presentation Layers. Die Daten werden angenommen aber nicht direkt verarbeitet. Dies geschieht in sogenannten Services, welche spezifische Funktionalität implementieren. Controller dienen hierbei als ein Verteiler der eingehenden Nachrichten zu diesen Services. Die Service-Instanzen werden den Controllern Über den Spring-Context mittels Dependency Injection bereitgestellt, sodass sich der Entwickler selbst sich nicht mit der Instanziierung etc. zu beschäftigen braucht. 
+
+  \item \emph{service}: Dieses Package enthält ausschließlich Service Implementierungen. Ein Service stellt einen logischen Funktionsbaustein der Anwendung dar und kann in den Spring-Context injected werden. \todo{Quelle???}
+
+  \item \emph{repository}: Spring bietet über das Framework die JPA Implementierung \emph{Hibernate} nativen Support für die Anbindung an eine Datenbankverbindung. Dieses Package enthält Interfaces welche die Treiberschnittstelle beerben. Mit Hilfe spezifizierter Namenskonventionen ist es möglich Methodensignaturen Datenbankanfragen zu gestalten. Das Framework generiert hieraus die entsprechenden SQL-Abfragen.
+
+  \item \emph{config}: Klassen dieses Packages konfiguieren instanziieren beziehungsweise konfigurieren Spring-Beans. Es gibt bei vielen voreingestellten Spring-Komponenten die Möglichkeit Beans über Annotations in der implementierenden Klasse zu erzeugen, in bestimmten Situation wird jedoch Zugriff auf die Instanz selbst zum Initialisierungszeitpunkt gebraucht um entsprechende Konfigurationsschritte zu unternehmen. Dies geschieht standardmäßig in diesem Package.
+
+  \item \emph{model}: Klassen welche lediglich zum Abbilden bestimmter Datensätze genutzt werden, residieren in diesem Package. Hierbei ist es irrelevant ob es sich um JPA-Entitäten oder herkömmliche POJOs handelt.
+
+  \item \emph{properties}: Spring bietet die Möglichkeit Daten aus den Konfigurationsdateien innerhalb der Resources direkt in den Application-Context zu laden.
+  
+  \item \emph{utils}: Klassen, die lediglich mit Business-Logik gefüllt sind und nicht vom Spring-Container verwaltet werden, sondern direkt im Programmcode instanziiert beziehungsweise aufgerufen werden, residieren in diesem Package.
+
+\end{itemize}
+
+
+\subparagraph{Programmfluss}
+In Listing \ref{lst:supplierBenchmarkEndpoint} ist die Definition desjenigen Endpunktes zu erkennen, der als primärer Einstiegspunkt für die eingehenden Anfragen gilt. Sobald der Benutzer eine Eingabe tätigt und der Endpunkt angesprochen wird, übersetzt eine Objectmapper Instanz den erhaltenen String in eine Datenstruktur, welche alle relevanten Informationen enthält. Die Methode wurde außerdem mit einer \emph{Transactional}-Annotation versehen, die es ermöglicht das Übermitteln mehrere Nachrichten an eine Queue in einer Transaktion durchzuführen (siehe \todo{Referenz} einfügen), dies wird im späteren Verlauf von Bedeutung sein. Im Spring-Framework muss jedoch bereits der Einstiegspunkt mit einer solchen Annotation versehen werden, um zu gewährleisten, dass die aufgerufenen Logikbausteine alle im selben Transaktion-Kontext ausgeführt werden \todo{Quelle?}.
+
+\begin{lstlisting}[style=javaStyle,caption={Supplier - Endpunkt},label=lst:supplierBenchmarkEndpoint]
+
+  ...
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @RequestMapping(value = "/start",
+          method = POST,
+          consumes = APPLICATION_JSON_VALUE)
+  public void startPaymentBenchmark(@RequestBody String jsonBody) throws JsonProcessingException {
+      log.info("new benchmark request: {}", jsonBody);
+      ParsedInstruction req = mapper.readValue(jsonBody, ParsedInstruction.class);
+      benchmarkService.benchmark(req);
+  }
+
+  ...
+  
+\end{lstlisting}
+
+
+
+
+\begin{lstlisting}[style=javaStyle,caption={Supplier - Service},label=lst:supplierServiceImpl]
+
+  ...
+
+  @SneakyThrows
+  @Transactional
+  public void benchmark(ParsedInstruction parsedInstruction) {
+      parsedInstruction.setReceived(now());
+      // set batch id by saving it to db and reloading instance
+      parsedInstruction = persistenceService.save(parsedInstruction);
+      int batchId = parsedInstruction.getMessageId();
+      boolean sessionIsTransacted = sessionIsTransacted(parsedInstruction);
+
+      Supplier<String> xPathSupplier = pathGenerator.getSupplier(parsedInstruction);
+      Supplier<String> paymentSupplier = payOptionGenerator.getSupplier(parsedInstruction);
+      Supplier<String> destinationSupplier = destGenerator.getSupplier(parsedInstruction);
+      BiConsumer<PaymentMessage, Supplier<String>> amqConsumer =
+              amqService.getConsumer(sessionIsTransacted);
+
+      int durationMillis = 0;
+      if (!sessionIsTransacted) {
+          durationMillis = parsedInstruction.getDuration()
+                  / (parsedInstruction.getMessageCnt() - 1);
+      }
+
+      for (int i = 0; i < parsedInstruction.getMessageCnt(); i++) {
+
+          PaymentMessage payment = PaymentMessage.builder()
+                  .batchId(batchId)
+                  .xPath(xPathSupplier.get())
+                  .content(paymentSupplier.get())
+                  .sentTimestamp(now())
+                  .build();
+
+          amqConsumer.accept(payment, destinationSupplier);
+
+          Thread.sleep(durationMillis);
+      }
+  }
+
+  ...
+  
+\end{lstlisting}
+
+In Listing \ref{lst:supplierServiceImpl} ist zu erkennen, wie die Abarbeitung einer übersetzten Nachricht im Detail funktioniert.
+
+\begin{itemize}
+  \item Zeile 7: Zu Beginn wird der aktuelle Timestamp an die übersetzte Nachricht angeheftet, um im Nachhinein diverse Messwerte berechnen zu können.
+
+  \item Zeile 9: Die übersetzte Nachricht wird in der Datenbank hinterlegt
+
+  \item Zeile 11: Da die gesamte Methode mit einer weiteren \emph{Transactional-Annotation} versehen wurde, ist es möglich beim tatsächlichen Absenden der Nachrichten einen transaktionbasierten Ansatz zu wählen. Es muss jedoch bereits an dieser Stelle entschieden werden, ob dies tatächlich nötig ist. Hierfür wird das übersetzte Datenobjekt entsprechend untersucht. 
+
+  \item Zeile 13: Abhängig von der gegebenen Instruktion ist es möglich unterschiedliche Felder eines Payments auszulesen. Es gibt beispielsweise die Möglichkeit eine IBAN, den Betrag der Überweisung, den Empfänger etc. auszulesen. An dieser Stelle wird ein entsprechender Supplier erzeugt, der im späteren Verlauf diese Information liefert. Der Grund diese Funktionalität in eine Callback Funktion ausgelagert wurde, ist der, dass es möglich sein soll, dass sich die Ausgabe über Zeit ändern kann. So kann der Benutzer beispielsweise in der Nachricht angeben, dass er zufällige Datenfelder pro Nachricht ausgeben möchte. Bei Nachricht X, soll zum Beispiel das IBAN Feld und bei Nachricht Y der Betragswert extrahiert werden. Diese Maßnahme wurde lediglich ergriffen um etwas Variation in die Messwerte hinsichtlich der Verarbeitungsdauer zu generieren.
+
+  \item Zeile 14: Selbes gilt für die Nachricht selbst. Es soll möglich sein, dem Benutzer die Wahl zu lassen, ob dieser die Benchmark-Tests stets mit der gleichen beispielhaften Payment-Nachricht durchführen möchte oder nicht. Falls ja soll Nachrichten mit zufälligen Werten zum Beispiel für die IBAN etc. zu generiert werden. In diesem Protoypen wurde allerdings lediglich das Design für die Funktionalität entwickelt, da es im Endeffekt keinen Einfluss auf die generierten Metriken hat welche Daten im Detail in dem XML-Inhalt hinterlegt wurden.
+
+  \item Zeile 15: Diese Callback Funktion gibt den Warteschlangennamen aus zu dem die generierten Nachrichten geschickt werden sollen.
+  
+  \item Zeile 16: Abhängig davon, ob es sich um eine Anfrage, die in einer Transaktion durchgeführt werden soll oder nicht, wird für das Callback eine Spring-Bean zur Datenübermittlung zum Message-Broker verwendet, die mit einem Transaction Flag versehen wurde oder nicht. Diese Funktion stellt beim Absenden der Nachrichten die Schnittstelle zum Messagebroker dar.
+
+  \item Zeile 27: Es werden Nachrichten generiert, die von den weiteren Stack-Komponenten verarbeitet werden können.
+
+\end{itemize}
+
+
+
+\paragraph{Build}
+
+
+
+
+
+\subsubsection{Spring Boot}
+
+% $ tree spring-consumer/ -L 7
+% spring-consumer/
+% ├── Dockerfile
+% ├── pom.xml
+% └── src
+%     └─ main
+%        ├── java
+%        │   └── dps
+%        │       └── hoffmann
+%        │           └── springconsumer
+%        │               ├── config
+%        │               ├── Main.java
+%        │               ├── model
+%        │               ├── service
+%        │               ├── SpringConsumerApplication.java
+%        │               └── utils
+%        └── resources
+%            ├── application-dev.properties
+%            ├── application-prod.properties
+%            ├── application.properties
+%            └── docs
+%                └── paymentSchema.xsd
 
 
 \subsection{Node.js}
-\subsection{Spring Boot}
+
+% \begin{lstlisting}[language=bash]
+%  tree . -L 1
+% .
+% ├── Dockerfile
+% ├── package.json
+% ├── package-lock.json
+% ├── specification.xsd
+% ├── src
+% └── tsconfig.json
+% \end{lstlisting}
+\todo{uncomment}
+
+\subsubsection{Projektübersicht}
+Das Projekt beinhaltet neben sämtlichen Quellcode-Dateien ein Dockerfile, eine package.json und eine tsconfig Konfigurationsdatei. 
+
+\subparagraph{Dockerfile}
+Bei dem verwendeten Dockerfile handelt es sich um eine multi-stage Konfiguration. \todo{Quellen raussuchen}
+
+\todo{Zeilennummern}
+\begin{lstlisting}[language=bash]
+  # stage 1 building the code
+  FROM node:10.15.3 AS builder
+  WORKDIR /usr/app
+  COPY package*.json ./
+  RUN npm install
+  COPY . .
+  RUN npm run build 
+  
+  # stage 2
+  FROM node:10.15.3-alpine
+  WORKDIR /usr/app
+  COPY package*.json ./
+  RUN npm install --production
+  
+  COPY --from=builder /usr/app/dist ./dist
+  
+  COPY --from=builder /usr/app/schema.sql .
+  COPY --from=builder /usr/app/specification.xsd .
+  
+  CMD node dist/src/index.js
+\end{lstlisting}
+
+\subparagraph{Typescript Konfiguration}
+
+\subparagraph{Quellcode}
+
+% \begin{lstlisting}[language=bash]
+  % src
+  % ├── index.ts
+  % ├── model
+  % │   ├── PaymentInput.ts
+  % │   ├── PaymentMessage.ts
+  % │   └── ResultWrapper.ts
+  % ├── service
+  % │   ├── AmqService.ts
+  % │   └── WorkerService.ts
+  % └── utils
+  %     ├── ElementExtractor.ts
+  %     ├── IdGenerator.ts
+  %     └── XsdChecker.ts
+% \end{lstlisting}
+\todo{uncomment}
+
+Die Programmlogik wurde in drei wesentliche packages aufgeteilt (siehe Listing \todo{Listing einkommentieren und referenzieren}). 
+
+\begin{itemize}
+  \item \emph{model}: Dieses Package beinhaltet sämtliche Datenstrukturen, die vom System zur Bearbeitung der eingehenden Nachrichten verwendet werden.
+  \item \emph{model}: Dieses Package beinhaltet sämtliche Komponenten welche logisch klar abgetrennte Aufgabe implementieren und über Schnittstellen miteinander kommunizieren. Hierbei wurde sich an der Architektur einer typischen Spring-Anwendung orientiert.
+  \item \emph{model}: Dieses Package beinhaltet sämtliche Funktionalität der abzuarbeitenden Businesslogik.
+\end{itemize}
+
+
+
+
 
 \section{Implementierung mittels Containerisierungsplattform}
 \subsection{Container Lifecycle}
