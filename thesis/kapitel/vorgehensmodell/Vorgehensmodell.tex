@@ -5,12 +5,12 @@ Nachdem im letzten Kapitel der aktuelle Aufbau der Payment-Anwendungen, sowie di
 \section{Anforderungen an Daten zur Messung des Startup-Verhaltens von Containern}
 \label{sec:startupAnforderungen}
 
-\begin{itemize}
-  \item Problem reduzieren
-  \item Messkriterien festlegen
-  \item Quellen finden
-  \item hier nur theoretisch schwafeln über einen kriterienkatalog und die möglichen „Messwerte“, die man ggf. braucht -> in Kap. 5 dann den Kriterienkatalog konkret aufstellen
-\end{itemize}
+% \begin{itemize}
+%   \item Problem reduzieren
+%   \item Messkriterien festlegen
+%   \item Quellen finden
+%   \item hier nur theoretisch schwafeln über einen kriterienkatalog und die möglichen „Messwerte“, die man ggf. braucht -> in Kap. 5 dann den Kriterienkatalog konkret aufstellen
+% \end{itemize}
 
 Der Fokus des Projekts liegt allerdings auf der Ermittlung der Cloudfähigkeit der unterschiedlichen System-Komponenten. Um dies festzustellen, muss im Vorwege eine Klassifizierung der Anforderungen stattfinden um festzustellen welche Messdaten für dieses Projekt überhaupt von Relevanz sind. Hierfür hat die ISO bereits einen ausführlichen Kriterienkatalog aufgestellt(siehe ISO/IEC 25010:2011 \cite{iso25010}, fig. \ref{fig:iso25010}). Die ISO 25010 besteht aus acht Hauptkategorien und 31 Unterkriterien, wobei lediglich die erste Hauptkategorie der "\emph{Funktionalität}" dabei als \emph{funktionale Qualitätseigenschaft} (engl. "\emph{functional requirement}") auftritt. Die restlichen Hauptkriterien lassen sich der Kategorie der \emph{Non-Functional requirements} zuordnen. Diese Unterscheidungen dienen als eine erste Abstraktionsschicht. Functional requirements beschreiben hierbei die Korrektheit des Produktes \cite{continuous-delivery}. "Sie spezifizieren die Funktion, die ein System oder Systemkomponente erfüllen muss" \cite{eide-requirements}. So lässt sich feststellen ob die Applikation den inhaltlichen Ansprüchen, sowohl aus technischer als auch aus Unternehmenssicht, genügen. Hierbei wird auf eine Vielzahl unterschiedlicher Tests zurückgegriffen, welche sich auf breit gefächerte Abstraktionstiefen etc. beziehen lassen (siehe \ref{fig:testing-quad}). Je nach Teilbereich lassen sich hierbei einzelne Gebiete automatisiert oder mittels anderweitiger Werkzeuge testen. Diese Tests sind in einem System in Produktion unabdingbar, für die Messdatenerhebung zur Beurteilung der Cloudfähigkeit allerdings vernachlässigbar. 
 
@@ -94,7 +94,7 @@ Dieses Hauptkriterium beschreibt, wie nebenläufig das System im Endeffekt ist. 
 
 Das Hauptkriterium der \emph{Zuverlässigkeit} beschreibt die Angabe wie lange eine Applikation garantiert läuft. Dies kann auf verschiedene Weisen festgehalten werden, eine typische wäre zum Beispiel den Anteil der Tage im Jahr, Tage pro Monat, oder Stunden am Tag die ein Service ansprechbar ist. Allgemein lässt sich diese Angabe als Metrik der \emph{Verfügbarkeit} charakterisieren. In einer Containerisierten Umgebung kommt es immer wieder zu Ausfällen einzelner Systeme, was es bei diesem Punkt besonders zu beachten gilt. Das Gesamtsystem soll hiervon jedoch unberührt bleiben. Dieses Prinzip wird in heutigen Systeme auch "\emph{Design for failure}" genannt. Das Hauptkriterium setzt sich aus unter anderem aus dem Unterkriterium der \emph{Reife} zusammen. Hierbei sind diejenigen Anforderungen gemeint, welche in einer normalen Prozessabarbeitungsphase ohne besondere Ereignisse hinsichtlich zum Beispiel der Anzahl der zu verarbeitenden Nachrichten, oder der Komplexität der zu bewältigenden Aufgaben, gelten müssen. Auch eine gewisse \emph{Fehlertoleranz} wird vom System erwartet. Um dies zu testen genügt es bereits dokumentierte allerdings fehlerbehaftete Benutzereingaben in einer Testumgebung zu tätigen und das Systemverhalten zu analysieren. Eine standardisierte Metrik gibt es auch nicht. Das letzte Unterkriterium der \emph{Zuverlässigkeit} ist die \emph{Wiederherstellbarkeit} nach einem beschriebenen Fehlerfall, falls es doch einmal zu einem Ausfall einzelner Komponenten kommen sollte. Generell gilt, auch dieses Hauptkriterium gibt Aufschluss über die Eignung gewisser technologischer Ansätze zum Arbeiten als Cloudkomponente, dennoch beschreibt sie die relevanten Umstände in manchen Teilen zu abstrakt als das man dort genaue Metriken ermitteln könnte. Im nächsten Kapitel wird festgehalten welche Metriken dennoch relevant erscheinen. \todo{Ref einbinden bzw. schauen ob überhaupt aufgenommen...}
 
-\subsubsection{irrelevante Themenfelder}
+\subsubsection{Irrelevante Themenfelder}
 \begin{itemize}
   \item Security (Injection, Broken Authentication, Cross Site Scripting etc.)
   \item Nutzbarkeit (Benutzerfreundlichkeit, Browser Kompatabilität, Internationalisierung - Eingabesprachen)
