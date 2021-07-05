@@ -385,9 +385,9 @@ In Listing \ref{lst:supplierServiceImpl} ist zu erkennen, wie die Abarbeitung ei
   public BiConsumer<PaymentMessage, Supplier<String>> getConsumer(boolean sessionIsTransacted) {
     return sessionIsTransacted
             ? (message, destGen) -> sendObjPaymentQueueMessage(
-            transactedJmsTemplate, message, destGen)
+              transactedJmsTemplate, message, destGen)
             : (message, destGen) -> sendObjPaymentQueueMessage(
-            nonTransactedJmsTemplate, message, destGen);
+              nonTransactedJmsTemplate, message, destGen);
   }
 
   ...
