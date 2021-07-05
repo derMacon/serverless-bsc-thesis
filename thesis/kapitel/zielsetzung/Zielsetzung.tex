@@ -1,4 +1,4 @@
-\chapter{Zielsetzung \checkmark}
+\chapter{Zielsetzung \checkmark \checkmark}
 
 Nachdem im letzten Kapitel ein kurzer Einblick in die Motivation für die Portierung alter JEE Technologie in neuere IT-Infrastruktur beschrieben wurde, wird im Folgenden darauf eingegangen, welcher wesentlichen Problemstellung sich die DPS gegenüber konfrontiert sieht und wie ich versuchen werde dies zu untersuchen.
 
@@ -9,7 +9,7 @@ Nachdem im letzten Kapitel ein kurzer Einblick in die Motivation für die Portie
 %   \item da anwendung in spring boot ist nicht cloud-fähig weil zu lange für startup, dadurch riskieren wir timeouts also rejects – das ist die besonderheit der anwendung…- ..neuer container muss sofort verfügbar sein! Eine alternative wird gesucht: serverless vespricht minimale startup zeiten!....
 % \end{itemize}
 
-\subsection{Begriffserklärung \checkmark}
+\subsection{Begriffserklärung \checkmark \checkmark}
 
 \paragraph{Cloudtechnologie}
 Der Begriff "\emph{Cloud-Infrastruktur}" wird oft auch unter dem Namen "\emph{Infrastructure-as-a-Service (IaaS)}" vermarktet. Er bezieht sich auf das Abstrahieren der Unternehmensinfrastruktur von konkreter Hardware. Es wird generell in drei verschiedene Kategorien unterschieden \cite[Seite~54]{continuous-delivery}:
@@ -32,7 +32,8 @@ Serverseitige Komponenten basieren auf bestimmten Technologien. Dies können ein
 \paragraph{Serverless Functions}
 Serverless Umgebungen bilden eine weitere Abstraktionsstufe zu IaaS Plattformen und werden auch als "\emph{Function-as-a-Service}" Technologien bezeichnet. Genau wie schon bei IaaS Plattformen gibt es eine Aufteilung zwischen der tatsächlichen Infrastruktur und der virtualisierten Umgebung. Zusätzlich wird jedoch die Funktionalität des automatischen Verwalten von benötigten Instanzen ermöglicht, hierbei werden also Instanzen je nach Bedarf hoch oder heruntergefahren \cite[Seite~70 ff.]{continuous-delivery}.
 
-\subsection{Kernziele \checkmark}
+\subsection{Kernziele \checkmark \checkmark}
+\label{ss:kernziele}
 Da das Unternehmen im Banking Bereich tätig ist, stellt eine hohe Verfügbarkeit der Komponenten eines der wesentlichen Kernziele dar. Auf die neuen Technologien bezogen, bedeutet dies, dass es zu ermitteln gilt, wie viel Zeit ein Skalierungsprozess in einem orchestrierten Komponentenstack im Detail braucht. Dazu müssen diverse Metriken erhoben werden, welche im Kapitel \ref{sec:startupAnforderungen} beschrieben werden. Wichtig an dieser Stelle, es soll vor allem untersucht werden, inwiefern eine Java-Anwendung als cloudfähig bezeichnet werden kann. Denn wenn die Initialisierungsphase zu viel Zeit in Anspruch nimmt, werden Timeouts riskiert, was es unter allen Umständen zu vermeiden gilt. Eine Alternative versprechen serverless Technologien, welche sich vorallem durch ihre minimale Startzeit für diesen Usecase qualifizieren.
 
 Zusammengefassung: 
@@ -42,7 +43,7 @@ Zusammengefassung:
 \end{itemize}
 
 
-\section{Lösungsweg \checkmark}
+\section{Lösungsweg \checkmark \checkmark}
 
 % \begin{itemize}
 %   \item Prinzip / Ablauf erklären
