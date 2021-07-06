@@ -1,4 +1,4 @@
-\section{Anforderungen an Prototypen}
+\section{Anforderungen an Prototypen \checkmark}
 % \begin{itemize}
 %   \item einmal als spring boot und einer weiteren variante mit einer cloud-native technologie -> hier wurde vorgegeben mit serverless zu arbeiten.
 % \end{itemize}
@@ -63,10 +63,15 @@ Wie bereits angedeutet, wird die aktuell laufende Java Enterprise Applikation mi
 %   \item  4.2.2 spring boot 4.2.3 serverless -> so bekommt der prof schon beim draufgucken auf das inhaltsverzeichnis die story mit….
 % \end{itemize}
 
-Um der kompilierten Spring Boot Anwendung eine Technologie ein auf skalierbare Komponenten ausgelegt Technologie gegenüberzustellen, wird hierbei auf eine skriptbasierte Technologie gesetzt. Seitens des Arbeitsgebers gab es zwar keinerlei Festlegungen hinsichtlich des spezifischen Frameworks, um allerdings ein möglichst repräsentatives Bild zu schaffen, wurde sich hierbei auf das Node.js Backend-Framework festgelegt, da dies als eines der am weitest verbreiteten Frameworks in diesem Bereich gilt.
+Um die kompilierte Spring Boot Anwendung mit einer Technologie zu vergleichen, die auf skalierbare Komponenten ausgelegt ist, wird hierbei auf eine skriptbasierte Technologie gesetzt. Seitens des Arbeitsgebers gab es zwar keinerlei Festlegungen hinsichtlich des spezifischen Frameworks, um allerdings ein möglichst repräsentatives Bild zu schaffen, wurde sich hierbei auf das Node.js Backend-Framework festgelegt, da dies als eines der am weitest verbreiteten Frameworks in diesem Bereich gilt.
 
-\section{Anfoderungen an Containerisierungsplattform / Orchestrierungsplattform}
-Es gibt zwar diverse Containerisierungsplattformen \todo{continuous delivery zitieren und aufzaehlen} dennoch hat sich vorallem die Technologie "\emph{Docker}" durchgesetzt, die Vorteile und generelle Funktionsweise wurden bereits relativ ausführlich erläutert. Deshalb soll diese auch im Prototypen Verwendung finden. Hinsichtlich der Orchestrierungsplattform (welche auch als \emph{Clustering Werkzeug} dient) werden folgende Anforderungen formuliert. 
+\section{Anfoderungen an Containersplattform / Orchestrierungsplattform}
+Unter dem Begriff des "emph{Containers}" wird in der Entwicklercommunity meist ein "emph{Docker-Container}" verstanden. Dies ist allerdings nicht zwangsweise korrekt. Allgemein verweist dieser Begriff in der Softwareentwicklung auf ein abstraktes Konzept auf Betriebssystem-Level zur Virtualisierung oder Prozessisolation. Es gibt zahlreiche Implementierungen wie bespielsweise CoreOS's "\emph{rkt}" oder Microsoft's "\emph{Hyper-V}". Docker stellt hierbei lediglich eine weitere Implementierung dieser Technologie dar \cite[Seite~63 ff.]{continuous-deliverty}. Dennoch hat sich Docker gegenüber anderen Implementierung vor allem über die einfache Benutzerführung sowie die zentralisierten Mechanismen zum \emph{Teilen}, \emph{pullen} und \emph{pushen} durchgesetzt. Die generelle Funktionsweise sowie Vorteile von Docker wurden bereits relativ ausführlich erläutert \todo{nochmal checken ob wirklich schon erklärt wurden}, deshalb soll diese auch im Prototypen Verwendung finden. 
+
+Eine Containerplattform zeichnet sich allerdings neben der genutzten Implentierung über weitere Komponenten aus. Eine der Wichtigsten stellt hierbei der Orchestrator dar. "\emph{This component is responsible for starting, stopping, and managing the container processes. This technology is often referred to as container infrastructure as a service (CIaaS), and in the Docker ecostystem this is typically provided by Docker Swarm or Kubernetes}" \cite[Seite~64 ff.]{continuous-delivery}. Da Kubernetes im Unternehmen bereits Anwendung findet, wurde sich hierbei auf Docker Swarm festgelegt, um ein Demo-Projekt zu auszuarbeiten, an dem sich in Zukunft andere Projekte orientieren können. Swarm setzt sich gegenüber vor allem durch den nativen Support innerhalb des Docker Ökosystems ab. Man benötigt keine weiteren externen Tools, sofern eine Docker Installation vorliegt \cite[Seite~10 ff.]{soppelsaswarm}. Das Swarm Tool wird ebenfalls massiv in Produktions-Umgebungen eingesetzt, da es in der Lage ist tausende von Containern zeitgleich zu verwalten und über eine dezentralen Discovery Service anzusteuern. 
+
+\todo{Discovery Service erklären}
+\cite[Seite~59]{soffelsaswarm}
 
 \todo{Anforderungen formulieren...}
 
