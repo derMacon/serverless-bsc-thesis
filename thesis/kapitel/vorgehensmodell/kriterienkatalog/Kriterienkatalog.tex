@@ -86,6 +86,7 @@ Dennoch muss die Software auf eine Skalierung der Hardware ausgelegt sein. Manch
 
 
 \subsubsection{Kompatabilität \checkmark}
+\label{ss:kompatabilitaet}
 Dieses Hauptkriterium beschreibt, wie ausgeprägt die nebenläufige Verarbeitung des Systems ist. Ist es möglich, dass mehrere Komponenten gleichzeitig arbeiten können, ohne sich gegenseitig zu behindern? Gerade in einer containerisierten Umgebung ist dies zu ermitteln. Der Unterbegriff \emph{Ko-Existenz} definiert dieses Verhalten. Der zweite Unterbegriff der "\emph{Interoperabilität}" grenzt hierbei die Kommunikation von der Nebenläufigkeit ab und beschreibt inwiefern die verschiedenen Komponenten in der Lage sind untereinander Daten auszutauschen. Wie genau dieser Datenaustausch aussieht, kann sich von System zu System unterscheiden. Zusammenfassend lässt sich sagen, dass diese Kriterien in einer containerbasierten Anwendung zwar gelten müssen, sie allerdings dennoch derartig abstrakt gehalten sind, dass es schwieriger ist hier messbare Metriken zu generieren. Entweder das System arbeitet hinsichtlich dieser Kriterien fehlerfrei oder es ist fehlerbehaftet, einen messbaren Mittelweg gibt es nicht direkt.
 
 

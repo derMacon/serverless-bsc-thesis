@@ -1,43 +1,46 @@
-\section{Bestimmung von Daten zur Messung des Startup-Verhaltens von Containern}
+\section{Bestimmung von Daten zur Messung des Start-up-Verhaltens von Containern \checkmark}
 
-Nachdem im letzten Abschnitt auf mögliche Kriterien zur Messung der relevanten Metrikinformationen eingegangen wurde, erfolgt im folgenden eine spezifische Festlegung auf bestimmte Kriterien, welche auf das zu lösende Problem zugeschnitten werden.
+Nachdem im letzten Abschnitt auf mögliche Kriterien zur Messung der relevanten Metrikinformationen eingegangen wurde, erfolgt im Folgenden eine spezifische Festlegung auf bestimmte Kriterien, welche auf das zu lösende Problem zugeschnitten werden.
 
-\subsection{Kriterienkatalog}
+% \subsection{Kriterienkatalog}
+% \begin{itemize}
+%   \item Vorallem Skalierbarkeit und Performance
+%   \item Transaktionen - Durchsatz wichtig
+%   \item Deployment egal, da bereits im Container deployed wird
+%   \item Generell sagen, warum einige Aspekte egal sind
+%   \item Wartbarkeit nicht so wichtig
+%   \item Ressourcennutzung
+%   \item St\"orungsf\"alle (Chaos Monkey)
+%   \item Non Functionals - Kai hat PDF geschickt
+% \end{itemize}
+
+\subsection{Leistungsfähigkeit \checkmark}
+Die wesentlichen Metriken stellen hierbei der Datendurchsatz sowie die Latenzzeit dar. Die Latenzzeit sollte die komplette Pipeline abdecken, also vom Dateneingang durch den Benutzer bis hin zur tatsächlichen Speicherung der Daten in der Persistenzschicht. Die gesamte Strecke lässt sich allerdings auch in noch kleinere Abschnitte unterteilen, um bei unerwarteten Werte festzustellen, an welcher Stelle genau es zu einem Engpass kommt. Die Unterteilung der gesamten Pipeline sollte zumindest in zwei Abschnitten erfolgen.
+
 \begin{itemize}
-  \item Vorallem Skalierbarkeit und Performance
-  \item Transaktionen - Durchsatz wichtig
-  \item Deployment egal, da bereits im Container deployed wird
-  \item Generell sagen, warum einige Aspekte egal sind
-  \item Wartbarkeit nicht so wichtig
-  \item Ressourcennutzung
-  \item St\"orungsf\"alle (Chaos Monkey)
-  \item Non Functionals - Kai hat PDF geschickt
+  \item Hierbei ist vor allem von Interesse, ob sich der Zeitenrahmen vom Eingang der Daten bis zum Erhalt der Daten durch die Konsumenten während der Skalierungstests in irgendeiner Weise verändert. Dies sollte zwar nicht der Fall sein, da beide Arten von Testläufen auf dieselbe Eingangsschnittstelle zurückgreifen. Dennoch ist es wichtig festzustellen, falls dies dennoch der Fall sein sollte, denn dann handelt es sich um ein tieferliegendes Problem bei der Orchestrierung des Stacks.
+  \item Außerdem sollte der Zeitrahmen von Erhalt der Daten durch die Konsumenten bis hin zur Interaktion mit der Persistenz-Schicht gesondert betrachtet werden. Dieser Abschnitt stellt den variablen Teil der Pipeline dar und ist von größtem Interesse. 
 \end{itemize}
 
-\subsubsection{Leistungsfähigkeit}
-Die wesentliche Metrik stellt hierbei der Datendurchsatz sowie die Latenzzeit. Die Latenzzeit sollte die komplette Pipeline abdecken, also vom Dateneingang durch den Benutzer, bis hin zur tatsächlichen Abspeicherung der Daten in der Persistenzschicht. Die gesamte Strecke lässt sich allerdings auch in noch kleinere Abschnitte unterteilen um bei unerwarteten Werte festzustellen an welcher Stelle genau es zu einem Engpass kommt. Die Unterteilung der gesamten Pipeline sollte zumindest in zwei Abschnitte erfolgen.
-
-\begin{itemize}
-  \item Hierbei ist vorallem von Interesse ob sich die Zeitenrahmen vom Eingang der Daten bis zum Erhalt der Daten durch die Consumer in irgendeiner Weise verändert. Dies sollte zwar nicht der Fall sein, da beide Arten von Testläufen auf die selbe Eingangsschnittstelle zurückgreifen. Dennoch ist es wichtig festzustellen, falls dies dennoch der Fall sein sollte, denn dann handelt es sich um ein tieferliegendes Problem bei der Orchestrierung des Stacks.
-  \item Außerdem sollte der Zeitrahmen von Erhalt der Daten durch die Consumer bis hin zur Interaktion mit der Persistenz-Schicht gesondert betrachtet werden. Dieser Abschnitt stellt den variablen Teil der Pipeline dar und ist von größtem Interesse. 
-\end{itemize}
-
-\todo{footnote mit link zu gatling und jmeter download seite}
-Auf Werkzeuge wie zum Beispiel \emph{Gatling} oder \emph{JMeter} muss hierbei verzichtet werden, da diese nicht in der Lage sind in die Pipeline einzugreifen um die einzelnen Abschnitte gesondert betrachten / messen zu können. Die Metriken müssen sowohl mittels der kompilierten Arbeitsversion als auch der Skript-Version generiert werden um eine Gegenüberstellung anstellen zu können. Hierbei sollte es außerdem möglich sein, den zeitlichen Verlauf der Metriken darzustellen um nachvollziehen zu können, ob es Phasen gibt in denen die Bearbeitung von dem berechneten Durchschnittswert abweicht. Je nach Stärke der Abweichung gilt es zu evaluieren ob weitere statistische Kenngrößen diesbezüglich berechnet werden sollten oder nicht. Ein weiteres mögliches Kriterium wäre in diesem Zusammenhang zum Beispiel die Standardabweichung. Da die Latenzzeit stark mit dem eigentlichen Datendurchsatz zusammenhängt ist es nicht nötig diese noch einmal gesondert zu berechnen um Redundanz zu vermeiden.
+Auf Werkzeuge wie zum Beispiel \emph{Gatling}\footnote{\url{https://gatling.io/}} oder \emph{JMeter}\footnote{\url{https://jmeter.apache.org/}} muss hierbei verzichtet werden, da diese nicht in der Lage sind in die Pipeline einzugreifen um die einzelnen Abschnitte gesondert betrachten beziehungsweise messen zu können. Die Metriken müssen sowohl mithilfe der kompilierten Arbeitsversion als auch der Skript-Version generiert werden um eine Gegenüberstellung anstellen zu können. Hierbei sollte es außerdem möglich sein, den zeitlichen Verlauf der Metriken darzustellen um nachvollziehen zu können, ob es Phasen gibt in denen die Bearbeitung von dem berechneten Durchschnittswert abweicht. Je nach Stärke der Abweichung gilt es zu evaluieren, ob zusätzliche statistische Kenngrößen diesbezüglich berechnet werden sollten oder nicht. Ein weiteres mögliches Kriterium wäre in diesem Zusammenhang zum Beispiel die Standardabweichung. Da die Latenzzeit stark mit dem eigentlichen Datendurchsatz zusammenhängt, ist es nicht nötig diese noch einmal gesondert zu berechnen um Redundanz zu vermeiden.
 
 
-\subsubsection{Skalierbarkeit}
-Da es sich bei dem Projekt um eine containerisierte Cloudanwendung handelt, muss hierbei eine \emph{Vertikale Skalierung} stattfinden. Um möglichst genaue Werte zu erreichen, müssen die zu skalierenden Container in engem Austausch mit dem System stehen. Es muss festgehalten werden, wann genau der Befehl zum Skalieren getätigt wird, und wann genau ein entsprechender Container gestartet ist. Als vollkommen initialisiert gilt ein Container, wenn neben dem eigenen Filesystem auch sämtliche relevante Kommunikationsschnittstellen gestartet und benötigte Datenverbindungen bestehen. Generell gilt, die erhobenen Metriken sollen jeweils getrennt pro Backend-Technologie erhoben werden um eine Gegenüberstellung zu gewährleisten.
+\subsubsection{Skalierbarkeit \checkmark}
+Da es sich bei dem Projekt um eine containerisierte Cloudanwendung handelt, muss hierbei eine \emph{vertikale Skalierung} stattfinden. Um möglichst akkurate Werte zu erreichen, müssen die zu skalierenden Container in engem Austausch mit dem System stehen. Es muss festgehalten werden, wann genau der Befehl zum Skalieren getätigt wird und wann die Initialisierungsphase eines entsprechenden Containers abgeschlossen wurde. Als vollkommen initialisiert gilt ein Container, wenn neben dem eigenen Filesystem auch sämtliche relevante Kommunikationsschnittstellen gestartet und benötigte Datenverbindungen bestehen. Darüber hinaus sei noch erwähnt, dass die erhobenen Metriken sollen jeweils getrennt pro Backend-Technologie erhoben werden, damit eine Gegenüberstellung gewährleistet werden kann.
 
-Bezüglich der Skalierung gilt vorallem es soll ein vorausschauendes Regelmodell entworfen werden, welches die Container stufenweise erst dann skaliert, wenn eine Vielzahl von Nachrichten eine gewisse Latenzzeit überschreitet oder der Message Broker eine entsprechende Menge an unbeantworteten Nachrichten hält. Hierbei soll eine sinnvolle Festlegung gefunden werden. Um im Nachhinein genaue Vergleichswerte ermitteln zu können sollen lediglich die Konsumenten Container skaliert werden. Die restlichen Stackkomponenten laufen jeweils mit einer einzigen Instanz.\todo{Im Ausblick erwähnen, dass es möglich ist Datenbanken, Broker etc. zu skalieren, Gegenstand der nächsten Arbeit...} Der Skalierungsprozess soll sowohl mittels eingegangener Nachrichten, als auch durch spezifische Benutzeranfrage, gestartet werden können. Diese Unterteilung soll in den persistierten Datensätzen erkennbar sein.
+Bezüglich der Skalierung gilt, dass insbesondere ein vorausschauendes Regelmodell entworfen werden soll, das die Container stufenweise erst dann skaliert, wenn eine Vielzahl von Nachrichten eine gewisse Latenzzeit überschreiten oder der Message Broker eine entsprechende Menge an unbeantworteten Nachrichten hält. Hierbei soll eine sinnvolle Festlegung gefunden werden. Um im Nachhinein genaue Vergleichswerte ermitteln zu können, sollen lediglich die Container der Konsumenten-Instanzen skaliert werden. Die restlichen Stackkomponenten laufen jeweils als eine Singleton-Instanz. Der Skalierungsprozess soll sowohl mit eingegangenen Nachrichten, als auch durch spezifische Benutzeranfrage gestartet werden können. Diese Unterteilung soll in den persistierten Datensätzen erkennbar sein.
 
-Die hierbei generierten Metriken sollen sich bezüglich der vom Nachrichteneingang generierten Skalierungen anhand des festgelegten Stufenmodels ausgegeben werden. Hierbei wird der Durchschnitt aller in dieser Stufe / Gruppe enthaltenen Skalierungen gebildet und dargestellt. Es soll allerdings auch möglich sein die durchschnittlichen Werte sowohl für einzelne Containeranzahlen als auch für alle durchlaufen Skalierungen geben. Ähnlich zu den Metriken der \emph{Leistungsfähigkeit} gilt, sie sollen ebenfalls zeitlich aufbereitet werden. Falls sich hierbei ungewöhnlich Auschweifungen hinsichlich der zeitlichen Entwicklung abzeichnen lassen sollten, können weitere statistische Metriken hinzugezogen werden. 
+\todo{Im Ausblick erwähnen, dass es möglich ist Datenbanken, Broker etc. zu skalieren, Gegenstand der nächsten Arbeit...}
 
-\todo{am Ende schauen ob genügend Zeit um noch die Verlässlichkeit des Systems zu testen. Stichwort Chaos Monkey}
+Die mit eingegangenen Nachrichten generierten Skalierungen sollen anhand des festgelegten Stufenmodells ausgegeben werden. Hierbei wird der Durchschnitt aller in dieser Stufe / Gruppe enthaltenen Skalierungen gebildet und dargestellt. Es soll allerdings ebenfalls möglich sein, die durchschnittlichen Werte sowohl für einzelne Containeranzahlen als auch für alle durchlaufenen Skalierungen geben. Ähnlich zu den Metriken der \emph{Leistungsfähigkeit} gilt, sie sollen ebenfalls zeitlich aufbereitet werden. Falls sich hierbei ungewöhnliche Auschweifungen hinsichlich der zeitlichen Entwicklung abzeichnen lassen, können zusätzliche statistische Metriken hinzugezogen werden. 
 
+\todo{Chaos Monkey Betrachtung an Ende der Thesis packen}
 
-\subsubsection{Zusammenfassung}
-Der Übersichtlichtkeitshalber hier noch einmal eine stichwortartige Zusammenfassung der zu ermittelnden Metriken hinsichtlich der betrachteten Kriterien.
+\subsubsection{Zusätzliche Kriterien \checkmark}
+Um einen funktionsfähigen Prototypen erstellen zu können, der die beiden wesentlichen Kenngrößen überhaupt erheben kann, müssen bereits viele der im vorherigen Abschnitt erläuterten Kriterien gelten. Um skalierte Konsumenten zu ermöglichen, sind die beiden Aspekte des ISO-Hauptkriterium der "\emph{Kompatabilität}" der Nebenläufigkeit (\emph{Ko-Existenz} sowie \emph{Interoperabilität} siehe Abschnitt \ref{ss:kompatabilitaet}) unabdingbar. Ein funktionierender Prototyp zeigt hierbei auf, dass die Aspekte zwangsweise erfüllt sein müssen. Diese werden daher nicht erneut gesondert betrachtet. Auch das Kriterium der "\emph{Zuverlässigkeit}" (siehe Abschnitt \ref{ss:zuverlaessigkeit}) wird durch eine funktionierende Implementierung bereits in Teilen erfüllt, da es beim genutzten Orchestrator zum gegenwärtigen Zeitpunkt noch keine Möglichkeit für eine definierte Ausführungsreihenfolge gibt. Die Komponenten müssen im Zweifelsfall mehrfach starten um eine Verbindung aufbauen zu können. Eine genaue Evaluierung sowie eine kritische Betrachtung dieses Aspektes erfolgt in Abschnitt \todo{Abschnitt einfügen}.
+
+\subsubsection{Zusammenfassung \checkmark}
+Der Übersichtlichkeit halber hier noch einmal eine stichwortartige Zusammenfassung der zu ermittelnden Metriken hinsichtlich der betrachteten Kriterien.
 
 \begin{itemize}
   \item Latenzzeit im Durchschnitt sowie als zeitliche Historie
@@ -48,7 +51,7 @@ Der Übersichtlichtkeitshalber hier noch einmal eine stichwortartige Zusammenfas
   \end{itemize}
   \item Skalierungsdauer jeweils pro verwendeter Backend-Technologie festzuhalten
   \begin{itemize}
-    \item Skalierung anhand eingehender Nachrichten mittels Stufenmodell
+    \item Skalierung anhand eingehender Nachrichten mithilfe Stufenmodell
     \item Skalierung mittels direkter Benutzeranfrage (ohne eingehende Nachrichten)
     \item Metriken als Datensätze in einer Datenbank hinterlegt
     \item Durchschnittliche Startzeit pro Containeranzahl 
