@@ -188,7 +188,7 @@ Kern des Spring Frameworks ist der \emph{Spring Container}. Dieser verwaltet fac
 
 
 
-Ebenfalls auffällig ist, dass bei beiden Technologien das Initialisieren einzelner Container deutlich schneller abläuft, als wenn mehrere Container gleichzeitig hochfahren. Dies lässt sich auf die geteilten Resourcen der Container zurückführen. In der Cloud wird hinsichtlich parallel arbeitender Container auch von "\emph{noisy neighbors}" gesprochen \cite[Seite~67 ff.]{oreilly-docker}. Dieses Konzept beschreibt ein generelles Problem bezüglich Cloud-Systemen. Im Gegensatz zu traditionellen virtuellen Maschinen ist es bei Docker Containern nicht möglich, den verfügbaren Speicher sowie CPU-Zeit zu regulieren. Hierbei muss auf die \emph{cgroup} Funktionalität des Linux Kernels zurückgegriffen werden \todo{cgroups mit Quelle erklären}. Dies wurde beim Prototypen nicht konfiguriert. Gerade hinsichtlich der Initialisierungsphase von neuen Containern, lässt sich hierbei sicherlich einiges optimieren. Im folgenden Abschnitt folgt eine kurze Diskussion über die verfügbaren Möglichkeiten diesbezüglich.
+Ebenfalls auffällig ist, dass bei beiden Technologien das Initialisieren einzelner Container deutlich schneller abläuft, als wenn mehrere Container gleichzeitig hochfahren. Dies lässt sich auf die geteilten Resourcen der Container zurückführen. In der Cloud wird hinsichtlich parallel arbeitender Container auch von "\emph{noisy neighbors}" gesprochen \cite[Seite~67 ff.]{oreilly-docker}. Dieses Konzept beschreibt ein generelles Problem bezüglich Cloud-Systemen. Im Gegensatz zu traditionellen virtuellen Maschinen ist es bei Docker Containern nicht möglich, den verfügbaren Speicher sowie CPU-Zeit zu regulieren. Hierbei muss auf die \emph{cgroup} Funktionalität des Linux Kernels zurückgegriffen werden. "\emph{Control groups, usually referred to as cgroups, are a Linux kernel feature which allow processes to be organized into hierarchical groups whose usage of various types of resources can then be limited and monitored}" \cite{man-cgroups}. Dies wurde beim Prototypen nicht konfiguriert. Insbesondere die Initialisierungsphase von neuen Containern, lässt sich hierdurch optimieren. Im folgenden Abschnitt folgt eine kurze Diskussion über die verfügbaren Möglichkeiten diesbezüglich (siehe Abschnitt \ref{par:resOpt}).
 
 
 
@@ -211,9 +211,6 @@ Ebenfalls auffällig ist, dass bei beiden Technologien das Initialisieren einzel
 \section{Diskussion}
 
 \subsection{Begr\"undung Startupzeit}
-\begin{itemize}
-  \item Warum Node.js schneller ist
-\end{itemize}
 
 \begin{itemize}
   \item Erlaeutern warum die erhaltenen Ergebnisse in einem real-life Szenario vielleicht nicht aussagekraeftig sein koennten
@@ -222,8 +219,39 @@ Ebenfalls auffällig ist, dass bei beiden Technologien das Initialisieren einzel
 
 
 
+\subsection{Ressourcenoptimierung}
+\label{par:resOpt}
+Docker bietet nativ die Möglichkeit sowohl Speicher als auch CPU-Ressourcen für spezifische Container oder den gesamten Stack zu regulieren. Dadurch könnten unter anderem mehr Ressourcen für das Hochfahren neuer Container zur Verfügung gestellt werden.
+
 Bezüglich dem Aufteilen der zugewiesenen CPU-Zeit modelliert Docker intern einen Pool mit 1024 Shares. Es ist nun möglich für einen Container anzugeben wie viele Shares dieser vom Scheduler zugewiesen bekommen soll. Falls ein Container beispielsweise lediglich die Hälfte der verfügbaren Resourcen verwenden soll, wird ein Wert von 512 angeben, wenn er allerdings so viel CPU-Zeit wie möglich in Anspruch nehmen soll, wird hierbei ein Wert von 1024 angegeben. Diese Anteile repräsentieren lediglich den Bedarf eines Containers. Ein Container mit 1024 angebenen Shares besetzt die CPU nicht ausschließlich, sondern signalisiert nur, dass dem Container so viel Zeit wie möglich zugewiesen werden soll. Außerdem ist es möglich mithilfe des sogenannten "\emph{CPU pinning}" einzene CPU-Kerne bestimmten Containern zuzuweisen. So ist es beispielsweise einzelne Kerne primär zum Hochfahren neuer Komponenten zu verwenden. 
 
-Neben der Anpassung der Rechenleistung ist es ebenfalls den verfügbaren Speicher eines Containers zu modifizieren. "\emph{While constraining the CPU only impacts the application’s priority for CPU time, the memory limit is a hard limit}" \cite[Seite~68 ff.]{oreilly-docker}. Bei einem unausgelasteten System würde auch eine niedrige Anzahl an CPU-Shares in einem größeren Anteil von Rechenleistung resultieren, bei der Begrenzung des Speichers gibt es diese Option nicht. 
-
+Neben der Anpassung der Rechenleistung ist es ebenfalls möglich den verfügbaren Speicher eines Containers zu modifizieren. "\emph{While constraining the CPU only impacts the application’s priority for CPU time, the memory limit is a hard limit}" \cite[Seite~68 ff.]{oreilly-docker}. Bei einem unausgelasteten System würde auch eine niedrige Anzahl an CPU-Shares in einem größeren Anteil von Rechenleistung resultieren, bei der Begrenzung des Speichers gibt es diese Option nicht. Eine feingranularere Anpassung der System-Ressourcen ist außerdem mit den sogenannten "\emph{user limits (ulimits)}" möglich.
 \todo{ulimit recherchieren S.72}
+
+
+\subsection{Optimierte Ausführungsreihenfolge}
+Um die gesamte Startzeit bei gleichzeitigem Starten von Node.js und Spring Containern minimieren zu können, wäre es ebenfalls angebracht eine Strategie hinsichtlich der Reihenfolge der Services zu entwickeln. In der Analyse der Daten war zu erkennen, dass ein Spring Container im Schnitt 13 Mal schneller arbeitet als ein Node Container. Um diesen Unterschied auszugleichen sollten entsprechend mehr Node Container gestartet werden um hierbei einen Ausgleich zu schaffen. Bereits während dem Hochfahrprozess der einzelnen Container sollte ein ähnliches Verhältnis eingehalten werden. Bisher find hier eine strikte Trennung der Services statt, es wurden also entweder \emph{n} Spring-Container und / oder \emph{n} Node-Container gestartet, eine Vermischung der Anfragen würde die Effizienz des Systems hinsichtlich des Datendurchsatzes sowie der Latenzzeit steigern. 
+
+
+\subsection{Aussagen über Produktivumgebung}
+Die Aussagen, die während der Analyse der Daten getroffen wurden, sind hinsichtlich eines Systems in einer Produktivumgebung nur in Teilen aussagekräftig. Ein wesentliches Hauptkriterium der ISO-Norm 25010 \todo{ref einbinden} wurde hierbei vernachlässigt, denn es wurde nur sehr eingeschränkt auf die Verfügbarkeit des Systems und dem \emph{Design for failure} eingegangen. Wenn zentrale Komponenten ausfallen gibt es lediglich ein definiertes Default-Verhalten des Orchestrators. So wird versucht die Komponente selbst, sowie sämtliche Kommunikationspartner neu zu starten. Dieses Verhalten hat vor allem Einfluss auf den Initialisierungszeitraum eines Containers. Da beide betrachteten Technologien jede auf eigene Weise Mechanismen zum erneuten Verbindungsaufbau im Falle eines Ausfalls zur Verfügung stellen, ist diese Betrachtung für die reine Evaluierung der Technologie von nicht allzu großer Bedeutung. Im Zweifelsfall wird ein Container mehrmals gestartet, die grundlegenden Messdaten lassen sich bereits an einem störungsfreien Ablauf ablesen. Falls es zu einem späteren Zeitpunkt während der Portierung der Banking-Anwendung hin zu einer der betrachteten Technologien kommen sollte, muss dieses Fehlerverhalten jedoch ausgiebig getestet werden um späteres unerwartetes Verhalten zu vermeiden. 
+
+Ein Werkzeug zum Testen dieses Verhaltens nennt sich "\emph{Chaos Monkey}"\footnote{\url{https://github.com/Netflix/chaosmonkey}}. 
+
+
+
+
+Sobald ein System jedoch skaliert wurde und eine Verbindung zwischen kommunizierenden Komponenten besteht, 
+
+
+
+\subsection{Zusammenfassung}
+
+\begin{itemize}
+	\item Ressourcenoptimierung könnte 
+	\item
+	\item
+	\item
+\end{itemize}
+
+
