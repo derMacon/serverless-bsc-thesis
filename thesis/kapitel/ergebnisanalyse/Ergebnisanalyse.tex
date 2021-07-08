@@ -175,48 +175,82 @@ Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurde diverse Panels zur zei
 \subsection{Latenzzeit}
 Hinsichtlich der Latenzzeit überrascht vor allem die deutliche Diskrepanz zwischen der Initialisierungsdauer der unterschiedlichen Technologien. Durch die Unterteilung der Pipeline in die zwei Messwerte ist erkennbar, dass diese auf die zeitliche Dauer bis zum Nachrichteneingang zurückzuführen ist. Hierbei läuft die Dauer der Initialisierungsphasen weit auseinander (siehe Abschnitt \ref{ss:skalierungsdauer}).
 
-Bezüglich der Verarbeitungsgeschwindigkeit ist die Spring-Boot-Komponente jedoch im Vergleich schneller. Dies ist auf die Natur einer kompilierten Sprache zurückzuführen. Java Code wird im Vorwege in entsprechenden Bytecode übersetzt, während eine Skriptsprache wie Javascript innerhalb der Node.js-Komponente zur Laufzeit interpretiert wird. Da in den betrachteten Komponenten nur minimale Logik verbaut wurde, ist der festgestellte zeitliche Unterschied in der Bearbeitungsdauer mit 359  Millisekunden zwar nicht so gravierend wie der Unterschied hinsichtlich der Initialisierungsphase der Container, allerdings drastischer als vorher angenommen. In Anbetracht der Komplexität der realen Banking-Anwendung gilt es ein spezifisches Konzept für das Regelwerk zum Starten der Container zu entwerfen. Hierbei muss eine Untersuchung bezüglich der Rentabilität eines neuen startenden Containers gegenüber eines laufenden Containers evaluiert werden. Diese Untersuchung kann sich aus mehreren Aspekten zusammensetzen. Dabei könnte zum Beispiel betrachtet werden, wie viele Nachrichten eine bereits einsatzfähige Komponente verarbeiten kann, bevor eine neu initialisierte Komponente bereit ist Nachrichten entgegenzunehmen. Ebenfalls ist die Wahrscheinlichkeit, dass eine bereits laufende Komponente während der Bearbeitung abstürzt geringer, als die einer neu startenden Komponente (fehleranfälliger Verbindungsaufbau). Diese Wahrscheinlichkeit sowie der beschriebenen Initialisierungsoverhead müssen bei der Ermittlung der idealen Threshholds zur Skalierung des Systems betrachtet werden. 
+Bezüglich der Verarbeitungsgeschwindigkeit ist die Spring-Boot-Komponente jedoch im Vergleich schneller. Dies ist auf die Natur einer kompilierten Sprache zurückzuführen. Java Code wird im Vorwege in entsprechenden Bytecode übersetzt, während eine Skriptsprache wie Javascript innerhalb der Node.js-Komponente zur Laufzeit interpretiert wird. Da in den betrachteten Komponenten nur minimale Logik verbaut wurde, ist der festgestellte zeitliche Unterschied in der Bearbeitungsdauer mit 359  Millisekunden zwar nicht so gravierend wie der Unterschied hinsichtlich der Initialisierungsphase der Container, allerdings lässt sich dadurch auch erkenne, dass die Spring Komponente durchschnittliche 13 mal schneller arbeitet als die Node.js Komponente. In Anbetracht der Komplexität der realen Banking-Anwendung gilt es ein spezifisches Konzept für das Regelwerk zum Starten der Container zu entwerfen. Hierbei muss eine Untersuchung bezüglich der Rentabilität eines neuen startenden Containers gegenüber eines laufenden Containers evaluiert werden. Diese Untersuchung kann sich aus mehreren Aspekten zusammensetzen. Dabei könnte zum Beispiel betrachtet werden, wie viele Nachrichten eine bereits einsatzfähige Komponente verarbeiten kann, bevor eine neu initialisierte Komponente bereit ist Nachrichten entgegenzunehmen. Ebenfalls ist die Wahrscheinlichkeit, dass eine bereits laufende Komponente während der Bearbeitung abstürzt geringer, als die einer neu startenden Komponente (fehleranfälliger Verbindungsaufbau). Diese Wahrscheinlichkeit sowie der beschriebenen Initialisierungsoverhead müssen bei der Ermittlung der idealen Threshholds zur Skalierung des Systems betrachtet werden. 
 
 \todo{Quellen interpretierte vs. kompilierte Sprachen}
 
 \subsection{Skalierungsdauer}
 \label{ss:skalierungsdauer}
-Die erheblich abweichende Initialisierungsgeschwindigkeit der beiden unterschiedlichen Komponenten lässt sich im Kern auf auf die Initialisierungs des Spring-Containers sowie des dazugehörgien Application-Contexts zurückführen. Das Framework bietet durch die ... \todo{Weiterschreiben, schauen ob es diese Erklärung schon irgendwo in der Thesis gibt.}
-Kern des Spring Frameworks ist der \emph{Spring Container}. Dieser verwaltet fachliche und nichtfachliche Objekte, die eine Anwendung ausmachen. Die verwalteten Objekte werden als \emph{Beans} bezeichnet. "Eine Bean ist ein Objekt, das vom Spring-Container instanziiert und konfiguriert wurde und dessen Lebenszyklus vom Container verwaltet wird. Die Abhängigkeiten zwischen Beans sind als Metadaten im Container verfügbar" \cite[Kapitel~3.1.1]{simons-spring}. 
+Besonders auffällig ist, dass bei beiden Technologien das Initialisieren einzelner Container deutlich schneller abläuft, als wenn mehrere Container gleichzeitig hochfahren oder eine gewisse Anzahl an Container bereits laufen. Dies lässt sich auf die geteilten Resourcen der Container zurückführen. In der Cloud wird hinsichtlich parallel arbeitender Container auch von "\emph{noisy neighbors}" gesprochen \cite[Seite~67 ff.]{oreilly-docker}. Dieses Konzept beschreibt ein generelles Problem bezüglich Cloud-Systemen. Im Gegensatz zu traditionellen virtuellen Maschinen ist es bei Docker Containern nicht möglich, den verfügbaren Speicher sowie CPU-Zeit zu regulieren. Hierbei muss auf die \emph{cgroup} Funktionalität des Linux Kernels zurückgegriffen werden. "\emph{Control groups, usually referred to as cgroups, are a Linux kernel feature which allow processes to be organized into hierarchical groups whose usage of various types of resources can then be limited and monitored}" \cite{man-cgroups}. Dies wurde beim Prototypen nicht konfiguriert. Insbesondere die Initialisierungsphase von neuen Containern, lässt sich hierdurch optimieren. Im folgenden Abschnitt folgt eine kurze Diskussion über die verfügbaren Möglichkeiten diesbezüglich (siehe Abschnitt \ref{par:resOpt}).
 
-\todo{Spring Initialisierungsschritte mit Node.js vergleichen}
+Die erheblich abweichende Initialisierungsgeschwindigkeit der beiden unterschiedlichen Komponenten lässt sich im Kern auf auf die Initialisierungs des Spring-Containers sowie des dazugehörgien Application-Contexts zurückführen. "\emph{Eines der Schlüsselelemente des Spring-Frameworks ist die Bereitstellung von Infrastruktur auf Anwendungsebene}" \cite[Seite~53 ff.]{simons-spring}. Hiermit sind in erster Linie die Mechanismen der "\emph{dependency injection}" sowie der "\emph{aspektorientierten Programmierung}" gemeint. Diese die lose Kopplung der Komponenten, die eine spezialisierte Aufgabe bearbeiten \emph{(hohe Kohäsion)}. Diese Strukturierung ermöglicht eine deutlich übersichtlicheren Quellcode. Kern des Spring Frameworks ist der \emph{Spring Container}. Dieser verwaltet fachliche und nichtfachliche Objekte, die eine Anwendung ausmachen. Die verwalteten Objekte werden als \emph{Beans} bezeichnet. "\emph{Eine Bean ist ein Objekt, das vom Spring-Container instanziiert und konfiguriert wurde und dessen Lebenszyklus vom Container verwaltet wird. Die Abhängigkeiten zwischen Beans sind als Metadaten im Container verfügbar}" \cite[Kapitel~3.1.1]{simons-spring}. Durch die Verwendung des Spring-Containers können sich die Entwickler mehr auf die Implementierung der Businesslogik und weniger auf die Konfiguration des Systems konzentrieren. Das Node.js Framework besitzt diese Mechanismen nicht. Der vom Entwickler geschriebene Code wird zur Laufzeit direkt ausgeführt. Dies erschwert zwar den späteren Verlauf eines Projektes, birgt allerdings auch keinen Konfigurationsoverhead. Spring bietet über die gegebene Grundfunktionalität mit jeder importierten Dependency weitere automatische Konfigurationsschritte. Es gibt zwar Möglichkeiten diese zusätzliche Konfiguration zu gewissen Teilen außer Kraft zu setzen, dennoch ändert dies nichts an dem grundlegenden "\emph{Problem}" der längeren Initialisierungsphase (siehe Abschnitt \ref{ss:spring-perf}). Um noch einmal zu betonen, wie viele Schritte zur Initialisierung einer Spring-Bean durchlaufen werden müssen, folgt ein kurzer Exkurs.
 
+\subsubsection{Exkurs: Initialisierung Spring Bean}
+Im folgenden Schaubild wurden die wesentlichen Schritte des Lebenszyklusses einer Spring-Bean exemplarisch dargestellt. Das kontrollierte Herunterfahren \emph{destruction} wird hierbei nicht weiter betrachtet. 
 
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{kapitel/ergebnisanalyse/_img/bean-lifecycle}
+	\caption[Bean Lifecycle]{Spring Bean Lifecycle \cite{bean-lifecycle}}
+	\label{fig:bean-init}
+\end{figure}
 
-Ebenfalls auffällig ist, dass bei beiden Technologien das Initialisieren einzelner Container deutlich schneller abläuft, als wenn mehrere Container gleichzeitig hochfahren. Dies lässt sich auf die geteilten Resourcen der Container zurückführen. In der Cloud wird hinsichtlich parallel arbeitender Container auch von "\emph{noisy neighbors}" gesprochen \cite[Seite~67 ff.]{oreilly-docker}. Dieses Konzept beschreibt ein generelles Problem bezüglich Cloud-Systemen. Im Gegensatz zu traditionellen virtuellen Maschinen ist es bei Docker Containern nicht möglich, den verfügbaren Speicher sowie CPU-Zeit zu regulieren. Hierbei muss auf die \emph{cgroup} Funktionalität des Linux Kernels zurückgegriffen werden. "\emph{Control groups, usually referred to as cgroups, are a Linux kernel feature which allow processes to be organized into hierarchical groups whose usage of various types of resources can then be limited and monitored}" \cite{man-cgroups}. Dies wurde beim Prototypen nicht konfiguriert. Insbesondere die Initialisierungsphase von neuen Containern, lässt sich hierdurch optimieren. Im folgenden Abschnitt folgt eine kurze Diskussion über die verfügbaren Möglichkeiten diesbezüglich (siehe Abschnitt \ref{par:resOpt}).
+Während der \emph{Initialisierungsphase} wird die genutzte Bean-Instanz vom Framework erstellt. Dies kann mittels eines direkten Konstruktoraufrufs oder sonstigen Mustern (Factory, Builder etc.) geschehen. Anschließend werden die die erstellten Instanzen einem sogenannten "\emph{componentscan}" unterzogen. Hierbei werden abhängige Beans untereinander mittels dependency injection in den Instanzen referenziert. Hierzu gibt es mehrere Möglichkeiten. 
 
+\begin{enumerate}
+	\item Es wird geschaut, welche der Instanzen ein Interface vom Typ \emph{Aware} implementieren. Bei dem Supertypen handelt es sich um ein reines Markerinterface. Jedoch gibt es verschiedene Subtypen, die Setter-Methoden für einzelne Kontext abhängige Ressourcen bieten. Über diese Methoden wird dem Framework beispielsweise signalisiert, dass eine Bean, welche das Interface \emph{ApplicationContextAware} implementiert eine Instanz vom Typ \emph{ApplicationContext} injeziert bekommen soll. Ähnliches gilt beispielsweise für Beans, die Zugriff auf Umgebungsvariablen benötigen (siehe Listing \ref{lst:bean-aware}) Über diese Interfaces ist es außerdem möglich direkt in den Initialisierungsprozess einer Bean einzugreifen, indem eine eigene Aware Implementierung.
+	\item Ab der Spring Version 4.3 und höher ist es möglich einen Konstruktor zu erzeugen, der lediglich die zu injezierenden Felder setzen muss.
+	\item Außerdem ist es möglich mittels der \emph{Autowired}-Annotation Instanzen zu setzen.
+\end{enumerate}
 
+\begin{lstlisting}[style=javaStyle,caption={Bean - EnvironmentAware \cite{bean-aware}},label=lst:bean-aware]
+@Component
+public class LoggerService implements EnvironmentAware {
 
+	private Environment environment;
 
-\todo{Docker Container Initialisierungszyklus recherchieren -> warum dauert das Initialisieren mehrere Container so viel länger als einzelner Container}
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
+}
+\end{lstlisting}
+
+Im nächsten Schritt folgt der Verarbeitungsschritt der \emph{Pre-Initialization}. Hierbei werden diverse Arbeitsschritte durchlaufen bevor die eigentlich Initialisierung stattfindet. Hierzu gehören zum Beispiel auch Methoden mit der \emph{PostContstructor} Annotation, welche auf Felder der Klasse zugreifen können, ohne im Konstruktor vertreten sein zu müssen. Es folgen noch weitere Schritte, auf die hierbei nicht weiter eingegangen wird. 
+
+Diese Beschreibung sollte lediglich einen kurzen Einblick über die Möglichkeiten die der Initialisierungsprozess dem Anwender bietet. Hierbei ist es nicht nur möglich genau nachzuvollziehen, in welcher Phase sich eine Bean momentan befindet, sonder der Prozess bietet die Möglichkeit mittels spezifizierter Schnittstellen an einer beliebigen Stelle eigene Logikbausteine zu integrieren. Um der Philosophie des Spring-Frameworks gerecht zu werden, braucht es auch einen solch komplexen Aufbau. 
 
 
 \subsection{Zusammenfassung}
 
 \begin{itemize}
-	\item 
+	\item Noisy Neighbors: Skalieren in der Cloud bedeutet Kampf um Ressourcen
+	\begin{itemize}
+		\item cgroups als wesentlicher Steuerungsmechanismus
+		\item Erörterung der Konfigurationsmöglichkeiten im nächstem Abschnitt
+	\end{itemize}
 	\item Skalierungsdauer: erhöhte Initialisierungsdauer von Spring auf zwei wesentliche Faktoren zurückzuführen
 	\begin{itemize}
 		\item Spring Initialisierungsaufwand (IoC, Spring Context, AOP)
 		\item Resourcenbegrenzung in der Cloud (CPU Shares)
 	\end{itemize}
+	\item Exkurs: Spring Initialisierungsschritte
+	\begin{itemize}
+		\item Möglichkeiten eigene Logikbausteine unterzubringen
+		\item Verarbeitungsschritte schaffe Nachvollziehbarkeit
+	\end{itemize}
 \end{itemize}
 
 
 \section{Diskussion}
+Im letzten Abschnitt wurde auf die zwei wesentlichen Kenndaten der ermittelten Metriken eingegangen. Dabei wurden mögliche Begründungen für die erhaltenen Messdaten präsentiert. Es folgte außerdem ein kurzer Exkurs zum Initialisierungsprozess einer Spring-Bean. Generell stellt die lange Initialisierungsphase der Spring-Komponenten ein ernsthaftes Problem dar. Welche Schritte zur Optimierung dieses Verhaltens durch die zugrunde Technologie ermöglicht werden und inwiefern das System dies mithilfe der schnellen Verarbeitungsdauer auszugleichen vermag, wird im folgenden Abschnitt beschrieben. 
 
-\subsection{Begr\"undung Startupzeit}
+\subsection{Spring-Bean - Optimierung der Initialisierungsphase}
+\label{ss:spring-perf}
 
-\begin{itemize}
-  \item Erlaeutern warum die erhaltenen Ergebnisse in einem real-life Szenario vielleicht nicht aussagekraeftig sein koennten
-  \item Vorschlag zur effizientere Skalierung vorstellen (in Batches aufteilen und nicht alles auf einmal skalieren)
-\end{itemize}
+Die deutliche längere Initialisierungsphase der Spring-Komponente lässt sich in erster Linie auf die beschriebene Komplexität der einzelnen Anwendungsschritte zurückführen. Um einem derart mächtigem Framework wie Spring Boot gerecht zu werden, benötigt es einen ähnlich ausgeprägten Initialisierungsmechanismus für den Spring-Container und allen damit verbundenen Anforderungen. Da das Projekt allerdings verschiedene Abhängigkeiten aufweist, wird auch der Initialisierungsprozess entsprechend erweitert. Mit dem Befehl \verb+mvn spring-boot:run -Ddebug+ können zum Beispiel alle automatischen Konfigurationsschritte ausgebeben werden. Wie im Artikel \cite{spring-perf} beschrieben ist es durchaus möglich einige der Konfigurationen wegzulassen, wenn die dazugehörigen Komponenten nicht genutzt werden. 
 
+Es ist außerdem möglich, auf einen anderen Servlet-Container wie "\emph{Undertow}" zuzugreifen. Dies soll ebenfalls eine Performancsteigerung mit sich ziehen. Dennoch wurde sich für den Prototypen dagegen entschieden weder einzelne Konfigurationen manuell zu entfernen noch die Container-Implementierung zu wechseln, da sich das Projekt auch nach Bearbeitung der Thesis eventuell noch weiterentwickelt und es später vielleicht zu sonderbaren Fehlerfällen kommen könnte.
 
 
 \subsection{Ressourcenoptimierung}
@@ -230,28 +264,38 @@ Neben der Anpassung der Rechenleistung ist es ebenfalls möglich den verfügbare
 
 
 \subsection{Optimierte Ausführungsreihenfolge}
-Um die gesamte Startzeit bei gleichzeitigem Starten von Node.js und Spring Containern minimieren zu können, wäre es ebenfalls angebracht eine Strategie hinsichtlich der Reihenfolge der Services zu entwickeln. In der Analyse der Daten war zu erkennen, dass ein Spring Container im Schnitt 13 Mal schneller arbeitet als ein Node Container. Um diesen Unterschied auszugleichen sollten entsprechend mehr Node Container gestartet werden um hierbei einen Ausgleich zu schaffen. Bereits während dem Hochfahrprozess der einzelnen Container sollte ein ähnliches Verhältnis eingehalten werden. Bisher find hier eine strikte Trennung der Services statt, es wurden also entweder \emph{n} Spring-Container und / oder \emph{n} Node-Container gestartet, eine Vermischung der Anfragen würde die Effizienz des Systems hinsichtlich des Datendurchsatzes sowie der Latenzzeit steigern. 
+Um die gesamte Startzeit bei gleichzeitigem Starten von Node.js und Spring Containern minimieren zu können, wäre es ebenfalls angebracht eine Strategie hinsichtlich der Reihenfolge der Services zu entwickeln. In der Analyse der Daten war zu erkennen, dass ein Spring Container im Schnitt 13 Mal schneller arbeitet als ein Node Container. Um diesen Unterschied auszugleichen sollten entsprechend mehr Node Container gestartet werden um hierbei einen Ausgleich zu schaffen. Bereits während dem Hochfahrprozess der einzelnen Container sollte ein ähnliches Verhältnis eingehalten werden. Bisher find hier eine strikte Trennung der Services statt, es wurden also entweder \emph{n} Spring-Container und / oder \emph{n} Node-Container gestartet, eine Vermischung der Anfragen würde die Effizienz des Systems hinsichtlich des Datendurchsatzes sowie der Latenzzeit steigern. Dies in Kombination mit den vorher vorgestellten Stellschrauben zur Ressourcenoptimierung bietet eine solide Basis für das Optimierungspotenzial der Initialisierungs- sowie Verarbeitungsphase der Anwendung.
 
 
 \subsection{Aussagen über Produktivumgebung}
 Die Aussagen, die während der Analyse der Daten getroffen wurden, sind hinsichtlich eines Systems in einer Produktivumgebung nur in Teilen aussagekräftig. Ein wesentliches Hauptkriterium der ISO-Norm 25010 \todo{ref einbinden} wurde hierbei vernachlässigt, denn es wurde nur sehr eingeschränkt auf die Verfügbarkeit des Systems und dem \emph{Design for failure} eingegangen. Wenn zentrale Komponenten ausfallen gibt es lediglich ein definiertes Default-Verhalten des Orchestrators. So wird versucht die Komponente selbst, sowie sämtliche Kommunikationspartner neu zu starten. Dieses Verhalten hat vor allem Einfluss auf den Initialisierungszeitraum eines Containers. Da beide betrachteten Technologien jede auf eigene Weise Mechanismen zum erneuten Verbindungsaufbau im Falle eines Ausfalls zur Verfügung stellen, ist diese Betrachtung für die reine Evaluierung der Technologie von nicht allzu großer Bedeutung. Im Zweifelsfall wird ein Container mehrmals gestartet, die grundlegenden Messdaten lassen sich bereits an einem störungsfreien Ablauf ablesen. Falls es zu einem späteren Zeitpunkt während der Portierung der Banking-Anwendung hin zu einer der betrachteten Technologien kommen sollte, muss dieses Fehlerverhalten jedoch ausgiebig getestet werden um späteres unerwartetes Verhalten zu vermeiden. 
 
-Ein Werkzeug zum Testen dieses Verhaltens nennt sich "\emph{Chaos Monkey}"\footnote{\url{https://github.com/Netflix/chaosmonkey}}. 
+Um das Verhalten des Systems bezüglich Ausfalls bestimmter Komponenten zu betrachten, stehen unterschiedliche Werkzeuge zur Verfügung. Ein etabliertes Werkzeug stellt das open source Projekt "\emph{Chaos Monkey\footnote{\url{https://github.com/Netflix/chaosmonkey}}}" dar, das von Netflix entwickelt und veröffentlicht wurde. Es ist allerdings auch möglich Werkzeuge für spezifische Orchestrator zu nutzen (Übersicht \cite[Seite~369]{continous-delivery}).
 
-
-
-
-Sobald ein System jedoch skaliert wurde und eine Verbindung zwischen kommunizierenden Komponenten besteht, 
-
+Die Aussage, dass die Spring-Komponente durchschnittliche 13 mal schneller arbeitet ist für den beschriebenen Anwendungsfall zwar korrekt, allerdings wurden hierbei lediglich die beschriebenen Schritte abgearbeitet (siehe Abschnitt \ref{} \todo{ref einbinden}). Auf das Laufzeitverhalten einer komplexeren Anwendung kann hierbei nicht geschlossen werden. Eventuell lässt sich dieser Unterschied lediglich auf einen Verbindungsaufbau oder Ähnliches zurückführen wobei die restliche Logik von hiervon nicht betroffen ist. Dies lässt sich mithilfe weiterer Timestamps innerhalb der Komponenten ermitteln.
 
 
 \subsection{Zusammenfassung}
 
+\todo{Schauen ob Begriff "Servlet-Container" irgendwo erklärt wurde...}
+
 \begin{itemize}
-	\item Ressourcenoptimierung könnte 
-	\item
-	\item
-	\item
+	\item lange Startzeit der Spring Komponente auf Initialisierungsphase zurückzuführen
+	\begin{itemize}
+		\item Möglichkeit überflüssige Konfiguration ungenutzter Komponenten zu entfernen
+		\item Möglichkeit auf anderen Servlet-Container umzusteigen
+	\end{itemize}
+	\item Ressourcenoptimierung um Ressourcen während Initialisierungsprozess zur Verfügung zu stellen
+	\begin{itemize}
+		\item CPU-Shares
+		\item Speicher
+		\item User Limits
+	\end{itemize}
+	\item Optimierte Ausführungsreihenfolge während Initialisierungsphase
+	\begin{itemize}
+		\item Vermischung beider Service Initialisierungsphasen
+		\item Node.js proportional zur Verarbeitungsgeschwindigkeit skalieren
+	\end{itemize}
 \end{itemize}
 
 
