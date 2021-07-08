@@ -97,8 +97,10 @@ Damit eine direkte Skalierungsaufforderung an das System gesendet werden kann, w
 
 Es handelt sich hierbei um eine Get-Anfrage an die \emph{Scaler-Proxy} Komponente des Stacks. Über die beiden Parameter "\emph{additionalCnt}" und "\emph{service}" lässt sich steuern wie viele neue Service Instanzen vom Orchestrator bereitgestellt werden sollen. Um dem Benutzer eine schlichtere Einstiegsmöglichkeit zu bieten, wurde das Skript \emph{direct-scaling.sh} implementiert (Inhalt siehe Listing \ref{lst:direct-scaling}). Dieses ist in der Lage automatisch eine Reihe von Anfragen an das System zu stellen. Vor der ersten Ausführung muss der Benutzer allerdings die IP-Adresse in der beiligenden .env Datei mit der seines Systems überschreiben.
 
+
 \label{verb:scriptStruct}
-\begin{lstlisting}[caption={request-script-structure},style=bashStyle]
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={Bash Skript - Struktur},style=bashStyle]
   $ tree request-scripts/ -a -L 3 --charset=ascii
   request-scripts/
   |-- curl-benchmark.sh
@@ -113,10 +115,20 @@ Es handelt sich hierbei um eine Get-Anfrage an die \emph{Scaler-Proxy} Komponent
       |   `-- benchmark_small_mixed.benchmark
       ...
 \end{lstlisting}
+\end{minipage}
+
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/input-uml}
+	\caption[Bash Input UML]{Bash Input UML}
+	\label{fig:stackOverview}
+\end{figure}
 
 Das Skript nimmt zwei Parameter entgegen. Der erste beschreibt die Anzahl der Instanzen, zu der das System skaliert werden soll, wobei hierbei eine inkrementelle Erhöhung von einer Instanz pro Durchlauf durchgeführt wird. Der Zweite Parameter gibt die Wiederholungen dieser testweisen Skalierung an. Der Aufruf \verb+./direct-scaling.sh 10 20+ resultiert beispielsweise darin, das sowohl für den Node.js als auch Spring Boot Service jeweils 10 Skalierungsschritte durchgeführt werden. Wenn zum Beispiel bereits ein Node.js Container läuft, wird im ersten Test eine weitere Instanz angefordert. Sobald die beiden Instanzen verfügbar sind, wird der Alert-Manager durch die Prometheus Komponente angewiesen die überflüssige Instanz zu löschen. Sobald wieder ein einziger Container verfügbar ist, wird dieser Schritt neunzehn weitere Male wiederholt. Nachdem dieser Schritt abgearbeitet wurde, erfolgt die nächste Skalierung bei der nun zwei neue Container kreiert werden sollen. Auch hier folgen 20 Wiederholungen. Diese Schritte werden solange durchgeführt bis zehn Container zwanzig Mal instanziiert wurden. 
 
 \label{lst:direct-scaling}
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[caption={direct-scaling},style=bashStyle]
 ...
 
@@ -136,6 +148,7 @@ do
   done
 done
 \end{lstlisting}
+\end{minipage}
 
 Das beschriebene Skript sowie die der zugrunde liegende Http-Endpunkt bieten eine Möglichkeit, das Skalieren als Reaktion auf unbeantwortete Nachrichten zu umgehen. Um jedoch einen herkömmlichen Testdurchlauf zu starten greift der Benutzer auf einen Endpunkt vom \emph{Supplier} zurück: 
 
@@ -178,7 +191,15 @@ für das \emph{curl-benchmark} Skript entwickelt. Dieses trägt den Namen "\emph
 \subsubsection{Supplier Backend}
 Bei dieser Komponente handelt es sich um ein Spring Projekt, dessen Aufgabe es ist, Benutzeranfragen in Nachrichten zu übersetzen, die vom System interpretiert und verarbeitet werden können. Die Schnittstelle für den Benutzer besteht hierbei aus einer REST-Api, die über Tools wie zum Beispiel curl angesprochen werden kann.
 
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/supplier-uml}
+	\caption[Backend Supplier UML]{Backend Supplier UML}
+	\label{fig:supplierUml}
+\end{figure}
+
 \label{verb:supplierStruct}
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[caption={Supplier Backend - Struktur},style=bashStyle]
   $ tree stack/supplier-backend/ -a -L 7 --charset=ascii
   stack/supplier-backend/
@@ -208,8 +229,8 @@ Bei dieser Komponente handelt es sich um ein Spring Projekt, dessen Aufgabe es i
               |   |-- sample-payment-short.xml
               |   `-- sample-payment.xml
               `-- schema.sql
-
 \end{lstlisting}
+\end{minipage}
 
 
 \paragraph{Implementierung}
@@ -382,6 +403,25 @@ Da alle Spring Projekte dieses Stacks mit einem fast identischen Dockerfile vers
 
 
 
+\subsubsection{Consumer}
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/consumer-uml}
+	\caption[Consumer UML]{Consumer UML}
+	\label{fig:consumerUml}
+\end{figure}
+
+
+\subsubsection{Scaler Proxy}
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/scaler-proxy-uml}
+	\caption[Scaler-Proxy UML]{Scaler-Proxy UML}
+	\label{fig:proxyScalerUml}
+\end{figure}
+
+
 \subsubsection{Spring Boot}
 
 % $ tree spring-consumer/ -L 7
@@ -456,22 +496,36 @@ Bei dem verwendeten Dockerfile handelt es sich um eine multi-stage Konfiguration
 
 \subparagraph{Quellcode}
 
-% \begin{lstlisting}[language=bash]
-  % src
-  % ├── index.ts
-  % ├── model
-  % │   ├── PaymentInput.ts
-  % │   ├── PaymentMessage.ts
-  % │   └── ResultWrapper.ts
-  % ├── service
-  % │   ├── AmqService.ts
-  % │   └── WorkerService.ts
-  % └── utils
-  %     ├── ElementExtractor.ts
-  %     ├── IdGenerator.ts
-  %     └── XsdChecker.ts
-% \end{lstlisting}
-\todo{uncomment}
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[style=bashStyle,caption={Node.js Projektstruktur},label=lst:nodeProjStruc]
+  $ tree stack/node-consumer/ -a -L 3 --charset=ascii
+  stack/node-consumer/
+  |-- Dockerfile
+  |-- .dockerignore
+  |-- package.json
+  |-- package-lock.json
+  |-- schema.sql
+  |-- scripts
+  |   `-- buildimage.sh
+  |-- specification.xsd
+  |-- src
+  |   |-- index.ts
+  |   |-- model
+  |   |   |-- PaymentInput.ts
+  |   |   |-- PaymentMessage.ts
+  |   |   `-- ResultWrapper.ts
+  |   |-- service
+  |   |   |-- AmqService.ts
+  |   |   `-- WorkerService.ts
+  |   `-- utils
+  |       |-- ElementExtractor.ts
+  |       |-- IdGenerator.ts
+  |       `-- XsdChecker.ts
+  `-- tsconfig.json
+\end{lstlisting}
+\end{minipage}
+
 
 Die Programmlogik wurde in drei wesentliche packages aufgeteilt (siehe Listing \todo{Listing einkommentieren und referenzieren}). 
 
@@ -485,7 +539,7 @@ Die Programmlogik wurde in drei wesentliche packages aufgeteilt (siehe Listing \
 
 
 
-\section{Implementierung mittels Containerisierungsplattform}
+\section{Implementierung mittels Containerplattform}
 \subsection{Container Lifecycle}
 \begin{itemize}
   \item Auf verschiedene Schichten eingehen
@@ -504,7 +558,8 @@ Die Programmlogik wurde in drei wesentliche packages aufgeteilt (siehe Listing \
 \renewcommand\cellgape{\Gape[4pt]}
 
 
-\begin{lstlisting}[language=bash]
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[style=bashStyle,caption={Node.js Projektstruktur},label=lst:nodeProjStruc]
 cat .env
 
 # qbn: queue bound (level) n
@@ -518,19 +573,12 @@ CB1=5
 CB2=10
 CB3=30
 \end{lstlisting}
+\end{minipage}
 
 
 \begin{tabularx}
   {\textwidth}
   { X | X | X | X | X }
-  % {p{0.2\textwidth} | X | X | X | X }
-  % {
-  %   |p{0.32\textwidth-2\tabcolsep}
-  %   |p{0.17\textwidth-2\tabcolsep}
-  %   |p{0.17\textwidth-2\tabcolsep}
-  %   |p{0.17\textwidth-2\tabcolsep}
-  %   |p{0.17\textwidth-2\tabcolsep}|}
-  % }
   \toprule
       \centering \hspace{4mm} \uline{QL3} \newline \footnotesize \textit{QB2 \textless{} MC} 
     & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB3)} 
@@ -602,113 +650,7 @@ CB3=30
 \end{table}
 
 
-% \begin{filecontents*}{test.csv}
-%   a,b,c,d
-%   1,4,5,1
-%   2,3,1,5
-%   3,5,6,1
-%   4,1,4,9
-%   5,3,4,7
-%   \end{filecontents*}
-
-
-\begin{tikzpicture}
-\begin{axis}[xlabel={Container Anzahl}, ylabel={Startzeit}]
-\addplot table [x=id, y=value, col sep=comma] {test.csv};
-\addlegendentry{Spring Boot}
-\addplot table [x=id, y=value, col sep=comma] {test2.csv};
-\addlegendentry{Node.js}
-\end{axis}
-\end{tikzpicture}
-
-% \begin{filecontents}{\jobname Data.csv}
-%   Jahr;CD;MC
-%   1990;298;450
-%   1991;330;370
-%   1992;420;373
-%   1993;485;345
-%   1994;650;355
-%   1995;710;275
-%   1996;770;225
-%   1997;750;170
-%   1998;815;155
-%   1999;925;125
-%   2000;926;75
-%   2001;890;50
-%   2002;825;30
-%   2003;750;20
-%   2004;775;12
-%   2005;700;7
-%   2006;620;5
-%   2007;515;5 
-%   \end{filecontents}
-%   \documentclass[paper=a4,12pt,version=last]{scrartcl}
-%   \usepackage{pgfplots}
-   
-%   \begin{document}
-%   \begin{tikzpicture}
-%         \begin{axis}[ymin=0,
-%   %         xtick={1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007},
-%            x tick label style={/pgf/number format/1000 sep=},
-%            xlabel={Jahr},
-%            y tick label style={/pgf/number format/1000 sep=},
-%            ylabel={in Mio. Stück}
-%            ]
-   
-%      \addplot table [y=CD,col sep=semicolon]  {\jobname Data.csv};
-%      \addlegendentry{CD}
-%      \addplot table [y=MC,col sep=semicolon]  {\jobname Data.csv};
-%      \addlegendentry{MC}
-  
-%         \end{axis}
-%      \end{tikzpicture}
-
-
 \section{Implementierung Visualierung und Monitoring zur Unterst\"utzung der Auswertung}
-
-
-% \begin{lstlisting}[style=javaStyle,float,caption=Bank - Konstruktor,label=lst:bank_konstruktor]
-\begin{lstlisting}[style=javaStyle]
-  // standard constructor 
-  public Bank(int playerCnt) {
-      this.entries = new Entry[playerCnt];
-      this.bankSize = playerCnt;
-          this.rand = new Random();
-  }
-  
-  // testing constructor - no fileIO
-  public Bank(Entry[] entries, Random pseudoRandom) {
-      this.entries = entries;
-      this.rand = pseudoRandom;
-      this.bankSize = entries.length;
-  }
-  
-  // testing constructor - with fileIO
-  public Bank(String preallocation, List<Player> players, Random rand) {
-      assert null != preallocation && null != players && null != rand;
-      this.bankSize = players.size();
-      this.entries = new Entry[this.bankSize];
-      if (0 < preallocation.length()) {
-          String[] singleEntries = preallocation.split(SEPERATOR_STRING_REPRESENTATION);
-          int offset = this.bankSize - singleEntries.length;
-          for (int i = singleEntries.length - 1; i >= 0; i--) {
-              this.entries[i + offset] = new Entry(singleEntries[i], players);
-          }
-      }
-  }
-\end{lstlisting}
-
-
-\begin{lstlisting}[style=bashStyle]
-#!/bin/bash
-
-# Add two numeric value
-((sum=25+35))
-
-#Print the result
-echo $sum
-\end{lstlisting}
-
 
 % \begin{lstlisting}[language=bash]
 %  tree . -L 1
