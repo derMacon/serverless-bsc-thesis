@@ -205,13 +205,13 @@ für das \emph{curl-benchmark} Skript entwickelt. Dieses trägt den Namen "\emph
 
 
 
-\subsubsection{Supplier Backend}
+\subsection{Supplier Backend}
 Bei dieser Komponente handelt es sich um ein Spring Projekt, dessen Aufgabe es ist, Benutzeranfragen in Nachrichten zu übersetzen, die vom System interpretiert und verarbeitet werden können. Die Schnittstelle für den Benutzer besteht hierbei aus einer REST-Api, die über Tools wie zum Beispiel curl angesprochen werden kann.
 
 
-\paragraph{Implementierung}
+\subsubsection{Implementierung}
 
-\subparagraph{Generelle Spring Projektübersicht}
+\paragraph{Generelle Spring Projektübersicht}
 Da diese Komponente bezüglich der Struktur eines Spring-Projekts alle wesentlichen Merkmale besitzt, wird die genutzte Projektstruktur an dieser Stelle etwas näher erläutert. 
 
 \label{verb:supplierStruct}
@@ -272,7 +272,7 @@ Das Muster, nach dem sämtliche Komponenten des Komponenten-Stacks entwickelt wu
 \end{itemize}
 
 
-\subparagraph{Programmfluss}
+\paragraph{Programmfluss}
 Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:supplierUml}) wurden ein Teil der Klassen des Suppliers dargestellt. Es wurde sich hierbei auf die wesentlichen Logikbausteine konzentriert. 
 
 \begin{figure}[ht!]
@@ -323,11 +323,11 @@ Wie im UML-Diagramm zu erkennen, werden aus der erhaltenen Instruktions-Instanz 
 
 In dem beschriebenen Listing ist zu erkennen, wie diese Generatoren genutzt werden. Sie extrahieren aus der gegebenen Instruktion-Instanz die jeweils relevanten Werte für ihren Anwendungsfall (Zeile 5 -- 9) und können bei der Erstellung der Nachrichten als Callback verwendet werden, und dynamisch neue Werte erstellen (Zeile 16 -- 21). Der Grund warum hierbei auf diese Callback-Struktur zurückgegriffen wurde, ist der, dass die gegebenen Werte in der Instruktion selbst als Instruktionen verstanden werden sollen. 
 
-\subparagraph{Beispiel xPathSupplier} 
+\paragraph{Beispiel xPathSupplier} 
 Der XPath gibt an, welches XML-Element bei der Verarbeitung durch den Konsumer im Detail extrahiert werden soll (bspw. IBAN, Betrag etc.). Es ist jedoch auch möglich, dass der Benutzer bei der API-Anfrage hierbei keinen genauen XPath angibt sondern möchte, dass hierbei ein beliebiges Element extrahiert werden soll. Dazu wird der Wert "\emph{Randomize}" in die Instruktion eingetragen. Dies ist sinnvoll um etwas Variation in die spätere Verarbeitung zu bekommen um bessere Messwerte erzielen zu könnnen. Im System wurden hierfür beispielhaft einige XPath Pfade manuell hinterlegt. Der Supplier hat intern Zugriff auf diese Sammlung. Je nachdem ob ein spezifischer Wert ausgegeben werden oder dieser variieren soll, wird stets der selbe Wert oder aber unterschiedliche Werte ausgegeben. Ähnliches gilt für die anderen verfügbaren Generator-Instanzen.
 
 
-\subsubsection{Konsumer-Komponente}
+\subsection{Konsumer-Komponente}
 
 Im folgenden UML-Diagramm ist die grundlegende Klassenstruktur der beteiligten Logikbausteine des Spring-Konsumenten zu erkennen. Da das Node.js Projekt einen sehr ähnlichen Aufbau besitzt, wird im folgenden lediglich der Ablauf der Spring Komponente zusammengefasst. Sämliche Informationen lassen sich jedoch nahtlos auf die Node.js Umgebung übertragen. 
 
@@ -361,7 +361,120 @@ Der Einstiegspunkt für den Spring-Konsumenten stellt der \emph{AmqService} dar.
 \end{minipage}
 
 
-\subsubsection{Scaler Proxy}
+\subsection{Prometheus}
+
+\paragraph{Regelsatz für Skalierung}
+Die Prometheus ist eine Komponente, die zum Monitoring genutzt werden kann (siehe Abschnitt \ref{ss:prometheus}). Für dieses Projekt musste diese lediglich derartig konfiguriert werden, dass entsprechende alerts generiert werden und an die Alter-Manager-Komponente weitergeleitet werden können. Diese Komponente informiert erst anschließend die (Proxy) Scaler Komponente. Die auszuwertenden Regeln residieren jedoch bereits in der Prometheus Komponente. Die Regeln wurden nach folgendem Schema entworfen.
+
+\bigskip
+
+\begin{minipage}{\linewidth}
+\begin{tabularx}
+  {\textwidth}
+  { X | X | X | X | X }
+  \toprule
+      \centering \hspace{4mm} \uline{QL3} \newline \footnotesize \textit{QB2 \textless{} MC} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB3)} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB1 -- CB3)} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB2 -- CB3)} 
+    & \centering \hspace{4mm} OK \newline -- 
+    \tabularnewline
+  \hline
+      \centering \hspace{4mm} \uline{QL2} \newline \footnotesize \textit{QB1 \textless{} MC $\leq$ QB2} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB2)} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB1 -- CB2)} 
+    & \centering \hspace{4mm} OK \newline -- 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB2 -- CB3)} 
+    \tabularnewline
+  \hline
+      \centering \hspace{4mm} \uline{QL1} \newline \footnotesize \textit{QB0 \textless{} MC $\leq$ QB1} 
+    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB1)} 
+    & \centering \hspace{4mm} OK \newline -- 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB2)} 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB3)} 
+    \tabularnewline
+  \hline
+      \centering \hspace{4mm} \uline{QL0} \newline \footnotesize \textit{MC $\leq$ QB0} 
+    & \centering \hspace{4mm} OK \newline -- 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB1)} 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB2)} 
+    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB3)} 
+    \tabularnewline
+  \hline
+    & \centering \hspace{4mm} \uline{CL0} \newline \footnotesize \textit{CB0 == CC} 
+    & \centering \hspace{4mm} \uline{CL1} \newline \footnotesize \textit{CB0 \textless{} CC $\leq$ CB1} 
+    & \centering \hspace{4mm} \uline{CL2} \newline \footnotesize \textit{CB1 \textless{} CC $\leq$ CB2} 
+    & \centering \hspace{4mm} \uline{CL3} \newline \footnotesize \textit{CB2 \textless{} CC $\leq$ CB3} \tabularnewline
+  \bottomrule
+\end{tabularx}
+\end{minipage}
+
+\bigskip
+
+Diese Tabelle bestimmt das Skalierungsverhalten des Systems. Aus ihr werden die Regeln für die Prometheus-Konfiguration ermittelt. Um diese Tabelle etwas anschaulicher erläutern zu können, werden die folgenden Werte für entsprechende Umgebungsvariablen angenommen. 
+
+
+\begin{verbatim}
+  CB0=1    CB2=10    QB0=15    QB2=100
+  CB1=5    CB3=30    QB1=30
+\end{verbatim}
+
+
+Auf der horizontale Achse wird die aktuelle Containeranzahl eines Systems in verschiedene Zustände eingeteilt. \emph{CL0} bis \emph{Cl3} beschreibt hierbei das sogenannte \emph{Container Level}. Diese Level geben Abschnitte an in denen sich die Containeranzahl zum aktuellen Zeitpunkt befinden kann, die Grenzen wurde mithilfe von Variablen festgelegt. Die Grenzen wurden mit dem Kürzel \emph{CB0} bis \emph{CB2} versehen, dies steht für den Begriff "\emph{Container Bound}". Die aktuelle Containeranzahl (engl. \emph{container count}) selbst, wurde in der Tabelle mit \emph{CC} abgekürzt. Wenn das System zu einem betrachteten Zeitraum beispielsweise fünf Containerinstanzen einer Konsumenten-Komponente laufen (im nachfolgenden stets als \emph{Consumer-Container} bezeichent). Dann befindet sich das System im Zustand \emph{Container level 1}, da die untere Grenze des Intervals mit \emph{CB0} auf 1 und die obere Grenze auf 5 gesetzt wurde. 
+
+Eine ähnliche Eingrenzung gibt es ebenfalls für die vertikale Achse wobei die unbeantworteten Nachrichten einer Warteschlange in einem Message-Broker betrachtet werden. Hierbei steht das \emph{QL0} bis \emph{Ql3} für das sogenannte "\emph{queue level}". Über die \emph{queue bound} (kurz \emph{QB0} bis \emph{QB3}) werden hierbei die Grenzen der Intervalle festgelegt. Wenn beispielsweise 101 uneantwortete Nachrichten in der Warteschlange residieren, befindet sich das System im Zustand \emph{QL3}, da die \emph{queue count} (kurz \emph{QC}) größer der Grenze \emph{QB2} (festgelegt auf 100) .
+
+Aus einer Überkreuzung dieser beiden Informationen lässt sich ableiten wie das System skaliert werden soll. Um beim beschriebenen Beispiel zu bleiben, würde sich das System im Feld \emph{CL1QL3} befinden. Hierbei gibt es zu wenig Container für die gegebene Nachrichtenanzahl. Die die Containeranzahl muss demnach nach oben skaliert werden und zwar um die Differenz der beiden Container-Intervall-Grenzen \emph{CB1} und \emph{CB3}. Wenn diese Skalierung durchgeführt wurde, befindet sich das System anschließend im Zustand \emph{CL3QL3}. Die Hauptdiagonale der Tabelle beschreibt die Idealzustände, hierbei muss keinerlei weitere Skalierung vorgenommen werden. 
+
+\label{prometheus:skalierungsmechanismus}
+Ein wesentlicher Nachteil dieser Herangehensweise ist, dass das System beim Skalieren über mehrere Intervallsgrenzen hinweg mit mehreren Zellen in Berührung kommt. So befindet sich das System bei der beschriebenen Skalierung beispielsweise für einen Moment im Zustand \emph{CL2QL3}. Je nach Konfiguration des Systems schlägt diese Regel hierbei an. Es gibt mehrere Möglichkeiten dieses Problem zu umgehen. Es ist zum Beispiel möglich das zeitliche Anfrageninterval nach Steuerungsinformationen vom Broker zu erhöhen, in der Hoffnung, dass das System bereits die gezielte Containeranzahl erreicht hat, wenn die nächste Anfrage erfolgt. Dies hat allerdings zur Folge, dass das System generell sehr lange braucht um zu erkennen, ob eine Skalierung bei der nächsten Aktion nötig ist oder nicht. Da dies einen sehr inpraktikabler Ansatz darstellt, wurde diese Verantwortlichkeit an den Proxy-Scaler übergeben. Da diese Komponente die tatsächlichen Skalierungsanfragen an die Docker-Scaler Api navigiert, ist sie ebenfalls in der Lage entsprechende Nachrichten zurückzuhalten, wenn klar ist, dass es sich hierbei lediglich um einen "\emph{Fehlalarm}" handelt, bei dem lediglich eine Skalierungsstufe während eines bereits laufenden Prozesses durchlaufen wird. 
+
+Ein Satz Sonderregeln, die bisher nicht erwähnt wurden, betreffen den Initialisierungszustand. Hierbei wird geprüft ob die Minimalanzahl von Containern läuft. Falls dies nicht der Fall sein sollte, wird eine Skalierungsanfrage mit genau dieser Anzahl generiert. 
+
+
+\paragraph{Konfiguration}
+
+\begin{lstlisting}[style=bashStyle,caption={Umgebungsvariablen - Prometheus Regelsatz},label=lst:envMatrix]
+  groups:
+  - name: springScaleAlert
+    rules:
+      - alert: spring_baseline
+        expr: >
+          org_apache_activemq_Broker_ConsumerCount{
+            brokerName="localhost",
+            destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+            destinationType="Queue",
+            instance="activemq:8080", 
+            job="services"
+          } < ${SCALING_CB0} 
+
+  ...
+
+\end{lstlisting}
+
+Dieser Ausschnitt aus dem hinterlegten Regelwerk stellt die als letztes erwähnte Sonderregel für die minimal Containeranzahl. Hiermit wird beispielhaft beschrieben wie die erläuterten Regeln aus der Tabelle kodiert werden. Das Schlüsselwort \emph{groups} dient lediglich dazu verwandte Regeln zusammenzufassen. Der Rest ist selbsterklärend, erwähnenswert ist lediglich, dass die Wert des Schlüssels \emph{alert} in dieser Form wortwörtlich an den Alertmanager weitergeleitet und dort entsprechend verarbeitet wird.
+
+Im folgenden Listing ist die Dateistruktur der Konfigurationsdateien von Prometheus dargestellt.
+
+\begin{lstlisting}[style=bashStyle,caption={Umgebungsvariablen - Prometheus Regelsatz},label=lst:envMatrix]
+  $ tree stack/data/prometheus/ --charset=ascii
+  stack/data/prometheus/
+  |-- alert-unparsed.yml
+  |-- alert.yml
+  |-- prometheus.yml
+  `-- targets
+      `-- alertmanager.json
+\end{lstlisting}
+
+In der Datei "\emph{alert-unparsed.yml}" werden die Regeln nach der bisher beschriebenen Struktur abgelegt. Hierbei wurden keinerlei festen Werte für die Intervallgrenzen eingesetzt. Zur Laufzeit der Komponente ist dies allerdings nicht zulässig. Um dennoch die Flexibilität des Formats mit Umgebungsvariablen nutzen zu können wurde ein Skript verfasst, das vor dem Starten der Komponente ausgeführt wird und die Datei "\emph{alert.yml}" generiert. In der "\emph{prometheus.yml}" Datei befindet sich ein Eintrag, der dem System mitteilt, dass diese generierte Datei für die Regelauswertung verwendet werden soll. In der \emph{prometheus.yml} Datei befinden sich ansonsten weitere Einstellungen bezüglich des Scraping Intervalls, der Adressierung der zu überwachenden Komponenten sowie die Angabe des Namens des Alert-Managers. Die komplette Konfigurationsdatei befindet sich im Anhang (siehe Listing \ref{anh:prometheusYml}).
+
+Der Ordner \emph{target} enthält die Routing Konfiguration für die Anbindung der generierten Alerts zur Alert-Manager-Komponente.
+
+\subsection{Alter-Manager}
+Diese Komponente ist in diesem Projekt sehr einfach gehalten. Es wird lediglich ein Webhook erstellt an den erhaltene Alerts ohne jegliche Modifikation weitergeleitet werden. Im Anhang wurde die komplette Konfiguration der Komponente aufgerführt (siehe Listing lst:alertManConfig).
+
+
+\subsection{Scaler Proxy}
 
 Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml}) wird die grundlegende Klassenstruktur der Scaler-Proxy-Komponente zusammengefasst. 
 
@@ -372,168 +485,48 @@ Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml}) wird die gr
 	\label{fig:proxyScalerUml}
 \end{figure}
 
+Diese Komponente stellt sowohl die Funktionalität bereit Alerts vom Alert-Manager als auch direkte Skalierungsanfragen vom Benutzer selbst anzunehmen. Für beide Szenarien gibt es einen entsprechenden Endpunkt. Beide Typen von Anfragen werden intern allerdings erst in ein Zwischenformat überführt, das wiederum vom \emph{RequestService} interpretiert werden kann. Die wesentliche Kernfunktionalität dieses Services wurde in Listing \ref{lst:proxyDelegate} dargestellt. Bei der Implementierung des Regelwerks in der Prometheus-Komponente wurde erwähnt, dass es einen Mechanismus zum Skalieren über mehrere Stufen des Models von der Proxy-Komponente geben muss (siehe Abschnitt \ref{prometheus:skalierungsmechanismus}). Dies wurde in der Proxy-Komponente über ein Acknowledgement der einzelnen hochgefahrenen Container ermöglicht. Es wird intern eine Liste von Skalierungsinstruktionen verwaltet. Jeder Container, der im Zuge einer der Instruktionen gestartet wird, generiert eine Id, die diesen Container identifiziert und gibt diese dem Proxy-Service über eine Rest-Schnittstelle bekannt. Dadurch ist es möglich festzustellen, ob sich das System aktuell in einem Skalierungsprozess befindet oder nicht. Wenn nun neue Skalierungsinstruktionen eingespeist werden (zum Beispiel in einer der beschriebenen Übergangsphasen in der Tabelle), dann ist es der Komponente möglich mithilfe einer einfachen Überprüfung der Liste diese zu verwerfen (Zeile 2). Im Anschluss wird über sämtliche generierten Skalierungsinstruktionen iteriert. Die verwaltete Liste wird mit neuen Einträgen gefüllt und die Anfragen werden an die Skalierungs-API geschickt, welche als letztes Abstraktionslevel ohne weitere Funktionalität die Skalierung für den Benutzer übernimmt. 
 
-% In Listing \ref{lst:supplierBenchmarkEndpoint} ist die Definition desjenigen Endpunktes zu erkennen, der als primärer Einstiegspunkt für die eingehenden Anfragen der Benutzeroberfläche gilt. Sobald der Benutzer eine Eingabe tätigt und der Endpunkt angesprochen wird, übersetzt eine Objectmapper Instanz den erhaltenen String in eine Datenstruktur, welche alle relevanten Informationen enthält. Die Methode wurde außerdem mit einer \emph{Transactional}-Annotation versehen, die es ermöglicht das Übermitteln mehrere Nachrichten an eine Queue in einer Transaktion durchzuführen (siehe \todo{Referenz} einfügen), dies wird im späteren Verlauf von Bedeutung sein. Im Spring-Framework muss jedoch bereits der Einstiegspunkt mit einer solchen Annotation versehen werden, um zu gewährleisten, dass die aufgerufenen Logikbausteine alle im selben Transaktion-Kontext ausgeführt werden \todo{Quelle?}.
-
-
-
-% \begin{lstlisting}[style=javaStyle,caption={Supplier - Endpunkt},label=lst:supplierBenchmarkEndpoint]
-
-%   ...
-
-%   @Transactional(propagation = Propagation.REQUIRES_NEW)
-%   @RequestMapping(value = "/start",
-%           method = POST,
-%           consumes = APPLICATION_JSON_VALUE)
-%   public void startPaymentBenchmark(@RequestBody String jsonBody) throws JsonProcessingException {
-%       log.info("new benchmark request: {}", jsonBody);
-%       ParsedInstruction req = mapper.readValue(jsonBody, ParsedInstruction.class);
-%       benchmarkService.benchmark(req);
-%   }
-
-%   ...
-  
-% \end{lstlisting}
+\begin{lstlisting}[style=javaStyle,caption={Proxy Scaler - RequestService},label=lst:proxyDelegate]
+  public boolean delegate(List<ScalingInstruction> instructions) {
+    if (!unacknowledgedInstructions.isEmpty()) {
+        return false;
+    }
+    boolean scaledToMinRepl = false;
+    for (ScalingInstruction instruction : instructions) {
+        instruction.setReceivedRequestTimestamp(now());
+        if (instruction.getScalingDirection() == UP) {
+            unacknowledgedInstructions.add(instruction);
+        }
+        scaledToMinRepl = scaledToMinRepl || scaleService.sendScaleRequest(instruction);
+    }
+    return scaledToMinRepl;
+  }
+\end{lstlisting}
 
 
+\subsection{Docker-Scaler}
+Dieses open source Projekt\footnote{\url{https://thomasjpfan.github.io/docker-scaler}} bietet eine Rest-Schnittstelle über die es möglich ist einen zugrunde liegenden Docker-Swarm zu skalieren. Die komplette Anfrage kann innerhalb einer einzigen POST-Anfrage abgeschickt werden. In diesem Projekt wurde hierfür der folgende Endpunkt verwendet.
+
+\begin{itemize}
+  \item URL: /v1/scale-service
+  \item Methode: POST
+  \item Parameter:
+  \begin{itemize}
+    \item service: Name des zu skalierenden Services
+    \item scale: Richtung in die skaliert werden soll 
+    \item by: Anzahl zusätzlichen / überflüssigen Replicas
+  \end{itemize}
+\end{itemize}
 
 
-% \begin{lstlisting}[style=javaStyle,caption={Supplier - Service},label=lst:supplierServiceImpl]
-
-%   ...
-
-%   @SneakyThrows
-%   @Transactional
-%   public void benchmark(ParsedInstruction parsedInstruction) {
-%       parsedInstruction.setReceived(now());
-%       // set batch id by saving it to db and reloading instance
-%       parsedInstruction = persistenceService.save(parsedInstruction);
-%       int batchId = parsedInstruction.getMessageId();
-%       boolean sessionIsTransacted = sessionIsTransacted(parsedInstruction);
-
-%       Supplier<String> xPathSupplier = pathGenerator.getSupplier(parsedInstruction);
-%       Supplier<String> paymentSupplier = payOptionGenerator.getSupplier(parsedInstruction);
-%       Supplier<String> destinationSupplier = destGenerator.getSupplier(parsedInstruction);
-%       BiConsumer<PaymentMessage, Supplier<String>> amqConsumer =
-%               amqService.getConsumer(sessionIsTransacted);
-
-%       int durationMillis = 0;
-%       if (!sessionIsTransacted) {
-%           durationMillis = parsedInstruction.getDuration()
-%                   / (parsedInstruction.getMessageCnt() - 1);
-%       }
-
-%       for (int i = 0; i < parsedInstruction.getMessageCnt(); i++) {
-
-%           PaymentMessage payment = PaymentMessage.builder()
-%                   .batchId(batchId)
-%                   .xPath(xPathSupplier.get())
-%                   .content(paymentSupplier.get())
-%                   .sentTimestamp(now())
-%                   .build();
-
-%           amqConsumer.accept(payment, destinationSupplier);
-
-%           Thread.sleep(durationMillis);
-%       }
-%   }
-
-%   ...
-  
-% \end{lstlisting}
-
-% In Listing \ref{lst:supplierServiceImpl} ist zu erkennen, wie die Abarbeitung einer übersetzten Nachricht im Detail erfolgt.
-
-% \begin{itemize}
-%   \item Zeile 7: Zu Beginn wird der aktuelle Timestamp an die übersetzte Nachricht angeheftet, um im Nachhinein diverse Messwerte berechnen zu können.
-
-%   \item Zeile 9: Die übersetzte Nachricht wird in der Datenbank hinterlegt.
-
-%   \item Zeile 11: Da die gesamte Methode mit einer weiteren \emph{Transactional-Annotation} versehen wurde, ist es möglich beim Absenden der Nachrichten einen transaktionbasierten Ansatz zu wählen. Es muss jedoch bereits an dieser Stelle entschieden werden, ob dies tatsächlich nötig ist. Hierfür wird das übersetzte Datenobjekt entsprechend untersucht. 
-
-%   \item Zeile 13: Abhängig von der gegebenen Instruktion ist es möglich unterschiedliche Felder eines Payments auszulesen. Es gibt beispielsweise die Möglichkeit eine IBAN, den Betrag der Überweisung, den Empfänger etc. zu extrahieren. An dieser Stelle wird ein entsprechender Supplier erzeugt, der im späteren Verlauf diese Information liefert und das standardisierte Java Interface des Function-Modules implementiert. Der Grund diese Funktionalität in eine Callback Funktion ausgelagert wurde, ist der, dass es möglich sein soll, dass sich die Ausgabe über Zeit ändern kann. So kann der Benutzer beispielsweise in der Nachricht angeben, dass er zufällige Datenfelder pro Nachricht ausgeben möchte. Bei Nachricht X, soll zum Beispiel das IBAN-Feld und bei Nachricht Y der Betragswert bestimmt werden. Diese Maßnahme wurde lediglich ergriffen um etwas Variation der Messwerte hinsichtlich der Verarbeitungsdauer zu generieren.
-
-%   \item Zeile 14: Selbes gilt für die Nachricht selbst. Es soll möglich sein, dem Benutzer die Wahl zu lassen, ob dieser die Benchmark-Tests stets mit der gleichen beispielhaften Payment-Nachricht durchführen möchte oder nicht. Falls ja soll Nachrichten mit zufälligen Werten zum Beispiel für die IBAN etc. zu generiert werden. In diesem Protoypen wurde allerdings lediglich das Design für die Funktionalität entwickelt, da es im Endeffekt keinen Einfluss auf die generierten Metriken hat welche Daten im Detail in dem XML-Inhalt hinterlegt wurden.
-
-%   \item Zeile 15: Diese Callback Funktion gibt den Warteschlangennamen aus zu dem die generierten Nachrichten geschickt werden sollen.
-  
-%   \item Zeile 16: Abhängig davon, ob es sich um eine Anfrage, die in einer Transaktion durchgeführt werden soll oder nicht, wird für das Callback eine Spring-Bean zur Datenübermittlung zum Message-Broker verwendet, die mit einem Transaction Flag versehen wurde oder nicht. In Listing \ref{lst:supplierBiConsumer} ist erkenntlich, dass hierbei je nach gesetztem Flag eine Auswahl eines vorkonfigurierten JmsTemplates erfolgt. Dieses Template stellt eine weitere Abstraktionsstufe zwischen Komponente und Broker dar. Sie wird vom Framework gestellt, die Verbindung muss jedoch über Klassen im \emph{config} Package konfiguriert werden. Diese Funktion stellt beim Absenden der Nachrichten die Schnittstelle zum Messagebroker dar.
-
-%   \item Zeile 27: Es werden Nachrichten generiert, die von den weiteren Stack-Komponenten verarbeitet werden können.
-
-%   \item Zeile 34: Die Nachrichten werden an die Broker-Schnittstelle übergeben.
-
-%   \item Zeile 36: Je nachdem ob bei der eingegangenen Nachricht ein Zeitraum angegeben wurde über den die Nachrichten abgeschickt werden soll, wird an dieser Stelle ein entsprechender Sleep-Aufruf durchgeführt.
-
-% \end{itemize}
-
-
-% \begin{lstlisting}[style=javaStyle,caption={Supplier - Bi Consumer},label=lst:supplierBiConsumer]
-
-%   ...
-
-%   public BiConsumer<PaymentMessage, Supplier<String>> getConsumer(boolean sessionIsTransacted) {
-%     return sessionIsTransacted
-%             ? (message, destGen) -> sendObjPaymentQueueMessage(
-%               transactedJmsTemplate, message, destGen)
-%             : (message, destGen) -> sendObjPaymentQueueMessage(
-%               nonTransactedJmsTemplate, message, destGen);
-%   }
-
-%   ...
-
-% \end{lstlisting}
-
-
-% \subparagraph{Programmfluss - Endpunkt Eingabedatei}
-% Da die Lastentests primär mit Hilfe diverser Bash-Skripte ausgeführt werden, gibt es einen weiteren Endpunkt für diesen Anwendungsfall. Nachdem Textnachrichten auf die Grammatik geprüft und in eine Objektstruktur konvertiert wurden, über die iteriert werden kann, wird allerdings die selbe Schnittstelle wie schon beim Gui-Aufruf angesteuert, da sich die darunter liegende Logik in keinster Weise unterscheidet. In Listing \ref{lst:supplierParserEndpoint} ist der erwähnte Endpunkt zu erkennen.
-
-% \begin{lstlisting}[style=javaStyle,caption={Supplier - Bi Consumer},label=lst:supplierParserEndpoint]
-%   @Autowired
-%   private RequestParserService parserService;
-
-%   @Transactional(propagation = Propagation.REQUIRES_NEW)
-%   @RequestMapping(value = "/benchmark",
-%           method = POST,
-%           consumes = TEXT_PLAIN_VALUE)
-%   public void parseBenchmark(@RequestBody String textValue) {
-%       new Thread(() -> parserService.runRequest(textValue)).start();
-%   }
-% \end{lstlisting}
-
-% Ähnlich wie bei ersten Endpunkt gibt es wieder ein Transaktion-Context eröffnet. Bezüglich der Http-Anfrage hat sich lediglich geändert, dass nun anstatt eines Json-Wertes eine Textnachricht erwartet wird, da die hinterlegte Grammatik nicht mit einem Json-Format kompatibel ist \todo{schauen ob Grammatik ueberhaupt vorher erklaert wurde}. Um zu ermöglich, dass mehrere Benchmark Dateiinhalte das System direkt hintereinander mit Werten versorgen kann, wird hier mit jeder eingehenden Anfrage ein neuer Thread gestartet. Dies stellt auch sicher, dass die Anfragen direkt hinterlegt werden und alte Anfragen nicht erst abgearbeitet werden müssen bevor neue angenommen werden können. Der Zwischenschritt des Übersetzens der Grammatik in tatsächlich ausführbare Anweisung erfolgt in einer dedizierten Service-Komponente. Damit es zu keiner Verfälschung der Ergebnisse kommt, ist es von größter Bedeutung, dass lediglich nur ein einziger Thread mit der Ausführung der eigentlichen Tests zur Zeit betraut wird. Wenn es hierbei zu einem nebenläufigen Verhalten kommen sollte, würde dies die verfügbaren Resourcen einschränken und die Werte würden Ungenauigkeiten aufweisen, was es unter allen Umständen zu vermeiden gilt. Um diesem Problem entgegenzuwirken, wurde im \emph{Parser-Service} eine Semaphore eingeführt, die sicherstellt, dass stets nur ein Thread arbeitet. Das Ausführen einer Anfrage wird demnach in einem kritischen Abschnitt ausgeführt. \todo{weiterschreiben}
+\subsection{Grafana}
 
 
 
 
 
 
-
-
-\subsubsection{Spring Boot}
-
-% $ tree spring-consumer/ -L 7
-% spring-consumer/
-% ├── Dockerfile
-% ├── pom.xml
-% └── src
-%     └─ main
-%        ├── java
-%        │   └── dps
-%        │       └── hoffmann
-%        │           └── springconsumer
-%        │               ├── config
-%        │               ├── Main.java
-%        │               ├── model
-%        │               ├── service
-%        │               ├── SpringConsumerApplication.java
-%        │               └── utils
-%        └── resources
-%            ├── application-dev.properties
-%            ├── application-prod.properties
-%            ├── application.properties
-%            └── docs
-%                └── paymentSchema.xsd
 
 
 \subsection{Node.js}
@@ -548,7 +541,7 @@ Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml}) wird die gr
 % ├── src
 % └── tsconfig.json
 % \end{lstlisting}
-\todo{uncomment}
+% \todo{uncomment}
 
 \subsubsection{Projektübersicht}
 Das Projekt beinhaltet neben sämtlichen Quellcode-Dateien ein Dockerfile, eine package.json und eine tsconfig Konfigurationsdatei. 
@@ -675,69 +668,8 @@ Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in ein
 \renewcommand\cellgape{\Gape[4pt]}
 
 
-\begin{minipage}{\linewidth}
-\begin{lstlisting}[style=bashStyle,caption={Node.js Projektstruktur},label=lst:nodeProjStruc]
-cat .env
-
-# qbn: queue bound (level) n
-# cbn: container bound (level) n
-
-QB0=15
-QB1=30
-QB2=100
-CB0=1
-CB1=5
-CB2=10
-CB3=30
-\end{lstlisting}
-\end{minipage}
 
 
-\begin{tabularx}
-  {\textwidth}
-  { X | X | X | X | X }
-  \toprule
-      \centering \hspace{4mm} \uline{QL3} \newline \footnotesize \textit{QB2 \textless{} MC} 
-    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB3)} 
-    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB1 -- CB3)} 
-    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB2 -- CB3)} 
-    & \centering \hspace{4mm} OK \newline -- 
-    \tabularnewline
-  \hline
-      \centering \hspace{4mm} \uline{QL2} \newline \footnotesize \textit{QB1 \textless{} MC $\leq$ QB2} 
-    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB2)} 
-    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB1 -- CB2)} 
-    & \centering \hspace{4mm} OK \newline -- 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB2 -- CB3)} 
-    \tabularnewline
-  \hline
-      \centering \hspace{4mm} \uline{QL1} \newline \footnotesize \textit{QB0 \textless{} MC $\leq$ QB1} 
-    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB1)} 
-    & \centering \hspace{4mm} OK \newline -- 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB2)} 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB3)} 
-    \tabularnewline
-  \hline
-      \centering \hspace{4mm} \uline{QL1} \newline \footnotesize \textit{QB0 \textless{} MC $\leq$ QB1} 
-    & \centering \hspace{4mm} UP \newline \footnotesize \textit{abs(CB0 -- CB1)} 
-    & \centering \hspace{4mm} OK \newline -- 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB2)} 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB1 -- CB3)} 
-    \tabularnewline
-  \hline
-      \centering \hspace{4mm} \uline{QL0} \newline \footnotesize \textit{QB0 == MC} 
-    & \centering \hspace{4mm} OK \newline -- 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB1)} 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB2)} 
-    & \centering \hspace{4mm} DOWN \newline \footnotesize \textit{abs(CB0 -- CB3)} 
-    \tabularnewline
-  \hline
-    & \centering \hspace{4mm} \uline{CL0} \newline \footnotesize \textit{CB0 == MC} 
-    & \centering \hspace{4mm} \uline{CL1} \newline \footnotesize \textit{CB0 \textless{} MC $\leq$ CB1} 
-    & \centering \hspace{4mm} \uline{CL1} \newline \footnotesize \textit{CB1 \textless{} MC $\leq$ CB2} 
-    & \centering \hspace{4mm} \uline{CL1} \newline \footnotesize \textit{CB2 \textless{} MC $\leq$ CB3} \tabularnewline
-  \bottomrule
-\end{tabularx}
 
 \section{Implementierung Lasttest}
 \subsection{Timeline}

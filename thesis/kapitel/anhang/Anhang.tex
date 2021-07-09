@@ -1,0 +1,54 @@
+\clearpage
+\appendix
+\clearpage
+\chapter{Anhang}
+
+\section{Imlementierung}
+
+\subsection{Prometheus - Konfiguration}
+
+
+\begin{lstlisting}[style=bashStyle,caption={Prometheus Konfiguration},label=anh:prometheusYml]
+  global:
+	scrape_interval: 1s
+	scrape_timeout: 1s
+	evaluation_interval: 10s
+  
+  rule_files:
+	- alert.yml
+  
+  scrape_configs:
+	- job_name: services
+	  metrics_path: /metrics
+	  static_configs:
+		- targets:
+			- 'prometheus:9090'
+			- 'activemq:8080'
+	- job_name: spring-actuator
+	  metrics_path: /actuator/prometheus
+	  static_configs:
+		- targets:
+			- 'scaler-proxy:9245'
+			- 'consumer-persistence:8965'
+  
+  alerting:
+	alertmanagers:
+	  - static_configs:
+		  - targets:
+			  - alertmanager:9093
+\end{lstlisting}
+
+\begin{lstlisting}[style=bashStyle,caption={Alert Manager - Konfiguration},label=lst:alertManConfig]
+  route:
+    receiver: 'proxy'
+    group_wait: 1s
+    group_interval: 10s
+    repeat_interval: 10s
+
+  receivers:
+    - name: 'proxy'
+      webhook_configs:
+        - url: 'http://scaler-proxy:9245/delegate'
+          send_resolved: false
+\end{lstlisting}
+
