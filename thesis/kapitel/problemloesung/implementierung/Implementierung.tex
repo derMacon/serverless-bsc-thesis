@@ -188,7 +188,7 @@ Die Benutzeroberfläche wurde mithilfe des Javascript-Frameworks \emph{React.js}
 Während der Entwicklungszeit des restlichen Systems, wurde das Arbeiten mit der Benutzeroberfläche allerdings vermehrt zum Flaschenhals. Sobald ein neues Feature oder ein neuer Datensatz in eine Anfrage integriert wurde oder sich das zugrunde liegende Datenmodell änderte, war es jedes Mal ein großer Aufwand dies ebenfalls in der Oberfläche anzupassen. Da die vorher spezifizierte Grammatik sowie die zugrunde liegende API einen deutlich flexibleren Ansatz und eine komplexere Ablauflogik ermöglichen wurde sich bereits relativ früh in der Entwicklung dagegen entschlossen diesen Ansatz der grafischen Benutzerführung weiterzuverfolgen. Die Oberfläche dient hierbei eher als ein \emph{Proof of concept} um darzustellen, wie ein solches Projekt konfiguriert werden muss. Da dem skriptbasierten Ansatz dieselben API-Schnittstellen zugrunde liegen wie dem oberflächenbasierten Ansatz, ist es ohne Probleme möglich das aktuelle React-Projekt den überarbeiteten Gegebenheiten anzupassen, falls dies in Zukunft gewünscht sein sollte.
 
 
-\subsection{Supplier Backend}
+\subsection{Supplier Backend \checkmark}
 Bei dieser Komponente handelt es sich um ein Spring Projekt, dessen Aufgabe es ist, Benutzeranfragen in Nachrichten zu übersetzen, die vom System interpretiert und verarbeitet werden können. Die Schnittstelle für den Benutzer besteht hierbei aus einer REST-Api, die über Tools wie zum Beispiel curl angesprochen werden kann.
 
 \subsubsection{Implementierung}
@@ -305,7 +305,7 @@ In dem beschriebenen Listing ist zu erkennen, wie diese Generatoren genutzt werd
 \paragraph{Beispiel xPathSupplier} 
 Der XPath gibt an, welches XML-Element bei der Verarbeitung durch den Konsumer im Detail extrahiert werden soll (bspw. IBAN, Betrag etc.). Es ist jedoch auch möglich, dass der Benutzer bei der API-Anfrage hierbei keinen genauen XPath angibt sondern möchte, dass hierbei ein beliebiges Element extrahiert werden soll. Dazu wird der Wert "\emph{Randomize}" in die Instruktion eingetragen. Dies ist sinnvoll um etwas Variation in die spätere Verarbeitung zu bekommen um bessere Messwerte erzielen zu könnnen. Im System wurden hierfür beispielhaft einige XPath Pfade manuell hinterlegt. Der Supplier hat intern Zugriff auf diese Sammlung. Je nachdem ob ein spezifischer Wert ausgegeben werden oder dieser variieren soll, wird stets der selbe Wert oder aber unterschiedliche Werte ausgegeben. Ähnliches gilt für die anderen verfügbaren Generator-Instanzen.
 
-\subsection{Konsumer-Komponente}
+\subsection{Konsumer-Komponente \checkmark}
 
 Im folgenden UML-Diagramm ist die grundlegende Klassenstruktur der beteiligten Logikbausteine des Spring-Konsumenten zu erkennen. Da das Node.js-Projekt einen sehr ähnlichen Aufbau besitzt, wird im Folgenden lediglich der Ablauf der Spring Komponente zusammengefasst. Sämtliche Informationen lassen sich jedoch nahtlos auf die Node.js-Umgebung übertragen. 
 
@@ -338,11 +338,10 @@ Der Einstiegspunkt für den Spring-Konsumenten stellt der \emph{AmqService} dar.
 \end{lstlisting}
 \end{minipage}
 
-
-\subsection{Prometheus}
+\subsection{Prometheus \checkmark}
 
 \paragraph{Regelsatz für Skalierung}
-Die Prometheus ist eine Komponente, die zum Monitoring genutzt werden kann (siehe Abschnitt \ref{ss:prometheus}). Für dieses Projekt musste diese lediglich derartig konfiguriert werden, dass entsprechende alerts generiert werden und an die Alter-Manager-Komponente weitergeleitet werden können. Diese Komponente informiert erst anschließend die (Proxy) Scaler Komponente. Die auszuwertenden Regeln residieren jedoch bereits in der Prometheus Komponente. Die Regeln wurden nach folgendem Schema entworfen.
+Prometheus ist eine Komponente, die zum Monitoring genutzt werden kann (siehe Abschnitt \ref{ss:prometheus}). Für dieses Projekt musste diese lediglich derartig konfiguriert werden, dass entsprechende Alerts generiert werden und an die Alter-Manager-Komponente weitergeleitet werden können. Diese Komponente informiert erst anschließend die (Proxy-)Scaler-Komponente. Die auszuwertenden Regeln residieren jedoch bereits in der Prometheus Komponente. Das Regelwerk wurden nach folgendem Schema entworfen.
 
 \bigskip
 
@@ -389,7 +388,7 @@ Die Prometheus ist eine Komponente, die zum Monitoring genutzt werden kann (sieh
 
 \bigskip
 
-Diese Tabelle bestimmt das Skalierungsverhalten des Systems. Aus ihr werden die Regeln für die Prometheus-Konfiguration ermittelt. Um diese Tabelle etwas anschaulicher erläutern zu können, werden die folgenden Werte für entsprechende Umgebungsvariablen angenommen. 
+Diese Tabelle bestimmt das Skalierungsverhalten des Systems. Aus ihr werden die Regeln für die Prometheus-Konfiguration abgeleitet. Um diese Tabelle etwas anschaulicher erläutern zu können, werden die folgenden Werte für entsprechende Umgebungsvariablen angenommen. 
 
 
 \begin{verbatim}
@@ -398,16 +397,16 @@ Diese Tabelle bestimmt das Skalierungsverhalten des Systems. Aus ihr werden die 
 \end{verbatim}
 
 
-Auf der horizontale Achse wird die aktuelle Containeranzahl eines Systems in verschiedene Zustände eingeteilt. \emph{CL0} bis \emph{Cl3} beschreibt hierbei das sogenannte \emph{Container Level}. Diese Level geben Abschnitte an in denen sich die Containeranzahl zum aktuellen Zeitpunkt befinden kann, die Grenzen wurde mithilfe von Variablen festgelegt. Die Grenzen wurden mit dem Kürzel \emph{CB0} bis \emph{CB2} versehen, dies steht für den Begriff "\emph{Container Bound}". Die aktuelle Containeranzahl (engl. \emph{container count}) selbst, wurde in der Tabelle mit \emph{CC} abgekürzt. Wenn das System zu einem betrachteten Zeitraum beispielsweise fünf Containerinstanzen einer Konsumenten-Komponente laufen (im nachfolgenden stets als \emph{Consumer-Container} bezeichent). Dann befindet sich das System im Zustand \emph{Container level 1}, da die untere Grenze des Intervals mit \emph{CB0} auf 1 und die obere Grenze auf 5 gesetzt wurde. 
+Auf der horizontale Achse wird die aktuelle Containeranzahl eines Systems in verschiedene Zustände eingeteilt. \emph{CL0} bis \emph{Cl3} beschreibt hierbei das sogenannte \emph{Container Level}. Diese Level geben Abschnitte an in denen sich die Containeranzahl zum aktuellen Zeitpunkt befinden kann. Diese Grenzen wurde mithilfe von Variablen festgelegt und mit dem Kürzel \emph{CB0} bis \emph{CB2} versehen, dies steht für den Begriff "\emph{Container Bound}". Die aktuelle Containeranzahl (engl. \emph{container Count}) selbst, wurde in der Tabelle mit \emph{CC} abgekürzt. Wenn im System zu einem betrachteten Zeitraum beispielsweise fünf Containerinstanzen einer Konsumenten-Komponente laufen (im nachfolgenden stets als \emph{Consumer-Container} bezeichent), dann befindet sich das System im Zustand \emph{Container Level 1}, da die untere Grenze des Intervals mit \emph{CB0} auf 1 und die obere auf 5 gesetzt wurde. 
 
-Eine ähnliche Eingrenzung gibt es ebenfalls für die vertikale Achse wobei die unbeantworteten Nachrichten einer Warteschlange in einem Message-Broker betrachtet werden. Hierbei steht das \emph{QL0} bis \emph{Ql3} für das sogenannte "\emph{queue level}". Über die \emph{queue bound} (kurz \emph{QB0} bis \emph{QB3}) werden hierbei die Grenzen der Intervalle festgelegt. Wenn beispielsweise 101 uneantwortete Nachrichten in der Warteschlange residieren, befindet sich das System im Zustand \emph{QL3}, da die \emph{queue count} (kurz \emph{QC}) größer der Grenze \emph{QB2} (festgelegt auf 100) .
+Eine ähnliche Eingrenzung gibt es ebenfalls bezüglich der vertikalen Achse, wobei die unbeantworteten Nachrichten einer Warteschlange in einem Message-Broker betrachtet werden. Hierbei steht das \emph{QL0} bis \emph{Ql3} für das sogenannte "\emph{Queue Level}". Über die \emph{Queue Bound} (kurz \emph{QB0} bis \emph{QB3}) werden hierbei die Grenzen der Intervalle festgelegt. Wenn beispielsweise 101 unbeantwortete Nachrichten in der Warteschlange residieren, befindet sich das System im Zustand \emph{QL3}, da die \emph{Queue Count} (kurz \emph{QC}) größer ist als die Grenze \emph{QB2} (festgelegt auf 100) .
 
-Aus einer Überkreuzung dieser beiden Informationen lässt sich ableiten wie das System skaliert werden soll. Um beim beschriebenen Beispiel zu bleiben, würde sich das System im Feld \emph{CL1QL3} befinden. Hierbei gibt es zu wenig Container für die gegebene Nachrichtenanzahl. Die die Containeranzahl muss demnach nach oben skaliert werden und zwar um die Differenz der beiden Container-Intervall-Grenzen \emph{CB1} und \emph{CB3}. Wenn diese Skalierung durchgeführt wurde, befindet sich das System anschließend im Zustand \emph{CL3QL3}. Die Hauptdiagonale der Tabelle beschreibt die Idealzustände, hierbei muss keinerlei weitere Skalierung vorgenommen werden. 
+Aus einer Überkreuzung dieser beiden Informationen lässt sich ableiten wie das System skaliert werden soll. Um beim beschriebenen Beispiel zu bleiben, würde sich das System im Feld \emph{CL1QL3} befinden. Hierbei gibt es zu wenig Container für die gegebene Nachrichtenanzahl. Die Containeranzahl muss demnach nach oben skaliert werden und zwar um die Differenz der beiden Container-Intervall-Grenzen \emph{CB1} und \emph{CB3}. Wenn diese Skalierung durchgeführt wurde, befindet sich das System anschließend im Zustand \emph{CL3QL3}. Die Hauptdiagonale der Tabelle beschreibt die Idealzustände, hierbei muss keine weitere Skalierung vorgenommen werden. 
 
 \label{prometheus:skalierungsmechanismus}
-Ein wesentlicher Nachteil dieser Herangehensweise ist, dass das System beim Skalieren über mehrere Intervallsgrenzen hinweg mit mehreren Zellen in Berührung kommt. So befindet sich das System bei der beschriebenen Skalierung beispielsweise für einen Moment im Zustand \emph{CL2QL3}. Je nach Konfiguration des Systems schlägt diese Regel hierbei an. Es gibt mehrere Möglichkeiten dieses Problem zu umgehen. Es ist zum Beispiel möglich das zeitliche Anfrageninterval nach Steuerungsinformationen vom Broker zu erhöhen, in der Hoffnung, dass das System bereits die gezielte Containeranzahl erreicht hat, wenn die nächste Anfrage erfolgt. Dies hat allerdings zur Folge, dass das System generell sehr lange braucht um zu erkennen, ob eine Skalierung bei der nächsten Aktion nötig ist oder nicht. Da dies einen sehr inpraktikabler Ansatz darstellt, wurde diese Verantwortlichkeit an den Proxy-Scaler übergeben. Da diese Komponente die tatsächlichen Skalierungsanfragen an die Docker-Scaler Api navigiert, ist sie ebenfalls in der Lage entsprechende Nachrichten zurückzuhalten, wenn klar ist, dass es sich hierbei lediglich um einen "\emph{Fehlalarm}" handelt, bei dem lediglich eine Skalierungsstufe während eines bereits laufenden Prozesses durchlaufen wird. 
+Ein wesentlicher Nachteil dieser Herangehensweise ist, dass das System beim Skalieren über mehrere Intervallgrenzen hinweg mit mehreren Zellen in Berührung kommt. So befindet sich das System bei der beschriebenen Skalierung beispielsweise für einen Moment im Zustand \emph{CL2QL3}. Je nach Konfiguration des Systems schlägt diese Regel hierbei an. Es gibt mehrere Möglichkeiten dieses Problem zu umgehen. Es ist zum Beispiel möglich das zeitliche Anfragenintervall durch Steuerungsinformationen vom Broker zu erhöhen, in der Hoffnung, dass das System bereits die gezielte Containeranzahl erreicht hat, sobald die nächste Anfrage erfolgt. Dies hat allerdings zur Folge, dass das System generell sehr lange braucht um zu erkennen, ob eine Skalierung bei der nächsten Aktion nötig ist oder nicht. Da dies einen impraktikablen Ansatz darstellt, wurde diese Verantwortlichkeit an den Proxy-Scaler übergeben. Da diese Proxy-Komponente die tatsächlichen Skalierungsanfragen an die Docker-Scaler-API navigiert, ist sie ebenfalls in der Lage entsprechende Nachrichten zurückzuhalten, wenn klar ist, dass es sich hierbei um einen "\emph{Fehlalarm}" handelt, bei dem lediglich eine Skalierungsstufe während eines bereits laufenden Prozesses durchlaufen wird. 
 
-Ein Satz Sonderregeln, die bisher nicht erwähnt wurden, betreffen den Initialisierungszustand. Hierbei wird geprüft ob die Minimalanzahl von Containern läuft. Falls dies nicht der Fall sein sollte, wird eine Skalierungsanfrage mit genau dieser Anzahl generiert. 
+Ein Satz Sonderregeln, die bisher nicht erwähnt wurden, betreffen den Initialisierungszustand. Hierbei wird geprüft ob die Minimalanzahl von Containern läuft. Falls dies nicht der Fall sein sollte, wird eine Skalierungsanfrage für genau diese Anzahl generiert.
 
 
 \paragraph{Konfiguration}
@@ -430,7 +429,7 @@ Ein Satz Sonderregeln, die bisher nicht erwähnt wurden, betreffen den Initialis
 
 \end{lstlisting}
 
-Dieser Ausschnitt aus dem hinterlegten Regelwerk stellt die als letztes erwähnte Sonderregel für die minimal Containeranzahl. Hiermit wird beispielhaft beschrieben wie die erläuterten Regeln aus der Tabelle kodiert werden. Das Schlüsselwort \emph{groups} dient lediglich dazu verwandte Regeln zusammenzufassen. Der Rest ist selbsterklärend, erwähnenswert ist lediglich, dass die Wert des Schlüssels \emph{alert} in dieser Form wortwörtlich an den Alertmanager weitergeleitet und dort entsprechend verarbeitet wird.
+Dieser Ausschnitt aus dem hinterlegten Regelwerk stellt die als letztes erwähnte Sonderregel für die minimal Containeranzahl dar. Hiermit wird beispielhaft beschrieben wie die erläuterten Regeln aus der Tabelle codiert werden. Das Schlüsselwort \emph{groups} dientallein dazu verwandte Regeln zusammenzufassen. Der Rest ist selbsterklärend, erwähnenswert ist, dass der Wert des Schlüssels \emph{alert} in dieser Form wortwörtlich an den Alertmanager weitergeleitet und dort entsprechend verarbeitet wird.
 
 Im folgenden Listing ist die Dateistruktur der Konfigurationsdateien von Prometheus dargestellt.
 
@@ -444,15 +443,16 @@ Im folgenden Listing ist die Dateistruktur der Konfigurationsdateien von Prometh
       `-- alertmanager.json
 \end{lstlisting}
 
-In der Datei "\emph{alert-unparsed.yml}" werden die Regeln nach der bisher beschriebenen Struktur abgelegt. Hierbei wurden keinerlei festen Werte für die Intervallgrenzen eingesetzt. Zur Laufzeit der Komponente ist dies allerdings nicht zulässig. Um dennoch die Flexibilität des Formats mit Umgebungsvariablen nutzen zu können wurde ein Skript verfasst, das vor dem Starten der Komponente ausgeführt wird und die Datei "\emph{alert.yml}" generiert. In der "\emph{prometheus.yml}" Datei befindet sich ein Eintrag, der dem System mitteilt, dass diese generierte Datei für die Regelauswertung verwendet werden soll. In der \emph{prometheus.yml} Datei befinden sich ansonsten weitere Einstellungen bezüglich des Scraping Intervalls, der Adressierung der zu überwachenden Komponenten sowie die Angabe des Namens des Alert-Managers. Die komplette Konfigurationsdatei befindet sich im Anhang (siehe Listing \ref{anh:prometheusYml}).
+In der Datei "\emph{alert-unparsed.yml}" werden die Regeln nach der bisher beschriebenen Struktur abgelegt. Hierbei wurden keinerlei festen Werte für die Intervallgrenzen eingesetzt. Zur Laufzeit der Komponente ist dies allerdings nicht zulässig. Um dennoch die Flexibilität des Formats mit Umgebungsvariablen nutzen zu können wurde ein Skript verfasst, das vor dem Starten der Komponente ausgeführt wird und die Datei "\emph{alert.yml}" generiert. Bei Ausführung des Skripts werden die hinterlegten Werte der Umgebungsvariablen in das gegebene Skript eingesetzt \todo{Skript in Anhang packen, ref hierhin}. 
+
+In der "\emph{prometheus.yml}" Datei befindet sich ein Eintrag, der dem System mitteilt, dass diese generierte Datei für die Regelauswertung verwendet werden soll. In der \emph{prometheus.yml} Datei werden ansonsten weitere Einstellungen bezüglich des Scraping-Intervalls, der Adressierung der zu überwachenden Komponenten sowie die Angabe des Namens des Alert-Managers konfiguriert. Die komplette Konfigurationsdatei befindet sich im Anhang (siehe Listing \ref{anh:prometheusYml}).
 
 Der Ordner \emph{target} enthält die Routing Konfiguration für die Anbindung der generierten Alerts zur Alert-Manager-Komponente.
+\subsection{Alter-Manager \checkmark}
+Diese Komponente ist in diesem Projekt sehr unkompliziert gehalten. Es wird lediglich ein Webhook erstellt, an den erhaltene Alerts ohne jegliche Modifikation weitergeleitet werden. Im Anhang wurde die komplette Konfiguration der Komponente aufgeführt (siehe Listing lst:alertManConfig).
 
-\subsection{Alter-Manager}
-Diese Komponente ist in diesem Projekt sehr einfach gehalten. Es wird lediglich ein Webhook erstellt an den erhaltene Alerts ohne jegliche Modifikation weitergeleitet werden. Im Anhang wurde die komplette Konfiguration der Komponente aufgerführt (siehe Listing lst:alertManConfig).
 
-
-\subsection{Scaler Proxy}
+\subsection{Scaler Proxy \checkmark}
 
 Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml}) wird die grundlegende Klassenstruktur der Scaler-Proxy-Komponente zusammengefasst. 
 
@@ -463,7 +463,7 @@ Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml}) wird die gr
 	\label{fig:proxyScalerUml}
 \end{figure}
 
-Diese Komponente stellt sowohl die Funktionalität bereit Alerts vom Alert-Manager als auch direkte Skalierungsanfragen vom Benutzer selbst anzunehmen. Für beide Szenarien gibt es einen entsprechenden Endpunkt. Beide Typen von Anfragen werden intern allerdings erst in ein Zwischenformat überführt, das wiederum vom \emph{RequestService} interpretiert werden kann. Die wesentliche Kernfunktionalität dieses Services wurde in Listing \ref{lst:proxyDelegate} dargestellt. Bei der Implementierung des Regelwerks in der Prometheus-Komponente wurde erwähnt, dass es einen Mechanismus zum Skalieren über mehrere Stufen des Models von der Proxy-Komponente geben muss (siehe Abschnitt \ref{prometheus:skalierungsmechanismus}). Dies wurde in der Proxy-Komponente über ein Acknowledgement der einzelnen hochgefahrenen Container ermöglicht. Es wird intern eine Liste von Skalierungsinstruktionen verwaltet. Jeder Container, der im Zuge einer der Instruktionen gestartet wird, generiert eine Id, die diesen Container identifiziert und gibt diese dem Proxy-Service über eine Rest-Schnittstelle bekannt. Dadurch ist es möglich festzustellen, ob sich das System aktuell in einem Skalierungsprozess befindet oder nicht. Wenn nun neue Skalierungsinstruktionen eingespeist werden (zum Beispiel in einer der beschriebenen Übergangsphasen in der Tabelle), dann ist es der Komponente möglich mithilfe einer einfachen Überprüfung der Liste diese zu verwerfen (Zeile 2). Im Anschluss wird über sämtliche generierten Skalierungsinstruktionen iteriert. Die verwaltete Liste wird mit neuen Einträgen gefüllt und die Anfragen werden an die Skalierungs-API geschickt, welche als letztes Abstraktionslevel ohne weitere Funktionalität die Skalierung für den Benutzer übernimmt. 
+Diese Komponente stellt sowohl die Funktionalität bereit Alerts vom Alert-Manager als auch direkte Skalierungsanfragen vom Benutzer selbst anzunehmen. Für beide Szenarien gibt es einen entsprechenden Endpunkt. Beide Typen von Anfragen werden intern allerdings erst in ein Zwischenformat überführt, das wiederum vom \emph{RequestService} interpretiert werden kann. Die wesentliche Kernfunktionalität dieses Services wurde in Listing \ref{lst:proxyDelegate} dargestellt. Bei der Implementierung des Regelwerks in der Prometheus-Komponente wurde erwähnt, dass es einen Mechanismus zum Skalieren über mehrere Stufen des Models von der Proxy-Komponente geben muss (siehe Abschnitt \ref{prometheus:skalierungsmechanismus}). Dies wurde in der Proxy-Komponente über ein Acknowledgement der einzelnen hochgefahrenen Container ermöglicht. Es wird intern eine Liste von Skalierungsinstruktionen verwaltet. Jeder Container, der im Zuge einer der Instruktionen gestartet wird, generiert eine ID, die diesen Container identifiziert und gibt diese dem Proxy-Service über eine Rest-Schnittstelle bekannt. Dadurch kann die Proxy-Komponente festzustellen, ob sich das System aktuell in einem Skalierungsprozess befindet oder nicht. Wenn nun neue Skalierungsinstruktionen eingespeist werden (zum Beispiel in einer der beschriebenen Übergangsphasen in der Tabelle), dann ist es der Komponente möglich mithilfe einer einfachen Überprüfung der Liste diese zu verwerfen (Zeile 2). Im Anschluss wird über sämtliche generierten Skalierungsinstruktionen iteriert. Die verwaltete Liste wird mit neuen Einträgen gefüllt und die Anfragen werden an die Skalierungs-API geschickt, die als letztes Abstraktionslevel ohne weitere Funktionalität die Skalierung für den Benutzer übernimmt. 
 
 \begin{lstlisting}[style=javaStyle,caption={Proxy Scaler - RequestService},label=lst:proxyDelegate]
   public boolean delegate(List<ScalingInstruction> instructions) {
@@ -484,7 +484,7 @@ Diese Komponente stellt sowohl die Funktionalität bereit Alerts vom Alert-Manag
 
 
 \subsection{Docker-Scaler}
-Dieses open source Projekt\footnote{\url{https://thomasjpfan.github.io/docker-scaler}} bietet eine Rest-Schnittstelle über die es möglich ist einen zugrunde liegenden Docker-Swarm zu skalieren. Die komplette Anfrage kann innerhalb einer einzigen POST-Anfrage abgeschickt werden. In diesem Projekt wurde hierfür der folgende Endpunkt verwendet.
+Dieses Open Source Projekt\footnote{\url{https://thomasjpfan.github.io/docker-scaler}} bietet eine Rest-Schnittstelle über die es möglich ist einen zugrunde liegenden Docker-Swarm zu skalieren. Die komplette Anfrage kann innerhalb einer einzigen POST-Anfrage abgeschickt werden. In diesem Projekt wurde hierfür der folgende Endpunkt verwendet.
 
 \begin{itemize}
   \item URL: /v1/scale-service
@@ -493,14 +493,13 @@ Dieses open source Projekt\footnote{\url{https://thomasjpfan.github.io/docker-sc
   \begin{itemize}
     \item service: Name des zu skalierenden Services
     \item scale: Richtung in die skaliert werden soll 
-    \item by: Anzahl zusätzlichen / überflüssigen Replicas
+    \item by: Anzahl zusätzlicher / überflüssiger Replicas
   \end{itemize}
 \end{itemize}
 
+\subsection{Grafana \checkmark}
 
-\subsection{Grafana}
-
-Dieses Werkzeug wird zur Erstellung von Graphen von erhaltenen Daten verwendet. Diese Daten werden von allen relevanten Stack-Komponenten über eine einheitliche Schnittstelle bereitgestellt und im Prometheus Client gebündelt. Die Grafana-Komponenten muss hierbei lediglich die Prometheus-Komponente als \emph{Datasource} deklarieren um Zugriff auf diese Metriken zu erhalten \cite[Seite~99 ff.]{oreillyPrometheus}. In Abbildung \ref{fig:prometheusDatasource} ist diese Konfiguration in Auszügen zu erkennen. Hierbei wird im Wesentlichen die Netzwerk-Adresse und Port spezifiziert. 
+Dieses Werkzeug wird zur Erstellung von Graphen hinsichtlich erhaltener Metriken verwendet. Diese Daten werden von allen relevanten Stack-Komponenten über eine einheitliche Schnittstelle bereitgestellt und im Prometheus Client gebündelt. Die Grafana-Komponenten muss hierbei lediglich die Prometheus-Komponente als \emph{Datasource} deklarieren, um Zugriff auf diese Metriken zu erhalten \cite[Seite~99 ff.]{oreillyPrometheus}. In Abbildung \ref{fig:prometheusDatasource} ist diese Konfiguration in Auszügen zu erkennen. Hierbei wird im Wesentlichen die Netzwerk-Adresse und Port spezifiziert. 
 
 \begin{figure}[ht!]
 	\centering
@@ -509,7 +508,7 @@ Dieses Werkzeug wird zur Erstellung von Graphen von erhaltenen Daten verwendet. 
 	\label{fig:prometheusDatasource}
 \end{figure}
 
-Über die in Prometheus deklarierten \emph{Targets} können die wichtigen Informationen ausgelesen werden. Die Abbildung \ref{fig:grafanaOverview} zeigt hierbei auf wie das fertige Dashboard aussieht. Die Aufnahme wurde zum Zeitpunkt der Benchmarks-Test, die als Grundlage für diese Analyse verwendet wurden, getätigt. Es lassen sich alle Metriken der Ergebnisanalyse (siehe Abschnitt \ref{} \todo{ref einbinden}) in diesem  Dashboard wiederfinden. 
+Über die in Prometheus deklarierten \emph{Targets} (überwachten Komponenten) können die wichtigen Informationen ausgelesen werden. Die Abbildung \ref{fig:grafanaOverview} zeigt hierbei auf wie das fertige Dashboard aussieht. Die Aufnahme wurde zum Zeitpunkt der Benchmarks-Test, die als Grundlage für diese Analyse verwendet wurden, getätigt. Es lassen sich alle Metriken der Ergebnisanalyse (siehe Abschnitt \ref{} \todo{ref einbinden}) in diesem Dashboard wiederfinden. 
 
 \begin{figure}
 	\centering
@@ -518,7 +517,7 @@ Dieses Werkzeug wird zur Erstellung von Graphen von erhaltenen Daten verwendet. 
 	\label{fig:grafanaOverview}
 \end{figure}
 
-Um ein Dashboard zu erstellen, wird auf das Webinterface der Komponente selbst zugegriffen. Es gibt hierbei zwar auch die Möglichkeit Dashboards im Json-Format einzulesen sowie zu exportieren, der Einfachheit halber wurde in diesem Projekt allerdings hierrauf verzichtet. In der folgenden Abbildung ist zu erkennen, wie die Konfiguration einer Dashboard-Komponente über das Webinterface funktioniert (siehe Abbildung \ref{fig:grafanaPromQl}). 
+Um ein Dashboard zu erstellen, wird auf das Webinterface der Komponente selbst zugegriffen. Es gibt hierbei zwar auch die Möglichkeit Dashboards im Json-Format einzulesen sowie zu exportieren, der Einfachheit halber wurde in diesem Projekt allerdings hierauf verzichtet. In der folgenden Abbildung ist zu erkennen, wie die Konfiguration einer Dashboard-Komponente über das Webinterface funktioniert (siehe Abbildung \ref{fig:grafanaPromQl}). 
 
 \begin{figure}
 	\centering
@@ -527,7 +526,7 @@ Um ein Dashboard zu erstellen, wird auf das Webinterface der Komponente selbst z
 	\label{fig:grafanaPromQl}
 \end{figure}
 
-Die wesentliche Hauptkomponente, die während der Konfiguration verwendet wird, stellt die Anfrage an die definierte Datasource dar (\emph{query}). Hierbei wird auf eine Anfragesprache namens \emph{PromQL} zurückgegriffen um verschiedene Metriken auslesen zu können. In der Abbildung ist beispielsweise zu erkennen, dass bei einem Messagebroker mit dem Namen "\emph{localhost}" eine Warteschlang (engl. emph{queue}) mit dem Namen "\emph{springqueue}" mit der Adresse "\emph{activemq:8080}" die aktuelle Größe der Warteschlange ausgeben soll\footnote{Die hier genutzte Anfrage lässt sich zum Beispiel bei der ActiveMq-Dokumentation nachlesen \url{https://docs.splunk.com/Observability/gdi/activemq/activemq.html}}. Diese Anfrage wird in einem konfigurierbaren Intervall wiederholt (hier alle 15 Sekunden). Es ist auch möglich mehrere Anfragen pro Graph zu definieren um mehrere Werte gegenüberzustellen sowie mehrere Anfragen zu verknüpfen. Die erhaltenen Daten werden anschließend automatisch in einem Graphen dargestellt (siehe Abbildung \ref{fig:graphEx}). 
+Das wesentliche Formularelement, das während der Konfiguration verwendet wird, stellt die Anfrage an die definierte Datasource dar (\emph{query}). Hierbei wird auf eine Anfragesprache namens \emph{PromQL} zurückgegriffen um verschiedene Metriken auslesen zu können. In der Abbildung ist beispielsweise zu erkennen, dass bei einem Messagebroker mit dem Namen "\emph{localhost}" eine Warteschlang (engl. emph{queue}) mit dem Namen "\emph{springqueue}" mit der Adresse "\emph{activemq:8080}" die aktuelle Größe der Warteschlange ausgeben soll\footnote{Die hier genutzte Anfrage lässt sich zum Beispiel bei der ActiveMq-Dokumentation nachlesen \url{https://docs.splunk.com/Observability/gdi/activemq/activemq.html}}. Diese Anfrage wird in einem konfigurierbaren Intervall wiederholt (hier alle 15 Sekunden). Es ist auch möglich mehrere Anfragen pro Graph zu definieren um mehrere Werte gegenüberzustellen, sowie mehrere Anfrageergebnisse zu verknüpfen. Die erhaltenen Daten werden anschließend automatisch in einem Graphen dargestellt (siehe Abbildung \ref{fig:graphEx}). 
 
 \begin{figure}
 	\centering
@@ -536,10 +535,9 @@ Die wesentliche Hauptkomponente, die während der Konfiguration verwendet wird, 
 	\label{fig:graphEx}
 \end{figure}
 
-In diesem Beispiel wurden eine größere Menge von Nachrichten für den Spring-Konsumenten in die Warteschlange geladen. Die unbeantworteten Nachrichten wurden hierbei in gelb dargestellt. Da zum Start der Anwendung nur ein einziger Container des Services aktiv läuft, werden im Nachhinein weitere Container hochgefahren (siehe orangene Kurve). Es ist zu erkennen, dass die Nachrichtenanzahl zu anfang sehr langsam abnimmt mit ansteigender Container anzahl jedoch immer schneller sinkt.
+In diesem Beispiel wurden eine größere Menge von Nachrichten für den Spring-Konsumenten in die Warteschlange geladen. Die unbeantworteten Nachrichten wurden hierbei in Gelb dargestellt. Da zum Start der Anwendung nur ein einziger Container des Services aktiv läuft, werden im Nachhinein weitere Container hochgefahren (siehe orangene Kurve). Es ist zu erkennen, dass die Nachrichtenanzahl zu Anfang sehr langsam abnimmt mit ansteigender Containeranzahl jedoch immer schneller sinkt.
 
-Die Daten hinsichtlich der Node.js Komponenten sowie die Zahlenwerte für die gemessenen Start-up-Zeiten werden ebenfalls in eigenen Dashboard-Komponenten dargestellt. Da die Konfiguration dieser, der vorgestellten allerdings deutlich ähnelt, wurde hierbei darauf verzichtet diese ebenfalls zu erläutern. Da das Dashboard im allgemeinen einen eher überprüfenden Charakter einnimmt um nachvollziehen zu können wie die letztendlichen Messwerte berechnet wurden, ist diese gesamte Komponente auch von nebensächlicher Bedeutung.
-
+Die Daten hinsichtlich der Node.js Komponenten sowie die Zahlenwerte für die gemessenen Start-up-Zeiten werden gleichermaßen in eigenen Dashboard-Komponenten dargestellt. Da die Konfiguration dieser, der Vorgestellten allerdings deutlich ähnelt, wurde hierbei darauf verzichtet diese ebenfalls zu erläutern. Da das Dashboard im Allgemeinen einen eher überprüfenden Charakter einnimmt um nachvollziehen zu können wie die letztendlichen Messwerte berechnet wurden, ist diese gesamte Komponente auch von nebensächlicher Bedeutung.
 
 % \subsection{Buildprozess}
 
