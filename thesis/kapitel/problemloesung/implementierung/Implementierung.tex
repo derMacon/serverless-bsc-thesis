@@ -631,13 +631,28 @@ Die Daten hinsichtlich der Node.js Komponenten sowie die Zahlenwerte für die ge
 
 
 \section{Deployment auf Containerplattform}
-Nachdem im letzten Abschnitt beschrieben wurden, wie die einzelnen Stack-Komponenten implementiert wurde, wird im Folgenden auf das Deployment mithilfe von Containern im Docker Swarm Stack eingegangen.
+Nachdem im letzten Abschnitt beschrieben wurden, wie die einzelnen Stack-Komponenten implementiert wurde, wird im Folgenden auf das Deployment mithilfe von Containern im Docker Swarm Stack eingegangen. 
 
 \subsection{Build}
-Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in einem ersten Schritt ein Docker Image erstellt werden. Dieses kann im Anschluss als Container instanziiert werden. Zum Erstellen eines Docker-Images wird auf ein sogenannten "\emph{Dockerfile}" zurückgegriffen, das die Beschreibung des Build-Prozesses für dieses Image enthält. Da alle Spring-Projekte im Komponenten-Stack mit einem fast identischen Dockerfile versehen wurden, gilt die folgende Beschreibung in gleichem Maß für alle weiteren Spring-Projekte. \todo{Multistage Build erklären / Quelle raussuchen}
+Hierbei werden zuerst die Buildvorgänge der einzelnen Komponenten beschrieben, im Anschluss daran wird ein Überblick über die Orchestrierung des Stacks gegeben.
+
+\subsubsection{Spring Komponenten}
+
+Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in einem ersten Schritt ein Docker Image erstellt werden. Dieses kann im Anschluss als Container instanziiert werden. Zum Erstellen eines Docker-Images wird auf ein sogenannten "\emph{Dockerfile}" zurückgegriffen, das die Beschreibung des Build-Prozesses für dieses Image enthält. Da alle Spring-Projekte im Komponenten-Stack mit einem fast identischen Dockerfile versehen wurden, gilt die folgende Beschreibung in gleichem Maß für alle Spring-Projekte dieses Stacks. \todo{Multistage Build erklären / Quelle raussuchen}
+
+Damit die folgende Erklärung der genutzten Dockerfiles verständlich erläutert werden kann, folgt eine kurze Zusammenfassung der Struktur eines Docker-Images. "\emph{A Docker image is made up of filesystems layered over each other}" \cite[Seite~71]{turnbulldocker}. Als erste Schicht wird hierbei ein bootbares Filesystem eingeführt, das einem typischen Linux Bootsystem ähnelt. Anschließend kann dieses Modell mit weiteren Schichten erweitert werden. Hierfür wird der sogenannte "\emph{union mount}" Mechanismus verwendet, der es ermöglicht mehrere read-only Dateisysteme in das Root-Dateisystem zu integrieren. Bei einem später hinzugefügten Dateisystem ist es möglich auf die Unterordner der vorher hinzugefügten Systeme zuzugreifen, umgekehrt gilt dies nicht. In einer Docker-Umgebung spricht man bei diesen aufgeschichteten Dateisystemen von Docker-Images. "\emph{Images can be layered on top of one another.  The image below is called the parent image and you can traverse each layer until you reach the bottom of the image stack where the final image is called the base image.  Finally, when a container is launched from an image, Docker mounts a read-write filesystem on top of any layers below. This is where whatever processes we want our Docker container to run will execute}" \cite[Seite~71]{turnbulldocker}. In Abbildung \ref{fig:dockerImage} wurde dies auch noch einmal grafisch aufgearbeitet.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=.6\linewidth]{kapitel/problemloesung/implementierung/_img/docker-image-fig}
+	\caption[Docker Image - Schaubild]{Docker Image - Schaubild \cite[Seite~72]{turnbulldocker}}
+	\label{fig:dockerImage}
+\end{figure}
+
+Um ein Docker-Image zu erstellen, wurde bei diesem Projekt auf eine Beschreibungsdatei namens "\emph{Dockerfile}" zurückgegriffen.
 
 \begin{minipage}{\linewidth}
-\begin{lstlisting}[style=javaStyle,caption={Supplier - Bi Consumer},label=lst:supplierParserEndpoint]
+\begin{lstlisting}[style=javaStyle,caption={Dockerfile - Supplier},label=lst:supplierDockerfile]
   FROM maven:3.8.1-openjdk-11 AS build
   COPY src /usr/src/app/src
   COPY pom.xml /usr/src/app
@@ -652,24 +667,51 @@ Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in ein
 
 \begin{itemize}
   \item Zeile 1: Ein Dockerfile beginnt meist mit der Angabe eines sogenannten "\emph{Baseimages}". Dies kann eine minimale Linux Distribution sein, oder wie in diesem Fall ein System auf dem bereits diverse Konfigurationen definiert wurden. Bei dem verwendeten Image, wurde eine Java Runtime sowie das Buildprogramm \emph{maven} bereits vorinstalliert. Beides wird für die Ausführung des Spring-Projekts gebraucht. 
+  \item Zeile 2: Der Buildprozess wird in der Root-Directory des Spring-Projekts ausgeführt. In diesem Verzeichnis befinden sich in einem Unterordner alle Quellcodedateien. Diese mit diesem Befehl in das das \emph{usr} Verzeichnis des zu erstellenden Images kopiert. 
+  \item Zeile 3: Da alle Spring-Projekte dieses Stacks mithilfe des Build-Tools \emph{Maven} gebaut werden, wird die \emph{pom.xml} Datei aus dem Root-Verzeichnis ebenfalls in den Container kopiert. Diese Datei enthält alle wesentlichen Metainformationen des Projekts. Dazu gehören beispielsweise sämtliche Abhängigkeit, verwendete Build-Plugins und Projektinformationen. 
+  \item Zeile 4: Der Run-Befehl ermöglicht es den nachfolgenden Shell-Befehl in einer Linux-Shell innerhalb des Containers selbst auszuführen. Hierbei wird die ausführbare .jar Datei gebaut die im späteren Verlauf im Dateisystem deployed wird.
+  \item Zeile 6: Es folgt eine erneute Anweisung zum Laden eines Base-Images, dies ist Teil eines sogenannten multi-stage Builds. Wie im letzten Abschnitt erwähnt werden beim Bauen von Docker-Images verschiedene Dateisysteme ineinander gemounted, hierbei entsteht eine Art Schichtenmodell. Bezogen auf ein Dockerfile wird mit jeder einzelnen Befehlszeile der Datei ein neues Image erstellt. Um am Ende ein möglichst kleines Docker-Images zu erhalten, wird versucht diese Schichtanzahl so minimal wie möglich zu halten. Hierbei gibt es die Möglichkeit das Bauen der ausführbaren Datei auszulagern und lediglich die fertige ausführbare Datei in den Container zu laden. Mit diesem Ansatz ist es allerdings nicht möglich, das Image direkt auf dem Server zu bauen, es sei denn die Datei liegt vor oder auf dem System wurden alle notwendigen Buildwerkzeuge installiert. Dies ist sehr impraktikabel, weswegen in der Praxis hierbei ein sogenannter "\emph{multistage build}" verwendet wird \cite[Kapitel~multi stage build]{docker-doc}. Hierbei kann auf einzelne Stufen Bezug genommen werden, und einzelne Dateien von einem Image direkt in ein anderes kopiert werden. Bezogen auf das dargestellte Dockerfile, ist es möglich die ausführbare Datei des vorherigen Buildprozesses zu kopieren ohne sämtliche Metadaten, die bei dem Buildprozess anfallen mit kopieren zu müssen.
+  \item Zeile 7: Wie im letzten Schritt erwähnt, wird hierbei die ausführbare Datei vom Buildprozess in das aktuelle Image herüberkopiert. Hierfür wird sich dem Schlüsselwort \emph{--from} bedient. Die vorher genierierten Schichten, die für im Buildprozess verwendet werden, werden bei der Erstelltung des letztendlichen Images wieder verworfen, da sie mit einem neuen Baseimage überschrieben wurden.
+  \item Zeile 8: Der Port über dem sämtliche Kommunikation mit der Außenwelt stattfindet wird freigegeben. 
+  \item Zeile 9: Der Entrypoint ähnelt dem \emph{CMD}-Befehl stark, es ist zum Ausführungszeitpunkt des Containers allerdings schwieriger diesen zu überschreiben.
 \end{itemize}
 
 
+\paragraph{Anmerkung: Vorteile der Imageschichtung} Der wesentliche Vorteil durch die Schichtung der Images während des Buildprozesses ist der, dass es so einfacher möglich ist, Images zu cachen. Es müssen schließlich nur die Teile des Images neu gebaut werden, die sich tatsächlich geändert haben. Dazu wird die Schicht ermittelt, ab der eine erste Abweichung zum vorherigen Build festgestellt werden kann. Anschließend wird lediglich diese Schicht, sowie alle Schicht darüber neu gebaut. Die \emph{parent layer} werden allerdings weiterhin verwendet ohne neu zu bauen. Beim Erstellen von Images sollte daher Wert darauf gelegt werden, den dynamischen Teil des Buildvorgangs móglichst weit an das Ende eines Dockerfiles zu legen, um den Caching-Mechanismus der Docker-Engine bestmöglich auszunutzen.
 
 
-
-
-
-\subsection{Container Lifecycle}
-\begin{itemize}
-  \item Auf verschiedene Schichten eingehen
-  \item Auf Ergebnisse beziehen
-\end{itemize}
 \subsection{Docker Swarm}
 
 \begin{itemize}
   \item Prototypen im Detail erlaeutern
 \end{itemize}
+
+
+% \begin{landscape}
+\begin{lstlisting}[style=javaStyle,caption={Dockerfile - Supplier},label=lst:supplierDockerfile]
+  $ docker stack services vossibility
+  ID             NAME                               MODE         REPLICAS   IMAGE                              PORTS
+  mct16nrd6e91   vossibility_activemq               replicated   1/1        bwolf/activemq-prometheus:latest   *:8080->8080/tcp, *:8161->8161/tcp, *:61613->61613/tcp, *:61616->61616/tcp
+  izrbys8vxive   vossibility_alertmanager           replicated   1/1        prom/alertmanager:v0.20.0          *:9093->9093/tcp
+  jibw9j22qsrd   vossibility_consumer-db            replicated   1/1        postgres:13-alpine                 *:9292->9292/tcp
+  rfocmjjuwzp8   vossibility_consumer-persistence   replicated   1/1        consumer-persistence:latest        *:8965->8965/tcp
+  xu48nv8p1mvi   vossibility_grafana                replicated   1/1        grafana/grafana:latest             *:3000->3000/tcp
+  orsxfojfj7u3   vossibility_history-db             replicated   1/1        postgres:13-alpine                 *:7004->7004/tcp
+  yh3ykz5ixfaw   vossibility_node-consumer          replicated   1/1        node-consumer:latest
+  ubeyrrzvatpq   vossibility_pgadmin                replicated   1/1        dpage/pgadmin4:latest              *:5050->5050/tcp
+  7m4bpz6t166b   vossibility_prometheus             replicated   1/1        prom/prometheus:v2.21.0            *:9000->9090/tcp
+  bfx1zqkg5oq0   vossibility_scaler                 replicated   1/1        thomasjpfan/docker-scaler:master   *:8743->8080/tcp
+  32bd0chtwvjg   vossibility_scaler-proxy           replicated   1/1        scaler-proxy:latest                *:9245->9245/tcp
+  twrq504kngog   vossibility_spring-consumer        replicated   1/1        spring-consumer:latest             *:7143->7143/tcp
+  j57rwkmj7xr3   vossibility_supplier-backend       replicated   1/1        supplier-backend:latest            *:8284->8284/tcp
+  f4wdecxpqxks   vossibility_supplier-frontend      replicated   1/1        supplier-frontend:latest           *:7384->80/tcp
+\end{lstlisting}
+% \end{landscape}
+
+
+
+
+
 
 
 \renewcommand\theadalign{bc}
@@ -691,9 +733,14 @@ Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in ein
   \item chaos monkey / Stoerfaelle erlaeutern
 \end{itemize}
 
-\begin{table}
+
+Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde (siehe Tabelle \ref{tab:serverSpecs}).
+
+
+\begin{table}[ht!]
   \centering
   \caption{Server Specs}
+  \label{tab:serverSpecs}
   \bigskip
   \begin{tabular}{ c l }
     \toprule
@@ -708,24 +755,3 @@ Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in ein
   \end{tabular}
 \end{table}
 
-
-\section{Implementierung Visualierung und Monitoring zur Unterst\"utzung der Auswertung}
-
-% \begin{lstlisting}[language=bash]
-%  tree . -L 1
-% .
-% ├── Dockerfile
-% ├── package.json
-% ├── package-lock.json
-% ├── specification.xsd
-% ├── src
-% └── tsconfig.json
-% \end{lstlisting}
-
-
-
-
-
-\begin{itemize}
-  \item 
-\end{itemize}
