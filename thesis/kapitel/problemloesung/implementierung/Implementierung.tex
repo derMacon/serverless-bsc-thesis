@@ -78,6 +78,8 @@ Diese Komponente ist nicht Kernbestandteil des Komponenten-Stacks. Sie dient led
 Der Benutzer besitzt die Möglichkeit, sowohl über eine Benutzeroberfläche als auch über Bash-Skripte Benchmark Anfragen an das System zu stellen. Im Folgenden wird beides im Detail erläutert.
 
 \subsubsection{Bash \checkmark}
+\label{ss:bash}
+
 \paragraph{Aufbau}
 In der folgenden Abbildung ist der Aufbau des Bash-Projektes dargestellt. Der Benutzer besitzt drei Möglichkeiten, Anfragen an das System zu stellen. Für jeden Einstiegspunkt wurde ein entsprechendes Bash-Skript zur Verfügung gestellt.
 
@@ -443,7 +445,7 @@ Im folgenden Listing ist die Dateistruktur der Konfigurationsdateien von Prometh
       `-- alertmanager.json
 \end{lstlisting}
 
-In der Datei "\emph{alert-unparsed.yml}" werden die Regeln nach der bisher beschriebenen Struktur abgelegt. Hierbei wurden keinerlei festen Werte für die Intervallgrenzen eingesetzt. Zur Laufzeit der Komponente ist dies allerdings nicht zulässig. Um dennoch die Flexibilität des Formats mit Umgebungsvariablen nutzen zu können wurde ein Skript verfasst, das vor dem Starten der Komponente ausgeführt wird und die Datei "\emph{alert.yml}" generiert. Bei Ausführung des Skripts werden die hinterlegten Werte der Umgebungsvariablen in das gegebene Skript eingesetzt \todo{Skript in Anhang packen, ref hierhin}. 
+In der Datei "\emph{alert-unparsed.yml}" werden die Regeln nach der bisher beschriebenen Struktur abgelegt. Hierbei wurden keinerlei festen Werte für die Intervallgrenzen eingesetzt. Zur Laufzeit der Komponente ist dies allerdings nicht zulässig. Um dennoch die Flexibilität des Formats mit Umgebungsvariablen nutzen zu können wurde ein Skript verfasst, das vor dem Starten der Komponente ausgeführt wird und die Datei "\emph{alert.yml}" generiert. Bei Ausführung des Skripts werden die hinterlegten Werte der Umgebungsvariablen in das gegebene Skript eingesetzt (siehe Listing \ref{lst:alert-unparsed}). 
 
 In der "\emph{prometheus.yml}" Datei befindet sich ein Eintrag, der dem System mitteilt, dass diese generierte Datei für die Regelauswertung verwendet werden soll. In der \emph{prometheus.yml} Datei werden ansonsten weitere Einstellungen bezüglich des Scraping-Intervalls, der Adressierung der zu überwachenden Komponenten sowie die Angabe des Namens des Alert-Managers konfiguriert. Die komplette Konfigurationsdatei befindet sich im Anhang (siehe Listing \ref{anh:prometheusYml}).
 
@@ -508,7 +510,7 @@ Dieses Werkzeug wird zur Erstellung von Graphen hinsichtlich erhaltener Metriken
 	\label{fig:prometheusDatasource}
 \end{figure}
 
-Über die in Prometheus deklarierten \emph{Targets} (überwachten Komponenten) können die wichtigen Informationen ausgelesen werden. Die Abbildung \ref{fig:grafanaOverview} zeigt hierbei auf wie das fertige Dashboard aussieht. Die Aufnahme wurde zum Zeitpunkt der Benchmarks-Test, die als Grundlage für diese Analyse verwendet wurden, getätigt. Es lassen sich alle Metriken der Ergebnisanalyse (siehe Abschnitt \ref{} \todo{ref einbinden}) in diesem Dashboard wiederfinden. 
+Über die in Prometheus deklarierten \emph{Targets} (überwachten Komponenten) können die wichtigen Informationen ausgelesen werden. Die Abbildung \ref{fig:grafanaOverview} zeigt hierbei auf wie das fertige Dashboard aussieht. Die Aufnahme wurde zum Zeitpunkt der Benchmarks-Test, die als Grundlage für diese Analyse verwendet wurden, getätigt. Es lassen sich alle Metriken der Ergebnisanalyse (siehe Abschnitt \ref{ch:ergebnisanalyse}) in diesem Dashboard wiederfinden. 
 
 \begin{figure}
 	\centering
@@ -638,7 +640,7 @@ Hierbei werden zuerst die Buildvorgänge der einzelnen Komponenten beschrieben, 
 
 \subsubsection{Spring Komponenten}
 
-Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in einem ersten Schritt ein Docker Image erstellt werden. Dieses kann im Anschluss als Container instanziiert werden. Zum Erstellen eines Docker-Images wird auf ein sogenannten "\emph{Dockerfile}" zurückgegriffen, das die Beschreibung des Build-Prozesses für dieses Image enthält. Da alle Spring-Projekte im Komponenten-Stack mit einem fast identischen Dockerfile versehen wurden, gilt die folgende Beschreibung in gleichem Maß für alle Spring-Projekte dieses Stacks. \todo{Multistage Build erklären / Quelle raussuchen}
+Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in einem ersten Schritt ein Docker Image erstellt werden. Dieses kann im Anschluss als Container instanziiert werden. Zum Erstellen eines Docker-Images wird auf ein sogenannten "\emph{Dockerfile}" zurückgegriffen, das die Beschreibung des Build-Prozesses für dieses Image enthält. Da alle Spring-Projekte im Komponenten-Stack mit einem fast identischen Dockerfile versehen wurden, gilt die folgende Beschreibung in gleichem Maß für alle Spring-Projekte dieses Stacks.
 
 Damit die folgende Erklärung der genutzten Dockerfiles verständlich erläutert werden kann, folgt eine kurze Zusammenfassung der Struktur eines Docker-Images. "\emph{A Docker image is made up of filesystems layered over each other}" \cite[Seite~71]{turnbulldocker}. Als erste Schicht wird hierbei ein bootbares Filesystem eingeführt, das einem typischen Linux Bootsystem ähnelt. Anschließend kann dieses Modell mit weiteren Schichten erweitert werden. Hierfür wird der sogenannte "\emph{union mount}" Mechanismus verwendet, der es ermöglicht mehrere read-only Dateisysteme in das Root-Dateisystem zu integrieren. Bei einem später hinzugefügten Dateisystem ist es möglich auf die Unterordner der vorher hinzugefügten Systeme zuzugreifen, umgekehrt gilt dies nicht. In einer Docker-Umgebung spricht man bei diesen aufgeschichteten Dateisystemen von Docker-Images. "\emph{Images can be layered on top of one another.  The image below is called the parent image and you can traverse each layer until you reach the bottom of the image stack where the final image is called the base image.  Finally, when a container is launched from an image, Docker mounts a read-write filesystem on top of any layers below. This is where whatever processes we want our Docker container to run will execute}" \cite[Seite~71]{turnbulldocker}. In Abbildung \ref{fig:dockerImage} wurde dies auch noch einmal grafisch aufgearbeitet.
 
@@ -680,12 +682,108 @@ Um ein Docker-Image zu erstellen, wurde bei diesem Projekt auf eine Beschreibung
 \paragraph{Anmerkung: Vorteile der Imageschichtung} Der wesentliche Vorteil durch die Schichtung der Images während des Buildprozesses ist der, dass es so einfacher möglich ist, Images zu cachen. Es müssen schließlich nur die Teile des Images neu gebaut werden, die sich tatsächlich geändert haben. Dazu wird die Schicht ermittelt, ab der eine erste Abweichung zum vorherigen Build festgestellt werden kann. Anschließend wird lediglich diese Schicht, sowie alle Schicht darüber neu gebaut. Die \emph{parent layer} werden allerdings weiterhin verwendet ohne neu zu bauen. Beim Erstellen von Images sollte daher Wert darauf gelegt werden, den dynamischen Teil des Buildvorgangs móglichst weit an das Ende eines Dockerfiles zu legen, um den Caching-Mechanismus der Docker-Engine bestmöglich auszunutzen.
 
 
+\subsection{Node.js}
+\todo{Build Prozess erklären - Typescript Config etc., nochmal alle Komponenten durchgehen...}
+
+\todo{Falls es mit dem Platz knapp werden sollte nochmal die Build Skripte im Detail erklären}
+
 \subsection{Docker Swarm}
+Um den Stack zu starten wird auf verschiedene Skripte sowie Beschreibungsdateien zugegriffen. Im Folgenden wird erst die Beschreibung des Container-Netzwerks und anschließend der Build- und Start-Vorgang des Projekts beschrieben.
+
+\subsubsection{Docker-Compose}
+\paragraph{Einleitung}
+Es ist möglich ein Netzwerk von Containern manuell über das CLI der Docker-Engine zu starten, hierbei können Mounts bestimmter Verzeichnisse angelegt, Kommunikations-Netzwerke definiert und Port freigegeben werden. Mithilfe von Shell-Skripten wäre es möglich diese Schritte zu automatisieren. Dieses Vorgehen erscheint aber schon bei kleineren Projekten sehr impraktikabel und unübersichtlich, hierbei wird daher auf Werkzeuge wie zum Beispiel \emph{Docker-Compose}\footnote{\url{https://github.com/docker/compose}} zurückgegriffen. Dieses Werkzeug bietet die Möglichkeit über ein Beschreibungssprache einen Stack zu definieren in dem sämtliche Abhängigkeiten bereits aufgelöst werden können. 
+
+\paragraph{Container Networking}
+Container werden hierbei in Clustern organisiert die es ermöglichen mithilfe des \emph{Docker-Link} Mechanismus die Container über ein definiertes Netzwerk miteinander in Verbindung treten zu lassen. "\emph{The Docker server acts as a virtual bridge and the containers are clients behind it}" \cite[Seite~13]{oreilly-docker}. Jeder Container besitzt ein eigenes virutelles Ethernet Interface, das eine eigene IP-Adresse allokiert und mit der beschriebenen Docker-Bridge verbunden ist. "\emph{Docker lets you bind ports on the host to the container so that the outside world can reach your container}". Hierbei wird ein lokales Netzwerk allokiert über das alle Container direkt miteinander kommunizieren können.
+
+\paragraph{Stack-Konfiguration}
+Um beim Beispiel des \emph{Suppliers} zu bleiben folgt eine kurze Zusammenfassung der Stack-Konfiguration für den Spring-Supplier-Container. Die gesamte Docker-Compose Konfigurationsdatei befindet sich ebenfalls im Anhang (siehe Listing \ref{lst:dockerCompose}).
+
+
+\begin{lstlisting}[style=bashStyle,caption={Docker Compose - Ausschnitt Supplier Definition},label=lst:dockerCompose]
+
+  ...
+
+  supplier-backend:
+    image: supplier-backend
+    build: supplier-backend/
+    ports:
+      - "${SUPPLIER_BACKEND_PORT}:${SUPPLIER_BACKEND_PORT}"
+    restart: unless-stopped
+    networks:
+      - scaler
+    environment:
+      - DATABASE_HOST=history-db
+      - DATABASE_USER=${SUPPLIER_USER_NAME}
+      - DATABASE_PASSWORD=${SUPPLIER_USER_PASSWORD}
+      - DATABASE_NAME=${SUPPLIER_DATABASE_NAME}
+      - DATABASE_PORT=${SUPPLIER_DATABASE_PORT}
+      - AMQ_NODE_QUEUE_NAME=${AMQ_NODE_QUEUE_NAME}
+      - AMQ_SPRING_QUEUE_NAME=${AMQ_SPRING_QUEUE_NAME}
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_BROKER_PORT=${AMQ_TCP_PORT}
+      - SERVER_PORT=${SUPPLIER_BACKEND_PORT}
+      - SPRING_PROFILES_ACTIVE=prod
+  
+  ...
+
+\end{lstlisting}
+
+Die Konfigurationsdatei wurde im yaml Dateiformat erfasst, wobei es hier eine Key-Value Verbindung zwischen dem Namen eines zu setzenden Konfigurationsparameters und dem definierten Wert gibt.
 
 \begin{itemize}
-  \item Prototypen im Detail erlaeutern
+  \item \emph{image}: über diesen Schlüsselwert wird der Name des zugrunde liegenden Images für den zu erstellenden Container gesetzt
+  \item \emph{build}: gibt an in welchem Verzeichnis die Quelltextdateien liegen. Über das CLI des compose Werkzeugs ist es möglich nicht auf das vorhandene Image bei Containererstellung zurückzugreifen, sondern das Image neu zu bauen. Hierbei wird auf diesen Konfigurationsparameter zurückgegriffen.
+  \item \emph{networks}: es wird ein Netzwerk referenziert in dem dieser Container agieren soll. Alle Container mit denen er in kommuniziert werden den gleichen Konfigurationsparameter gesetzt haben. 
+  \item \emph{environment}: hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen. Hierbei ist es irrelevant ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13), für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
 \end{itemize}
 
+Neben den wesentlichen beschriebenen Konfigurationsparameter gilt es noch die \emph{volume} Definition hervorzuheben (siehe Listing \ref{lst:composeVolumes}) zu erwähnen. 
+
+
+\begin{lstlisting}[style=bashStyle,caption={Docker Compose - Volume Definition},label=lst:composeVolumes]
+  volumes:
+    - consumer-db:/var/lib/postgresql/dat
+\end{lstlisting}
+
+Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts zu persistieren. Hierbei gibt es zwei Varianten. 
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=.6\linewidth]{kapitel/problemloesung/implementierung/_img/types-of-mounts-volume}
+	\caption[Docker Image - Schaubild]{Docker Image - Schaubild \cite[Kapitel~/storage/volumes/]{docker-doc}}
+	\label{fig:dockerImage}
+\end{figure}
+
+\todo{weiterschreiben}
+\begin{itemize}
+  \item 
+\end{itemize}
+
+
+\paragraph{Docker Swarm} 
+Mit diesem Werkzeug ist es möglich den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform}}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Hierbei können mehrere Maschinen derartig agieren, dass es für den Anwender so aussieht, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren ohne, dass die restlichen Stack-Komopnenten hiervon beeinflusst werden. Um dies nutzen zu können muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm Werkzeug allerdings nur teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das setzen von Umgebungsvariablen mithilfe definierter Umgebungsvariablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben Daten mithilfe von Umgebungsvariablen zu setzen, die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich diverser Anmeldedaten, zum Beispiel bei Datenbanken etc. katastrophal. Um dennoch in der Lage zu sein bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit das Docker-Compose Werkzeug selbst als Präprozessor zu verwenden. Hierbei gibt es die Möglichkeit das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umzuwandeln und die Umgebungsvariablen direkt mit den im System hinterlegten Werten auszuwechseln. Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein swarm auf der Hostmaschine initialisiert werden und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert (siehe Auszug \ref{summary-start-stack-services}, komplettes Skript im Anhang unter \ref{start-stack-services}).
+
+
+\begin{lstlisting}[style=bashStyle,caption={start-stack-services.sh},label=lst:summary-start-stack-services]
+
+  ...
+
+  echo 'use docker-compose as preprocessor for environmental variables'
+  docker-compose -f $STACK_DIR/docker-compose.yml config > $STACK_DIR/docker-compose-parsed.yaml
+
+  if [ ! isSwarmNode ]; then
+    echo 'init swarm'
+    docker swarm init
+  fi
+
+  echo 'redeploy stack'
+  docker stack rm vossibility
+  docker stack deploy --compose-file $STACK_DIR/docker-compose-parsed.yaml vossibility
+\end{lstlisting}
+
+Über den Befehl \verb+docker stack services vossibility+ lässt sich anschließend kontrollieren, ob der Stack gestartet ist und wie viele Serviceinstanzen jeder Komponente aktiv laufen. Die Ausgabe ist in Listing \ref{lst:supplierDockerfile} zu erkennen.
 
 % \begin{landscape}
 \begin{lstlisting}[style=javaStyle,caption={Dockerfile - Supplier},label=lst:supplierDockerfile]
@@ -709,33 +807,37 @@ Um ein Docker-Image zu erstellen, wurde bei diesem Projekt auf eine Beschreibung
 % \end{landscape}
 
 
+\section{Implementierung Lasttest}
+Nachdem im letzten Abschnitt auf die Konfiguration des Stacks eingegangen wurde, wird im Folgenden darauf eingegangen welche Szenarien für die Messdatenerhebung durchgeführt wurden und unter welchen Bedingungen das System diese bearbeitet hat.
 
+\subsection{Testszenarien}
+Für die Erhebung der Messdaten wurde auf die in \ref{} \todo{Ref einbinden} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese nach und nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit kleineren weniger Nachrichten in das System eingepflegt wurde, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueue} zeigt die Daten des Message Brokers. 
 
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/benchmark-queues}
+	\caption[Benchmark - Queues]{Benchmark - Queues}
+	\label{fig:benchmarkQueues}
+\end{figure}
 
+Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bearbeitet. Dies ist daran zu erkennen, dass die \emph{persistencequeue} entsprechend viele Einträge verwaltet hat. Die Hälfte ging wurde jeweils von der Node.js- sowie Spring-Boot-Komponente bearbeitet (siehe \emph{nodequeue} sowie \emph{springqueue}). Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu \ref{ss:bash}).
 
+Das zweite Testszenario betrifft die direkt Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash}). Hierbei wurde der Aufruf mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insegesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
+
+\subsection{Testbedingungen}
+% \begin{itemize}
+%   \item Kommt in den Anhang
+%   \item hat Prof. zwar als eigenes Kapitel erwaehnt, bin mir aber nicht sicher ob das wirklich noetig ist
+%   \item auf welcher Hardware werden Tests durchgefuehrt?
+%   \item chaos monkey / Stoerfaelle erlaeutern
+% \end{itemize}
+
+Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde (siehe Tabelle \ref{tab:serverSpecs}). 
 
 \renewcommand\theadalign{bc}
 \renewcommand\theadfont{\bfseries}
 \renewcommand\theadgape{\Gape[4pt]}
 \renewcommand\cellgape{\Gape[4pt]}
-
-
-
-
-
-\section{Implementierung Lasttest}
-\subsection{Timeline}
-\subsection{Testbedingungen}
-\begin{itemize}
-  \item Kommt in den Anhang
-  \item hat Prof. zwar als eigenes Kapitel erwaehnt, bin mir aber nicht sicher ob das wirklich noetig ist
-  \item auf welcher Hardware werden Tests durchgefuehrt?
-  \item chaos monkey / Stoerfaelle erlaeutern
-\end{itemize}
-
-
-Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde (siehe Tabelle \ref{tab:serverSpecs}).
-
 
 \begin{table}[ht!]
   \centering
@@ -751,7 +853,8 @@ Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folge
     RAM & 16 GB \\
     \midrule
     Storage & 150 GB \\
+    \midrule
+    Distro & CentOS 8\\
     \bottomrule
   \end{tabular}
 \end{table}
-

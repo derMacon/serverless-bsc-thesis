@@ -52,3 +52,1012 @@
           send_resolved: false
 \end{lstlisting}
 
+\begin{lstlisting}[style=bashStyle,caption={alert-unparsed.yml},label=lst:alert-unparsed]
+	groups:
+  - name: springScaleAlert
+    rules:
+      - alert: spring_baseline
+        expr: >
+          org_apache_activemq_Broker_ConsumerCount{
+          brokerName="localhost",
+          destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+          destinationType="Queue",
+          instance="activemq:8080", 
+          job="services"
+          } < ${SCALING_CB0}
+      - alert: spring_ql1_cl0
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } == ${SCALING_CB0}
+        for: 0m
+      - alert: spring_ql2_cl0
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } == ${SCALING_CB0}
+        for: 0m
+      - alert: spring_ql3_cl0
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } == ${SCALING_CB0}
+        for: 0m
+      - alert: spring_ql0_cl1
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } >= 0
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB0}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB1}
+        for: 0m
+      - alert: spring_ql2_cl1
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB0}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB1}
+        for: 0m
+      - alert: spring_ql3_cl1
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB0}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB1}
+        for: 0m
+      - alert: spring_ql0_cl2
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } >= 0
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB1}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB2}
+        for: 0m
+      - alert: spring_ql1_cl2
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB1}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB2}
+        for: 0m
+      - alert: spring_ql3_cl2
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="springqueue", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB1}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB2}
+        for: 0m
+      - alert: spring_ql0_cl3
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } >= 0
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB2}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB3}
+        for: 0m
+      - alert: spring_ql1_cl3
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB2}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB3}
+        for: 0m
+      - alert: spring_ql2_cl3
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_SPRING_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB2}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_SPRING_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB3}
+        for: 0m
+
+  - name: nodeScaleAlert
+    rules:
+      - alert: node_baseline
+        expr: >
+          org_apache_activemq_Broker_ConsumerCount{
+          brokerName="localhost",
+          destinationName="${AMQ_NODE_QUEUE_NAME}", 
+          destinationType="Queue",
+          instance="activemq:8080", 
+          job="services"
+          } < ${SCALING_CB0}
+      - alert: node_ql1_cl0
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } == ${SCALING_CB0}
+        for: 0m
+      - alert: node_ql2_cl0
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } == ${SCALING_CB0}
+        for: 0m
+      - alert: node_ql3_cl0
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } == ${SCALING_CB0}
+        for: 0m
+      - alert: node_ql0_cl1
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } >= 0
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB0}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB1}
+        for: 0m
+      - alert: node_ql2_cl1
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB0}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB1}
+        for: 0m
+      - alert: node_ql3_cl1
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB0}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB1}
+        for: 0m
+      - alert: node_ql0_cl2
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } >= 0
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB1}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB2}
+        for: 0m
+      - alert: node_ql1_cl2
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB1}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB2}
+        for: 0m
+      - alert: node_ql3_cl2
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="nodequeue", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB1}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB2}
+        for: 0m
+      - alert: node_ql0_cl3
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } >= 0
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB2}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB3}
+        for: 0m
+      - alert: node_ql1_cl3
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB0}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB2}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB3}
+        for: 0m
+      - alert: node_ql2_cl3
+        expr: >
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } > ${SCALING_QB1}
+          and 
+          org_apache_activemq_Broker_QueueSize{
+           brokerName="localhost", 
+           destinationName="${AMQ_NODE_QUEUE_NAME}",
+           destinationType="Queue", 
+           instance="activemq:8080", job="services"
+          } <= ${SCALING_QB2}
+          and 
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } > ${SCALING_CB2}
+          and
+          org_apache_activemq_Broker_ConsumerCount{
+           brokerName="localhost",
+           destinationName="${AMQ_NODE_QUEUE_NAME}", 
+           destinationType="Queue",
+           instance="activemq:8080", 
+           job="services"
+          } <= ${SCALING_CB3}
+        for: 0m 
+\end{lstlisting}
+
+
+\subsection{Stack - Konfiguration}
+
+\begin{lstlisting}[style=bashStyle,caption={Docker Compose},label=lst:dockerCompose]
+version: '3.7'
+
+services:
+
+  activemq:
+    image: bwolf/activemq-prometheus
+    deploy:
+      replicas: 1
+    networks:
+      - scaler
+    ports:
+      - "61616:61616"
+      - "61613:61613"
+      - "8161:8161"
+      - "8080:8080"
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    networks:
+      - scaler
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_LISTEN_PORT=${PGADMIN_LISTEN_PORT}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_LISTEN_PORT}:5050"
+
+  consumer-db:
+    image: postgres:13-alpine
+    container_name: consumer-db
+    ports:
+      - "${CONSUMER_DATABASE_PORT}:${CONSUMER_DATABASE_PORT}"
+    command: -p ${CONSUMER_DATABASE_PORT}
+    networks:
+      - scaler
+    environment:
+      - DEBUG=false
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=consumer-db
+    volumes:
+      - consumer-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  history-db:
+    image: postgres:13-alpine
+    ports:
+      - "${SUPPLIER_DATABASE_PORT}:${SUPPLIER_DATABASE_PORT}"
+    command: -p ${SUPPLIER_DATABASE_PORT}
+    environment:
+      - DEBUG=false
+      - POSTGRES_USER=${SUPPLIER_USER_NAME}
+      - POSTGRES_PASSWORD=${SUPPLIER_USER_PASSWORD}
+      - POSTGRES_DB=${SUPPLIER_DATABASE_NAME}
+    networks:
+      - scaler
+    volumes:
+      - history-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  consumer-persistence:
+    image: consumer-persistence
+    build: consumer-persistence/
+    ports:
+      - "${CONSUMER_PERSISTENCE_SERVER_PORT}:${CONSUMER_PERSISTENCE_SERVER_PORT}"
+    restart: unless-stopped
+    networks:
+      - scaler
+    environment:
+      - DATABASE_HOST=consumer-db
+      - DATABASE_USER=${CONSUMER_USER_NAME}
+      - DATABASE_PASSWORD=${CONSUMER_USER_PASSWORD}
+      - DATABASE_NAME=${CONSUMER_DATABASE_NAME}
+      - DATABASE_PORT=${CONSUMER_DATABASE_PORT}
+      - AMQ_NODE_QUEUE_NAME=${AMQ_NODE_QUEUE_NAME}
+      - AMQ_CONSUMER_PERSISTENCE_QUEUE=${AMQ_CONSUMER_PERSISTENCE_QUEUE}
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_BROKER_PORT=${AMQ_TCP_PORT}
+      - SERVER_PORT=${CONSUMER_PERSISTENCE_SERVER_PORT}
+      - "SPRING_PROFILES_ACTIVE=prod"
+
+  supplier-backend:
+    image: supplier-backend
+    build: supplier-backend/
+    ports:
+      - "${SUPPLIER_BACKEND_PORT}:${SUPPLIER_BACKEND_PORT}"
+    restart: unless-stopped
+    networks:
+      - scaler
+    environment:
+      - DATABASE_HOST=history-db
+      - DATABASE_USER=${SUPPLIER_USER_NAME}
+      - DATABASE_PASSWORD=${SUPPLIER_USER_PASSWORD}
+      - DATABASE_NAME=${SUPPLIER_DATABASE_NAME}
+      - DATABASE_PORT=${SUPPLIER_DATABASE_PORT}
+      - AMQ_NODE_QUEUE_NAME=${AMQ_NODE_QUEUE_NAME}
+      - AMQ_SPRING_QUEUE_NAME=${AMQ_SPRING_QUEUE_NAME}
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_BROKER_PORT=${AMQ_TCP_PORT}
+      - SERVER_PORT=${SUPPLIER_BACKEND_PORT}
+      - "SPRING_PROFILES_ACTIVE=prod"
+
+  supplier-frontend:
+    image: supplier-frontend
+    build: supplier-frontend/
+    networks:
+      - scaler
+    deploy:
+      replicas: 1
+    ports:
+      - "${SUPPLIER_FRONTEND_PORT}:80"
+    restart: unless-stopped
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - API_HOSTNAME=supplier-backend
+      - API_PORT=${SUPPLIER_BACKEND_PORT}
+
+  node-consumer:
+    image: node-consumer:latest
+    networks:
+      - scaler
+    build: node-consumer/
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+    environment:
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_STOMP_PORT=${AMQ_STOMP_PORT}
+      - AMQ_USER_NAME=${AMQ_USER_NAME}
+      - AMQ_USER_PASS=${AMQ_USER_PASS}
+      - AMQ_NODE_QUEUE_NAME=${AMQ_NODE_QUEUE_NAME}
+      - AMQ_NODE_ACK_QUEUE=${AMQ_NODE_ACK_QUEUE}
+      - AMQ_CONSUMER_PERSISTENCE_QUEUE=${AMQ_CONSUMER_PERSISTENCE_QUEUE}
+
+  spring-consumer:
+    image: spring-consumer
+    build: spring-consumer/
+    ports:
+      - "${SPRING_SERVER_PORT}:${SPRING_SERVER_PORT}"
+    restart: unless-stopped
+    networks:
+      - scaler
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
+      - DATABASE_HOST=spring-db
+      - DATABASE_USER=${SPRING_USER_NAME}
+      - DATABASE_PASSWORD=${SPRING_USER_PASSWORD}
+      - DATABASE_NAME=${SPRING_DATABASE_NAME}
+      - DATABASE_PORT=${SPRING_DATABASE_PORT}
+      - AMQ_SPRING_QUEUE_NAME=${AMQ_SPRING_QUEUE_NAME}
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_BROKER_PORT=${AMQ_TCP_PORT}
+      - SERVER_PORT=${SPRING_SERVER_PORT}
+
+  scaler-proxy:
+    image: scaler-proxy
+    build: scaler-proxy/
+    deploy:
+      replicas: 1
+    networks:
+      - scaler
+    ports:
+      - "9245:9245"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
+      - DELEGATION_HOSTNAME=scaler
+      - DATABASE_HOST=history-db
+      - DATABASE_USER=${SUPPLIER_USER_NAME}
+      - DATABASE_PASSWORD=${SUPPLIER_USER_PASSWORD}
+      - DATABASE_NAME=${SUPPLIER_DATABASE_NAME}
+      - DATABASE_PORT=${SUPPLIER_DATABASE_PORT}
+      - AMQ_NODE_ACK_QUEUE=${AMQ_NODE_ACK_QUEUE}
+      - AMQ_SPRING_ACK_QUEUE=${AMQ_SPRING_ACK_QUEUE}
+      - SCALING_QB0=${SCALING_QB0}
+      - SCALING_QB1=${SCALING_QB1}
+      - SCALING_QB2=${SCALING_QB2}
+      - SCALING_CB0=${SCALING_CB0}
+      - SCALING_CB1=${SCALING_CB1}
+      - SCALING_CB2=${SCALING_CB2}
+      - SCALING_CB3=${SCALING_CB3}
+
+  scaler:
+    image: thomasjpfan/docker-scaler:${TAG:-master}
+    environment:
+      - ALERTMANAGER_ADDRESS=http://alert-manager:9093
+      - SERVER_PREFIX=/scaler
+      - DEFAULT_MAX_REPLICAS=150
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8743:8080"
+    networks:
+      - scaler
+    deploy:
+      replicas: 1
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/scaler
+        - com.df.port=8080
+      placement:
+        constraints: [ node.role == manager ]
+
+  alertmanager:
+    image: prom/alertmanager:v0.20.0
+    deploy:
+      replicas: 1
+    ports:
+      - 9093:9093
+    networks:
+      - scaler
+    command:
+      - '--log.level=debug'
+      - '--config.file=/alertmanager.yml'
+      - '--web.external-url=http://localhost:9093/'
+    volumes:
+      - ./data/alertmanager/alertmanager.yml:/alertmanager.yml
+
+  prometheus:
+    image: prom/prometheus:v2.21.0
+    deploy:
+      replicas: 1
+    ports:
+      - 9000:9090
+    networks:
+      - scaler
+    volumes:
+      - ./data/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    networks:
+      - scaler
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD="admin"
+      - GF_SECURITY_ADMIN_USER="admin"
+
+networks:
+  scaler:
+    external: true
+
+volumes:
+  prometheus-data:
+  pgadmin-data:
+  history-db:
+  consumer-db:
+
+\end{lstlisting}
+
+
+
+\begin{lstlisting}[style=bashStyle,caption={start-stack-services.sh},label=lst:start-stack-services]
+#!/bin/bash
+
+STACK_DIR=stack
+
+# https://stackoverflow.com/questions/43053013/how-do-i-check-that-a-docker-host-is-in-swarm-mode
+function isSwarmNode(){
+    if [ "$(docker info | grep Swarm | sed 's/Swarm: //g')" == "inactive" ]; then
+        echo false;
+    else
+        echo true;
+    fi
+}
+
+echo 'remove development stack if existent'
+docker-compose -f $STACK_DIR/docker-compose_dev.yml down -v
+
+echo 'parse prometheus alert rule config'
+export $(cat $STACK_DIR/.env | xargs)
+rm $STACK_DIR/data/prometheus/alert.yml
+$STACK_DIR/scripts/prod/shell_expension.sh $STACK_DIR/data/prometheus/alert-unparsed.yml $STACK_DIR/data/prometheus/alert.yml
+
+# https://stackoverflow.com/questions/44694640/docker-swarm-with-image-versions-externalized-to-env-file
+echo 'use docker-compose as preprocessor for environmental variables'
+docker-compose -f $STACK_DIR/docker-compose.yml config > $STACK_DIR/docker-compose-parsed.yaml
+
+if [ ! isSwarmNode ]; then
+	echo 'init swarm'
+	docker swarm init
+fi
+
+echo 'redeploy stack'
+docker stack rm vossibility
+docker stack deploy --compose-file $STACK_DIR/docker-compose-parsed.yaml vossibility
+
+\end{lstlisting}
+
