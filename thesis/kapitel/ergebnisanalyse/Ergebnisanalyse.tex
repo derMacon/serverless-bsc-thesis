@@ -4,7 +4,8 @@
 \todo{Verweis auf Anhang mit allen Tabellen für Metrikinformationen}
 
 
-\begin{wraptable}{r}{5.8cm}
+\begin{wraptable}[10]{r}{5.8cm}
+  \vspace{-8mm}
   \centering
   \label{tab:latency}
   \hspace{1cm}
@@ -139,7 +140,7 @@ Im durchgeführten Testszenario betrug die Grenze zum Überschreiten der ersten 
 \label{par:specContainer}
 Die grundlegendste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gleichzeitig hochfahrender Container (siehe \ref{fig:specContainers}). Wie im Graphen erkennbar, handelt es sich um ein lineares Wachstum. Mit jedem zusätzlichen zeitgleich erstellten Container, dauert der Initialisierungsprozess bei der Spring-Implementierung im Schnitt 1611 Millisekunden länger. Bei der Node.js Implementierung liegt dieser Wert bei 194 Millisekunden. So dauert das Initialisieren eines einzelnen neuen Containers bei der Spring-Boot-Komponente 4,8 Sekunden während sich dieser Wert bei der Node.js-Koponente lediglich 2,6 Sekunden beläuft. Um diese nach Containeranzahl aufgeschlüsselten Werte zu erhalten, wurde nicht wie bei den anderen Skalierungstests auf die öffentliche Schnittstelle mittels Nachrichtengenerierung zurückgegriffen, es wurde stattdessen eine interne Schnittstelle mittels dediziertem Skript verwendet um möglichst störungsfrei direkt auf die Komponente, die das Skalieren orchestriert zuzugreifen. Die nachfolgenden Metriken wurden allerdings durch die öffentliche Schnittstelle generiert.
 
-\begin{wrapfigure}[15]{l}{0.53\textwidth}
+\begin{wrapfigure}[16]{l}{0.53\textwidth}
   \vspace{-12mm}
   \centering
   \caption[Startzeit Container - Anzahl spezifisch]{Anzahlspezifisch}

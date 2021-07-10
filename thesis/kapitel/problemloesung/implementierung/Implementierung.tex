@@ -203,6 +203,18 @@ für das \emph{curl-benchmark} Skript entwickelt. Dieses trägt den Namen "\emph
 
 \todo{UI Erklärung einbinden...}
 
+\paragraph{Benutzeroberfläche}
+Die Benutzeroberfläche wurde mithilfe des Frontendframeworks \emph{React} entwickelt. Es ist möglich über diverse Select-Felder die voreingestellten Pfad sowie Payment Optionen ausgewählt werden. Außerdem ist es möglich die Anzahl sowie die Zeitspanne zu spezifizieren. Beim Initialisierungsprozess dieser Komponente starten zuallererst alle dargestellten Komponenten. React ist ein Komponentenbasiertes Framework, hierbei werden sämtliche visuellen Elemente als einezelne Komponenten betrachtet und es ist möglich diese Komponenten zu gruppieren und somit neue Komponenten zu formen. Außerdem ermöglicht das Framework diesen Komponenten einen sogenannten \emph{State} anzuheften. In diesem können Daten hinterlegt werden. Wenn diese an irgendeiner Stelle modifiziert werden, erkennt React dies und rendert die betroffene Komponente sowie alle untergeordneten Komponenten neu. Dies ist insbsondere Hilfreich um die Fromulareinträge direkt abzuspeichern. Bei der Initialisierung fragt die Frontend-Komponente beim \emph{Supplier} nach den darzustellenden Optionen. Diese Komponente beantwortet diese Frage mit den Daten, die im Anschluss in der Oberfläche angezeigt werden. Wenn der Benutzer anschließend Daten auswählt beziehungsweise Daten in die Felder einträgt, werden hierfür zugeschnittene Eventhandler ausgelöst. Diese Eventhander registrieren die Datenauswahl und speichern sie direkt im State der Komponente ab. Wenn der Benutzer nun auf den Button zum Absenden der Anfrage klickt, muss hierbei lediglich auf der State ausgelesen werden und an die entsprechende Backend-Api-Schnittstelle geschickt werden. In Abbildung \ref{fig:reactUi} wurde der aktuelle Stand der Oberfläche dargestellt.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=.9\linewidth]{kapitel/problemloesung/implementierung/_img/react01}
+	\caption[React - Benutzeroberfläche]{React - Benutzeroberfläche}
+	\label{fig:reactUi}
+\end{figure}
+
+Während der Entwicklungszeit des restlichen Systems, wurde das Arbeiten mit der Benutzeroberfläche allerdings vermehrt zum Flaschenhals. Sobald ein neues Feature oder ein neuer Datensatz in eine Anfrage integriert wurde, war es jedes Mal ein großer Aufwand dies ebenfalls in die Oberfläche zu integrieren. Da die vorher spezifizierte Grammatik sowie die zugrundeliegende API einen deutlich flexibleren Ansatz und eine deutlich komplexere Ablauflogik ermöglichen wurde sich bereits relativ früh in der Entwicklung dagegen entschlossen diesen Ansatz der graphischen Benutzerführung weiterzuverfolgen. Das Projekt dient hierbei eher als ein \emph{Proof of concept} um darzustellen, wie ein solches Projekt konfiguiert werden muss. Da dem skriptbasierten Ansatz die selben Api-Schnittstellen zugrunde liegen wie dem oberflächenbasierten Ansatz, ist es ohne Probleme möglich das aktuelle React-Projekt den überarbeiteten Gegebenheiten anzupassen. 
+
 
 
 \subsection{Supplier Backend}
