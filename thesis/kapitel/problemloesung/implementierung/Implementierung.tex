@@ -739,7 +739,7 @@ Die Konfigurationsdatei wurde im yaml Dateiformat erfasst, wobei es hier eine Ke
   \item \emph{environment}: hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen. Hierbei ist es irrelevant ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13), für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
 \end{itemize}
 
-Neben den wesentlichen beschriebenen Konfigurationsparameter gilt es noch die \emph{volume} Definition hervorzuheben (siehe Listing \ref{lst:composeVolumes}) zu erwähnen. 
+Neben den wesentlichen beschriebenen Konfigurationsparameter gilt es noch die \emph{volume} Definition (siehe Listing \ref{lst:composeVolumes}) zu erwähnen. 
 
 
 \begin{lstlisting}[style=bashStyle,caption={Docker Compose - Volume Definition},label=lst:composeVolumes]
@@ -747,7 +747,7 @@ Neben den wesentlichen beschriebenen Konfigurationsparameter gilt es noch die \e
     - consumer-db:/var/lib/postgresql/dat
 \end{lstlisting}
 
-Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts zu persistieren. Hierbei gibt es zwei Varianten. 
+Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts zu persistieren. Das folgende Schaubild gibt einen Überblick über die verfügbaren Varianten.
 
 \begin{figure}[ht!]
 	\centering
@@ -756,10 +756,14 @@ Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts z
 	\label{fig:dockerImage}
 \end{figure}
 
-\todo{weiterschreiben}
-\begin{itemize}
-  \item 
-\end{itemize}
+Daten, die über Volumes persistiert werden sind vom Betriebssystem des Hosts komplett unabhängig. Die Daten können dabei entweder in dem \emph{writeable layer} des Containers selbst gespeichert werden\footnote{Erinnerung: Alle Schichten des Images werden als \emph{read-only} Systeme deployed, erst während der Initialierungsphase des Containers wird eine weitere Schicht hinzugefügt, die während der Containerlaufzeit bearbeitet werden kann.}. Diese Daten werden allerdings verworfen, sobald der Container gelöscht wird. Um Daten auch weiterhin zu behalten und in neue Container-Instanzen laden zu können wird hierbei auf Volumes zurückgegriffen. Es gibt zwei Varianten von Volumes \cite[Kapitel~/storage/volumes]{docker-doc}: 
+
+\begin{enumerate}
+  \item \emph{Named volumes}: have a specific source from outside the container, for example \verb+awesome:/bar+.
+  \item \emph{Anonymous volumes}: have no specific source so when the container is deleted, instruct the Docker Engine daemon to remove them.
+\end{enumerate}
+
+Im Projekt wurde auf anonymous volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes}). Diese werden direkt vom Docker-Daeomon verwaltet wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit auf sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, das auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
 
 
 \paragraph{Docker Swarm} 
@@ -858,3 +862,7 @@ Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folge
     \bottomrule
   \end{tabular}
 \end{table}
+
+
+\subsection{Zusammenfassung}
+\todo{schreiben}
