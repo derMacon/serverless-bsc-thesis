@@ -1,4 +1,4 @@
-\chapter{Ergebnisanalyse}
+\chapter{Ergebnisanalyse \checkmark}
 \label{ch:ergebnisanalyse}
 
 \todo{Verweis auf Anhang mit allen Tabellen für Metrikinformationen, wird im Intro erwähnt}
@@ -31,7 +31,7 @@ Nachdem die Implementierung des Komponentenstacks im letzten Abschnitt detaillie
 
 \todo{Messwerte im Anhang noch einmal gesammelt darstellen}
 
-\section{Ergebnisse}
+\section{Ergebnisse \checkmark}
 
 % \begin{itemize}
 %   \item Vorstellung der erhaltenen Daten
@@ -163,19 +163,19 @@ Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurde diverse Panels zur zei
 \end{figure}
 
 
-\section{Analyse}
+\section{Analyse \checkmark}
 
 % \begin{itemize}
 %   \item Interpretation / Analyse der Daten
 %   \item Begruendung fuer Verhalten suchen
 % \end{itemize}
 
-\subsection{Latenzzeit}
+\subsection{Latenzzeit \checkmark}
 Hinsichtlich der Latenzzeit überrascht vor allem die deutliche Diskrepanz zwischen der Initialisierungsdauer der unterschiedlichen Technologien. Durch die Unterteilung der Pipeline in die zwei Messwerte ist erkennbar, dass diese auf die zeitliche Dauer bis zum Nachrichteneingang zurückzuführen ist. Hierbei läuft die Dauer der Initialisierungsphasen weit auseinander (siehe Abschnitt \ref{ss:skalierungsdauer}).
 
 Bezüglich der Verarbeitungsgeschwindigkeit ist die Spring-Boot-Komponente jedoch im Vergleich schneller. Dies ist auf die Natur einer kompilierten Sprache zurückzuführen. Java Code wird im Vorwege in entsprechenden Bytecode übersetzt, während eine Skriptsprache wie Javascript innerhalb der Node.js-Komponente zur Laufzeit interpretiert wird. Da in den betrachteten Komponenten nur minimale Logik verbaut wurde, ist der festgestellte zeitliche Unterschied in der Bearbeitungsdauer mit 359  Millisekunden zwar nicht derartig gravierend wie der Unterschied hinsichtlich der Initialisierungsphase der Container, allerdings lässt sich dadurch auch erkennen, dass die Spring Komponente durchschnittliche 13 mal schneller arbeitet als die Node.js Komponente. In Anbetracht der Komplexität der realen Banking-Anwendung gilt es ein spezifisches Konzept für das Regelwerk zum Starten der Container zu entwerfen. Hierbei muss eine Untersuchung bezüglich der Rentabilität eines neuen startenden Containers gegenüber eines laufenden Containers evaluiert werden. Diese Untersuchung kann sich aus mehreren Aspekten zusammensetzen. Dabei könnte zum Beispiel betrachtet werden, wie viele Nachrichten eine bereits einsatzfähige Komponente verarbeiten kann, bevor eine neu initialisierte Komponente bereit ist Nachrichten entgegenzunehmen. Ebenfalls ist die Wahrscheinlichkeit, dass eine bereits laufende Komponente während der Bearbeitung abstürzt geringer, als die einer neu startenden Komponente (fehleranfälliger Verbindungsaufbau). Diese Wahrscheinlichkeit sowie der beschriebenen Initialisierungsoverhead müssen bei der Ermittlung der idealen Threshholds zur Skalierung des Systems betrachtet werden.
 
-\subsection{Skalierungsdauer}
+\subsection{Skalierungsdauer \checkmark}
 \label{ss:skalierungsdauer}
 Besonders auffällig ist, dass bei beiden Technologien das Initialisieren einzelner Container deutlich schneller abläuft, als wenn mehrere Container gleichzeitig hochfahren oder eine gewisse Anzahl an Container bereits laufen. Dies lässt sich auf die geteilten Resourcen der Container zurückführen. In der Cloud wird hinsichtlich parallel arbeitender Container auch von "\emph{noisy neighbors}" gesprochen \cite[Seite~67 ff.]{oreilly-docker}. Dieses Konzept beschreibt ein generelles Problem bezüglich Cloud-Systemen. Im Gegensatz zu traditionellen virtuellen Maschinen ist es bei Docker-Containern nicht möglich, den verfügbaren Speicher sowie CPU-Zeit direkt über den Container zu regulieren. Hierbei muss auf die \emph{cgroup} Funktionalität des Linux-Kernels zurückgegriffen werden. "\emph{Control groups, usually referred to as cgroups, are a Linux kernel feature which allow processes to be organized into hierarchical groups whose usage of various types of resources can then be limited and monitored}" \cite{man-cgroups}. Dies wurde beim Prototypen nicht konfiguriert. Insbesondere die Initialisierungsphase von neuen Containern, lässt sich hierdurch optimieren. Im folgenden Abschnitt folgt eine kurze Diskussion über die verfügbaren Möglichkeiten diesbezüglich (siehe Abschnitt \ref{par:resOpt}).
 
@@ -216,7 +216,7 @@ Im nächsten Schritt folgt der Verarbeitungsschritt der \emph{Pre-Initialization
 Diese Beschreibung sollte lediglich einen kurzen Einblick über die Möglichkeiten welche durch den Initialisierungsprozess dem Anwender zur Verfügung gestellt werden. Hierbei ist es nicht nur möglich, genau nachzuvollziehen, in welcher Phase sich eine Bean momentan befindet. Der Prozess bietet ebenfalls die Möglichkeit, mithilfe spezifizierter Schnittstellen an einer beliebigen Stelle eigene Logikbausteine zu integrieren. Um der Philosophie des Spring-Frameworks gerecht zu werden, braucht es auch einen solch komplexen Aufbau. 
 
 
-\subsection{Zusammenfassung}
+\subsection{Zusammenfassung \checkmark}
 
 \begin{itemize}
 	\item Noisy Neighbors: Skalieren in der Cloud bedeutet Kampf um Ressourcen
@@ -236,7 +236,7 @@ Diese Beschreibung sollte lediglich einen kurzen Einblick über die Möglichkeit
 	\end{itemize}
 \end{itemize}
 
-\section{Diskussion}
+\section{Diskussion \checkmark}
 Im letzten Abschnitt wurde auf die zwei wesentlichen Kenndaten der ermittelten Metriken eingegangen. Dabei wurden mögliche Begründungen für die erhaltenen Messdaten präsentiert. Es folgte außerdem ein kurzer Exkurs zum Initialisierungsprozess einer Spring-Bean. Generell stellt die lange Initialisierungsphase der Spring-Komponenten ein ernsthaftes Problem dar. Welche Schritte zur Optimierung dieses Verhaltens durch die zugrunde Technologie ermöglicht werden und inwiefern das System dies mithilfe der schnellen Verarbeitungsdauer auszugleichen vermag, wird im folgenden Abschnitt beschrieben. 
 
 \subsection{Spring-Bean - Optimierung der Initialisierungsphase \checkmark}
@@ -247,7 +247,7 @@ Die deutliche längere Initialisierungsphase der Spring-Komponente lässt sich i
 Es ist außerdem denkbar, auf einen anderen Servlet-Container wie "\emph{Undertow}" zuzugreifen. Dieser stellt eine leichtgewichtigere Implementierung eines Webservers bereit und ermöglicht dadurch eine Performancsteigerung. Dennoch wurde sich für den Prototypen dagegen entschieden weder einzelne Konfigurationen manuell zu entfernen noch die Container-Implementierung zu wechseln, da sich das Projekt auch nach Bearbeitung der Thesis eventuell weiterentwickelt und als Beispielprojekt gelten könnte. Hierbei gilt es darauf zu achten auch zukünftig vermeidbare Fehlerfälle zu vermeiden.
 
 
-\subsection{Ressourcenoptimierung}
+\subsection{Ressourcenoptimierung \checkmark}
 \label{par:resOpt}
 Docker bietet nativ die Möglichkeit sowohl Speicher als auch CPU-Ressourcen für spezifische Container oder den gesamten Stack zu regulieren. Dadurch könnten unter anderem mehr Ressourcen für das Hochfahren neuer Container zur Verfügung gestellt werden.
 
@@ -255,11 +255,11 @@ Bezüglich des Aufteilens der zugewiesenen CPU-Zeit modelliert Docker intern ein
 
 Neben der Anpassung der Rechenleistung ist es ebenfalls möglich den verfügbaren Speicher eines Containers zu modifizieren. "\emph{While constraining the CPU only impacts the application’s priority for CPU time, the memory limit is a hard limit}" \cite[Seite~68 ff.]{oreilly-docker}. Bei einem unausgelasteten System würde auch eine niedrige Anzahl an CPU-Shares in einem größeren Anteil von Rechenleistung resultieren, bei der Begrenzung des Speichers gibt es diese Option nicht. Eine feingranularere Anpassung der System-Ressourcen ist außerdem mit den sogenannten "\emph{user limits (ulimits)}" möglich.
 
-\subsection{Optimierte Ausführungsreihenfolge}
+\subsection{Optimierte Ausführungsreihenfolge \checkmark}
 Um die gesamte Startzeit bei gleichzeitigem Starten von Node.js und Spring Containern minimieren zu können, wäre es ebenfalls angebracht eine Strategie hinsichtlich der Reihenfolge der Services zu entwickeln. In der Analyse der Daten war zu erkennen, dass ein Spring-Container im Schnitt 13 Mal schneller arbeitet als ein Node-Container. Um diesen Unterschied auszugleichen sollten entsprechend mehr Node Container gestartet werden um hierbei einen Ausgleich zu schaffen. Bereits während dem Hochfahrprozess der einzelnen Container sollte ein ähnliches Verhältnis eingehalten werden. Bisher find hier eine strikte Trennung der Services statt, es wurden also entweder \emph{n} Spring-Container und / oder \emph{n} Node-Container gestartet, eine Vermischung der Anfragen würde die Effizienz des Systems hinsichtlich des Datendurchsatzes sowie der Latenzzeit steigern. Dies in Kombination mit den vorher vorgestellten Stellschrauben zur Ressourcenoptimierung bietet eine solide Basis für das Optimierungspotenzial der Initialisierungs- sowie Verarbeitungsphase der Anwendung.
 
 
-\subsection{Aussagen über Produktivumgebung}
+\subsection{Aussagen über Produktivumgebung \checkmark}
 Die Aussagen, die während der Analyse der Daten getroffen wurden, sind hinsichtlich eines Systems in einer Produktivumgebung nur in Teilen aussagekräftig. Ein wesentliches Hauptkriterium der ISO-Norm 25010 \todo{ref einbinden} wurde hierbei vernachlässigt, denn es wurde nur sehr eingeschränkt auf die Verfügbarkeit des Systems und dem \emph{Design for failure} eingegangen. Wenn zentrale Komponenten ausfallen gibt es lediglich ein definiertes Default-Verhalten des Orchestrators. So wird versucht die Komponente selbst, sowie sämtliche Kommunikationspartner neu zu starten. Dieses Verhalten hat vor allem Einfluss auf den Initialisierungszeitraum eines Containers. Da beide betrachteten Technologien auf eigene Weise Mechanismen zum erneuten Verbindungsaufbau im Falle eines Ausfalls zur Verfügung stellen, ist diese Betrachtung für die reine Evaluierung der Technologie von nicht allzu großer Bedeutung. Im Zweifelsfall wird ein Container mehrmals gestartet, die grundlegenden Messdaten lassen sich bereits an einem störungsfreien Ablauf ablesen. Falls es zu einem späteren Zeitpunkt während der Portierung der Banking-Anwendung hin zu einer der betrachteten Technologien kommen sollte, muss dieses Fehlerverhalten jedoch ausgiebig getestet werden um späteres unerwartetes Verhalten zu vermeiden. 
 
 Damit das Verhalten des Systems bezüglich Ausfalls bestimmter Komponenten betrachtet werden kann, stehen unterschiedliche Werkzeuge zur Verfügung. Ein etabliertes Werkzeug stellt das open source Projekt "\emph{Chaos Monkey\footnote{\url{https://github.com/Netflix/chaosmonkey}}}" dar, das von Netflix entwickelt und veröffentlicht wurde. Es ist allerdings auch möglich Werkzeuge für spezifische Orchestrator zu nutzen (Übersicht \cite[Seite~369]{continous-delivery}). Diese Art von Werkzeugen ermöglicht das kontrollierte Aussetzen bestimmter Netzwerkverbindungen sowie das Herunterfahren ganzer Services über einen festgelegten Zeitraum. 
@@ -267,11 +267,11 @@ Damit das Verhalten des Systems bezüglich Ausfalls bestimmter Komponenten betra
 Die Aussage, dass die Spring-Komponente durchschnittliche 13 Mal schneller arbeitet als das Node.js-Pendant ist für den beschriebenen Anwendungsfall zwar korrekt, allerdings wurden hierbei lediglich die erläuterten Schritte abgearbeitet (siehe Abschnitt \ref{} \todo{ref einbinden}). Auf das Laufzeitverhalten einer komplexeren Anwendung kann hierbei nicht geschlossen werden. Eventuell lässt sich dieser Unterschied lediglich auf einen Verbindungsaufbau oder Ähnliches zurückführen wobei die restliche Logik hiervon nicht betroffen ist. Dies lässt sich mithilfe weiterer Timestamps innerhalb der Komponenten ermitteln.
 
 
-\subsection{Beurteilung der Technologien hinsichtlich des beschriebenen Usecases}
+\subsection{Beurteilung der Technologien hinsichtlich des beschriebenen Usecases \checkmark}
 Der Fokus der Thesis liegt auf dem Start-up-Verhalten der Komponenten. Hierbei ist festzustellen, dass Node.js einen deutlichen Vorteil gegenüber dem Spring-Boot-Framework vorzuweisen hat. Im Banking-Bereich ist dies unabdingbar. Die Performanz lässt sich allerdings zum gegenwärtigen Zeitpunkt nur eingeschränkt beurteilen. Mit den erhaltenen Daten zeichnet sich hierbei im Gesamtbild für den Anwendungsfall des Unternehmens jedoch eine Empfehlung für die Verwendung neuwertiger Skript-Technologien aus. 
 
 
-\subsection{Zusammenfassung}
+\subsection{Zusammenfassung \checkmark}
 
 \todo{Schauen ob Begriff "Servlet-Container" irgendwo erklärt wurde...}
 

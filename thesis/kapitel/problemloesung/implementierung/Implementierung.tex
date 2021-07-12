@@ -80,7 +80,7 @@ Der Benutzer besitzt die Möglichkeit, sowohl über eine Benutzeroberfläche als
 \subsubsection{Bash \checkmark}
 \label{ss:bash}
 
-\paragraph{Aufbau}
+\paragraph{Aufbau \checkmark}
 In der folgenden Abbildung ist der Aufbau des Bash-Projektes dargestellt. Der Benutzer besitzt drei Möglichkeiten, Anfragen an das System zu stellen. Für jeden Einstiegspunkt wurde ein entsprechendes Bash-Skript zur Verfügung gestellt.
 
 \begin{figure}[ht!]
@@ -118,7 +118,7 @@ Im folgenden Listing (siehe \ref{verb:scriptStruct}) ist ein Auszug der Projekt-
 \end{minipage}
 
 \label{erklaerungDirScal}
-\paragraph{Manuelles Skalieren}
+\paragraph{Manuelles Skalieren \checkmark}
 Hierfür wird auf ein Bash-Skript namens "\emph{direct-scaling}" zurückgegriffen. Das Skript nimmt zwei Parameter entgegen. Der Erste beschreibt die Anzahl der Instanzen, zu der das System skaliert werden soll, wobei hierbei eine inkrementelle Erhöhung von einer Instanz pro Durchlauf durchgeführt wird. Der zweite Parameter gibt die Wiederholungen dieser testweisen Skalierung an. Der Aufruf \verb+./direct-scaling.sh 10 20+ resultiert beispielsweise darin, das sowohl für den Node.js als auch Spring Boot Service jeweils 10 Skalierungsschritte durchgeführt werden. Wenn zum Beispiel bereits ein Node.js-Container läuft, wird im ersten Test eine weitere Instanz angefordert. Sobald die beiden Instanzen verfügbar sind, wird der Alert-Manager durch die Prometheus-Komponente angewiesen die überflüssige Instanz zu löschen. Sobald wieder ein einziger Container läuft, wird dieser Schritt neunzehn weitere Male wiederholt. Anschließend erfolgt die nächste Skalierung bei der nun zwei neue Container kreiert werden sollen, anstatt wie vorher nur ein weiterer. Auch hier folgen 20 Wiederholungen. Diese Schritte werden solange durchgeführt bis zehn Container zwanzig Mal instanziiert wurden.
 
 \label{lst:direct-scaling}
@@ -193,7 +193,7 @@ Während der Entwicklungszeit des restlichen Systems, wurde das Arbeiten mit der
 \subsection{Supplier Backend \checkmark}
 Bei dieser Komponente handelt es sich um ein Spring Projekt, dessen Aufgabe es ist, Benutzeranfragen in Nachrichten zu übersetzen, die vom System interpretiert und verarbeitet werden können. Die Schnittstelle für den Benutzer besteht hierbei aus einer REST-Api, die über Tools wie zum Beispiel curl angesprochen werden kann.
 
-\subsubsection{Implementierung}
+\subsubsection{Implementierung \checkmark}
 
 \paragraph{Generelle Spring Projektübersicht \checkmark}
 Da diese Komponente bezüglich der Struktur eines Spring-Projekts alle wesentlichen Merkmale besitzt, wird die genutzte Projektstruktur an dieser Stelle etwas näher erläutert. 
@@ -254,7 +254,7 @@ Das Muster, nach dem sämtliche Komponenten des Komponenten-Stacks entwickelt wu
   \item \emph{resources}: Die genutzte Verbindungs-Konfiguration zwischen Komponenten des Stacks werden innerhalb der \emph{.properties} Dateien verwaltet. Es ist möglich auf diese Information über den Dependency-Injection-Mechanismus innerhalb der Klassen zuzugreifen.
 
 \end{itemize}
-\paragraph{Programmfluss}
+\paragraph{Programmfluss \checkmark}
 Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:supplierUml}) wurden ein Teil der Klassen des Suppliers dargestellt. Es wurde sich hierbei auf die wesentlichen Logikbausteine konzentriert. 
 
 \begin{figure}[ht!]
@@ -342,7 +342,7 @@ Der Einstiegspunkt für den Spring-Konsumenten stellt der \emph{AmqService} dar.
 
 \subsection{Prometheus \checkmark}
 
-\paragraph{Regelsatz für Skalierung}
+\paragraph{Regelsatz für Skalierung \checkmark}
 Prometheus ist eine Komponente, die zum Monitoring genutzt werden kann (siehe Abschnitt \ref{ss:prometheus}). Für dieses Projekt musste diese lediglich derartig konfiguriert werden, dass entsprechende Alerts generiert werden und an die Alter-Manager-Komponente weitergeleitet werden können. Diese Komponente informiert erst anschließend die (Proxy-)Scaler-Komponente. Die auszuwertenden Regeln residieren jedoch bereits in der Prometheus Komponente. Das Regelwerk wurden nach folgendem Schema entworfen.
 
 \bigskip
@@ -411,7 +411,7 @@ Ein wesentlicher Nachteil dieser Herangehensweise ist, dass das System beim Skal
 Ein Satz Sonderregeln, die bisher nicht erwähnt wurden, betreffen den Initialisierungszustand. Hierbei wird geprüft ob die Minimalanzahl von Containern läuft. Falls dies nicht der Fall sein sollte, wird eine Skalierungsanfrage für genau diese Anzahl generiert.
 
 
-\paragraph{Konfiguration}
+\paragraph{Konfiguration \checkmark}
 
 \begin{lstlisting}[style=bashStyle,caption={Umgebungsvariablen - Prometheus Regelsatz},label=lst:envMatrix]
   groups:
@@ -541,10 +541,10 @@ In diesem Beispiel wurden eine größere Menge von Nachrichten für den Spring-K
 
 Die Daten hinsichtlich der Node.js Komponenten sowie die Zahlenwerte für die gemessenen Start-up-Zeiten werden gleichermaßen in eigenen Dashboard-Komponenten dargestellt. Da die Konfiguration dieser, der Vorgestellten allerdings deutlich ähnelt, wurde hierbei darauf verzichtet diese ebenfalls zu erläutern. Da das Dashboard im Allgemeinen einen eher überprüfenden Charakter einnimmt um nachvollziehen zu können wie die letztendlichen Messwerte berechnet wurden, ist diese gesamte Komponente auch von nebensächlicher Bedeutung.
 
-\section{Deployment auf Containerplattform}
+\section{Deployment auf Containerplattform \checkmark}
 Nachdem im letzten Abschnitt beschrieben wurden, wie die einzelnen Stack-Komponenten implementiert wurde, wird im Folgenden auf das Deployment mithilfe von Containern im Docker-Swarm-Stack eingegangen. 
 
-\subsection{Build}
+\subsection{Build \checkmark}
 Hierbei werden zuerst die Buildvorgänge der einzelnen Komponenten beschrieben, im Anschluss daran wird ein Überblick über die Orchestrierung des Stacks gegeben.
 
 \subsubsection{Spring Komponenten \checkmark}
@@ -588,14 +588,14 @@ Um ein Docker-Image zu erstellen, wurde bei diesem Projekt auf eine Beschreibung
 \end{itemize}
 
 
-\paragraph{Anmerkung: Vorteile der Imageschichtung} Der wesentliche Vorteil durch die Schichtung der Images während des Buildprozesses ist der, dass es so einfacher möglich ist, Images zu cachen. Es müssen schließlich nur die Teile des Images neu gebaut werden, die sich tatsächlich geändert haben. Dazu wird die Schicht ermittelt, ab der eine erste Abweichung zum vorherigen Build festgestellt werden kann. Anschließend wird lediglich diese Schicht, sowie alle Schicht darüber neu gebaut. Die \emph{parent layer} werden allerdings weiterhin wiederverwendet. Beim Erstellen von Images sollte daher Wert darauf gelegt werden, den dynamischen Teil des Buildvorgangs möglichst weit an das Ende eines Dockerfiles zu legen, um den Caching-Mechanismus der Docker-Engine bestmöglich auszunutzen.
+\paragraph{Anmerkung: Vorteile der Imageschichtung \checkmark} Der wesentliche Vorteil durch die Schichtung der Images während des Buildprozesses ist der, dass es so einfacher möglich ist, Images zu cachen. Es müssen schließlich nur die Teile des Images neu gebaut werden, die sich tatsächlich geändert haben. Dazu wird die Schicht ermittelt, ab der eine erste Abweichung zum vorherigen Build festgestellt werden kann. Anschließend wird lediglich diese Schicht, sowie alle Schicht darüber neu gebaut. Die \emph{parent layer} werden allerdings weiterhin wiederverwendet. Beim Erstellen von Images sollte daher Wert darauf gelegt werden, den dynamischen Teil des Buildvorgangs möglichst weit an das Ende eines Dockerfiles zu legen, um den Caching-Mechanismus der Docker-Engine bestmöglich auszunutzen.
 
-\subsubsection{Node.js}
+\subsubsection{Node.js \checkmark}
 
-\paragraph{Überblick}
+\paragraph{Überblick \checkmark}
 Das Node.js-Projekt wurde mithilfe des npx "\emph{create-react-app}"-Starters initialisiert. Npx ist ein package runner für den node package manager (kurz npm). Npx stellt dabei ein CLI-Werkzeug bereit, welche bei Installation von npm direkt mit ausgeliefert wird und dient zur Unterstützung zur Verwaltung von Abhängigkeiten. Im Bezug auf das Node.js-Projekt ist es beispielsweise möglich hiermit ein Projekt zu initialisieren, das auf der Programmiersprache \emph{Typescript} basiert und nicht wie herkömmlich, auf Javascript. Typescript stellt eine Erweiterung von Javascript dar, es ist demnach möglich Javascript-Code in einem Typescript-Projekt auszuführen. Es wurde sich für Typescript entschieden, da diese Sprache die vier wesentlichen Prinzipien objektorientierter Sprachen bereitstellt. Diese setzten sich aus der \emph{Kapselung von Code}, der \emph{Vererbung}, \emph{Abstraktion} und \emph{Polymorphie} zusammen \cite{typescript-oop}. Dies ermöglicht eine klarer strukturierte Codebasis und ist über ein objektorientiertes Modell ebenfalls einfacher mit dem Spring Boot Pendant zu vergleichen.
 
-\paragraph{Kompilieren der Sourcen}
+\paragraph{Kompilieren der Sourcen \checkmark}
 Ähnlich wie Java wird auch ein Typescript-Projekt kompiliert, hierbei erfolgt die Kompilierung allerdings in Javascript-Code. Die Konfiguration des Typescript-Compiler \emph{tsc} befindet sich in einer Datei namens \emph{tsconfig.json} (siehe Listing \ref{lst:tsconfig}).
 
 \begin{minipage}{\linewidth}
@@ -669,7 +669,7 @@ Die wichtigesten Konfigurationsparameter im Überblick.
 
 In dem angegebenen Dateiinhalt lassen sich vor allem Metainformationen des Projekts identifizieren (Projektname, Autor). Außerdem werden Projekt-Abhängigkeiten definiert, wobei die letztendlich genutzten Packages mit den entsprechenden Versionsnummern in einem dedizierten Format aufgezählt werden. Diese sind standardmäßig Javascript Projekte. Da Typescript dennoch die Möglichkeit bietet, über einen definierten \emph{any type} eine untypisierte Variante von Variablen etc. zu erstellen, können diese Bibliotheken ohne weitere Konfiguration genutzt werden. Um allerdings die Typisierungsfunktionen von Typescript sinnvoll nutzen zu können, müssen diese Informationen entweder als getrennte Abhängigkeit getrennt importiert werden (siehe Zeile 13 / 14) oder sie sind bereits in der importierten Bibliothek enthalten und können nativ genutzt werden. Zur Überprüfung kann die Ausgaben des TSC-Compilers zurate gezogen werden.
 
-\paragraph{Dockerbuild}
+\paragraph{Dockerbuild \checkmark}
 Um ein Dockerimage für das Typescript-Projekt zu erstellen, wird auf folgendes Dockerfile zurückgegriffen \ref{lst:ts-dockerfile}.
 
 \begin{lstlisting}[style=bashStyle,caption={Dockerfile - Typescript Projekt},label=lst:ts-dockerfile]
@@ -698,14 +698,14 @@ Dieses verhält sich relativ ähnlich zu dem der Spring-Boot-Projekte (siehe ref
 \subsection{Docker Swarm \checkmark}
 Um den Stack zu starten, wird auf verschiedene Skripte sowie Beschreibungsdateien zugegriffen. Im Folgenden wird erst die Beschreibung des Container-Netzwerks und anschließend der Build- sowie Start-Vorgang des Projekts beschrieben.
 
-\subsubsection{Docker-Compose}
-\paragraph{Einleitung}
+\subsubsection{Docker-Compose \checkmark}
+\paragraph{Einleitung \checkmark}
 Es ist möglich, ein Netzwerk von Containern manuell über das CLI der Docker-Engine zu starten, hierbei können Mounts bestimmter Verzeichnisse angelegt, Kommunikations-Netzwerke definiert und Ports freigegeben werden. Mithilfe von Shell-Skripten wäre es möglich, diese Schritte zu automatisieren. Dieses Vorgehen erscheint aber schon bei kleineren Projekten sehr impraktikabel und unübersichtlich, hierbei wird daher auf Werkzeuge wie zum Beispiel \emph{Docker-Compose}\footnote{\url{https://github.com/docker/compose}} zurückgegriffen. Dieses Tool bietet die Möglichkeit über eine Beschreibungssprache einen Stack zu definieren, in dem sämtliche Abhängigkeiten bereits aufgelöst werden können. 
 
-\paragraph{Container Networking}
+\paragraph{Container Networking \checkmark}
 Container werden hierbei in Clustern organisiert die es ermöglichen mithilfe des \emph{Docker-Link}-Mechanismus die Container über ein definiertes Netzwerk miteinander in Verbindung treten zu lassen. "\emph{The Docker server acts as a virtual bridge and the containers are clients behind it}" \cite[Seite~13]{oreilly-docker}. Jeder Container besitzt ein eigenes virutelles Ethernet Interface, das eine eigene IP-Adresse allokiert und mit der beschriebenen Docker-Bridge verbunden ist. "\emph{Docker lets you bind ports on the host to the container so that the outside world can reach your container}". Hierbei wird ein lokales Netzwerk allokiert über das alle Container direkt miteinander kommunizieren können.
 
-\paragraph{Stack-Konfiguration}
+\paragraph{Stack-Konfiguration \checkmark}
 Um beim Beispiel des \emph{Suppliers} zu bleiben folgt eine kurze Zusammenfassung der Stack-Konfiguration für den Spring-Supplier-Container. Die gesamte Docker-Compose Konfigurationsdatei befindet sich ebenfalls im Anhang (siehe Listing \ref{lst:dockerCompose}).
 
 \begin{lstlisting}[style=bashStyle,caption={Docker Compose - Ausschnitt Supplier Definition},label=lst:dockerCompose]
@@ -771,7 +771,7 @@ Daten, die über Volumes persistiert werden sind vom Betriebssystem des Hosts ko
 
 Im Projekt wurde auf anonyme Volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes}). Diese werden direkt vom Docker-Daeomon verwaltet, wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit auf sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, welches auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
 
-\paragraph{Docker Swarm} 
+\paragraph{Docker Swarm \checkmark}
 Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform}}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Dabei können mehrere Maschinen derartig agieren, dass es für den Anwender den Anschein erweckt, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das Skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren ohne, dass die restlichen Stack-Komopnenten hiervon beeinflusst werden. Um dies nutzen zu können muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm-Werkzeug allerdings lediglich teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das Setzen von Umgebungsvariablen mithilfe definierter Variablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben Umgebungsvariablen zu über Variablen des Buildsystems zu definieren, die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich sensitiver Daten, zum Beispiel bei Anmeldedaten für Datenbanken etc. katastrophal. Um dennoch in der Lage zu sein bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit das Docker-Compose-Werkzeug selbst als Präprozessor zu verwenden. Dabei wird das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umgewandelt und die Umgebungsvariablen direkt mit den im System hinterlegten Werten ausgewechselt. Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein Swarm auf der Hostmaschine initialisiert, und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert (siehe Auszug \ref{summary-start-stack-services}, komplettes Skript im Anhang unter \ref{start-stack-services}).
 
 \begin{lstlisting}[style=bashStyle,caption={start-stack-services.sh},label=lst:summary-start-stack-services]
@@ -814,10 +814,10 @@ Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer s
 \end{lstlisting}
 % \end{landscape}
 
-\section{Implementierung Lasttest}
+\section{Implementierung Lasttest \checkmark}
 Nachdem im letzten Abschnitt auf die Konfiguration des Stacks eingegangen wurde, wird im Folgenden erklärt, welche Szenarien für die Messdatenerhebung durchgeführt wurden und unter welchen Bedingungen das System diese bearbeitet hat.
 
-\subsection{Testszenarien}
+\subsection{Testszenarien \checkmark}
 Für die Erhebung der Messdaten wurde auf die in \ref{} \todo{Ref einbinden} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese der Riehe nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit weniger Nachrichten in das System eingepflegt wurde, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueue} zeigt die Daten des Message Brokers. 
 
 \begin{figure}[ht!]
@@ -831,7 +831,7 @@ Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bea
 
 Das zweite Testszenario betrifft die direkt Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash}). Der Aufrufd wurde mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insgesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
 
-\subsection{Testbedingungen}
+\subsection{Testbedingungen \checkmark}
 % \begin{itemize}
 %   \item Kommt in den Anhang
 %   \item hat Prof. zwar als eigenes Kapitel erwaehnt, bin mir aber nicht sicher ob das wirklich noetig ist
