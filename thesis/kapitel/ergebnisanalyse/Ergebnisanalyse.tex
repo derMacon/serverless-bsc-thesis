@@ -267,6 +267,10 @@ Damit das Verhalten des Systems bezüglich Ausfalls bestimmter Komponenten betra
 Die Aussage, dass die Spring-Komponente durchschnittliche 13 Mal schneller arbeitet als das Node.js-Pendant ist für den beschriebenen Anwendungsfall zwar korrekt, allerdings wurden hierbei lediglich die erläuterten Schritte abgearbeitet (siehe Abschnitt \ref{} \todo{ref einbinden}). Auf das Laufzeitverhalten einer komplexeren Anwendung kann hierbei nicht geschlossen werden. Eventuell lässt sich dieser Unterschied lediglich auf einen Verbindungsaufbau oder Ähnliches zurückführen wobei die restliche Logik hiervon nicht betroffen ist. Dies lässt sich mithilfe weiterer Timestamps innerhalb der Komponenten ermitteln.
 
 
+\subsection{Beurteilung der Technologien hinsichtlich des beschriebenen Usecases}
+Der Fokus der Thesis liegt auf dem Start-up-Verhalten der Komponenten. Hierbei ist festzustellen, dass Node.js einen deutlichen Vorteil gegenüber dem Spring-Boot-Framework vorzuweisen hat. Im Banking-Bereich ist dies unabdingbar. Die Performanz lässt sich allerdings zum gegenwärtigen Zeitpunkt nur eingeschränkt beurteilen. Mit den erhaltenen Daten zeichnet sich hierbei im Gesamtbild für den Anwendungsfall des Unternehmens jedoch eine Empfehlung für die Verwendung neuwertiger Skript-Technologien aus. 
+
+
 \subsection{Zusammenfassung}
 
 \todo{Schauen ob Begriff "Servlet-Container" irgendwo erklärt wurde...}
@@ -288,4 +292,5 @@ Die Aussage, dass die Spring-Komponente durchschnittliche 13 Mal schneller arbei
 		\item Vermischung beider Service-Initialisierungsphasen
 		\item Node.js proportional zur Verarbeitungsgeschwindigkeit skalieren
 	\end{itemize}
+	\item Finale Beurteilung: beschriebene Vorteile Skript-Technologien überwiegen
 \end{itemize}
