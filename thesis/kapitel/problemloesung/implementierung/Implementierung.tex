@@ -541,108 +541,17 @@ In diesem Beispiel wurden eine größere Menge von Nachrichten für den Spring-K
 
 Die Daten hinsichtlich der Node.js Komponenten sowie die Zahlenwerte für die gemessenen Start-up-Zeiten werden gleichermaßen in eigenen Dashboard-Komponenten dargestellt. Da die Konfiguration dieser, der Vorgestellten allerdings deutlich ähnelt, wurde hierbei darauf verzichtet diese ebenfalls zu erläutern. Da das Dashboard im Allgemeinen einen eher überprüfenden Charakter einnimmt um nachvollziehen zu können wie die letztendlichen Messwerte berechnet wurden, ist diese gesamte Komponente auch von nebensächlicher Bedeutung.
 
-% \subsection{Buildprozess}
-
-% % \begin{lstlisting}[language=bash]
-% %  tree . -L 1
-% % .
-% % ├── Dockerfile
-% % ├── package.json
-% % ├── package-lock.json
-% % ├── specification.xsd
-% % ├── src
-% % └── tsconfig.json
-% % \end{lstlisting}
-% % \todo{uncomment}
-
-% \subsubsection{Projektübersicht}
-% Das Projekt beinhaltet neben sämtlichen Quellcode-Dateien ein Dockerfile, eine package.json und eine tsconfig Konfigurationsdatei. 
-
-% \subparagraph{Dockerfile}
-% Bei dem verwendeten Dockerfile handelt es sich um eine multi-stage Konfiguration. \todo{Quellen raussuchen}
-
-% \todo{Zeilennummern}
-% \begin{lstlisting}[language=bash]
-%   # stage 1 building the code
-%   FROM node:10.15.3 AS builder
-%   WORKDIR /usr/app
-%   COPY package*.json ./
-%   RUN npm install
-%   COPY . .
-%   RUN npm run build 
-  
-%   # stage 2
-%   FROM node:10.15.3-alpine
-%   WORKDIR /usr/app
-%   COPY package*.json ./
-%   RUN npm install --production
-  
-%   COPY --from=builder /usr/app/dist ./dist
-  
-%   COPY --from=builder /usr/app/schema.sql .
-%   COPY --from=builder /usr/app/specification.xsd .
-  
-%   CMD node dist/src/index.js
-% \end{lstlisting}
-
-% \subparagraph{Typescript Konfiguration}
-
-% \subparagraph{Quellcode}
-
-
-% \begin{minipage}{\linewidth}
-% \begin{lstlisting}[style=bashStyle,caption={Node.js Projektstruktur},label=lst:nodeProjStruc]
-%   $ tree stack/node-consumer/ -a -L 3 --charset=ascii
-%   stack/node-consumer/
-%   |-- Dockerfile
-%   |-- .dockerignore
-%   |-- package.json
-%   |-- package-lock.json
-%   |-- schema.sql
-%   |-- scripts
-%   |   `-- buildimage.sh
-%   |-- specification.xsd
-%   |-- src
-%   |   |-- index.ts
-%   |   |-- model
-%   |   |   |-- PaymentInput.ts
-%   |   |   |-- PaymentMessage.ts
-%   |   |   `-- ResultWrapper.ts
-%   |   |-- service
-%   |   |   |-- AmqService.ts
-%   |   |   `-- WorkerService.ts
-%   |   `-- utils
-%   |       |-- ElementExtractor.ts
-%   |       |-- IdGenerator.ts
-%   |       `-- XsdChecker.ts
-%   `-- tsconfig.json
-% \end{lstlisting}
-% \end{minipage}
-
-
-% Die Programmlogik wurde in drei wesentliche packages aufgeteilt (siehe Listing \todo{Listing einkommentieren und referenzieren}). 
-
-% \begin{itemize}
-%   \item \emph{model}: Dieses Package beinhaltet sämtliche Datenstrukturen, die vom System zur Bearbeitung der eingehenden Nachrichten verwendet werden.
-%   \item \emph{model}: Dieses Package beinhaltet sämtliche Komponenten welche logisch klar abgetrennte Aufgabe implementieren und über Schnittstellen miteinander kommunizieren. Hierbei wurde sich an der Architektur einer typischen Spring-Anwendung orientiert.
-%   \item \emph{model}: Dieses Package beinhaltet sämtliche Funktionalität der abzuarbeitenden Businesslogik.
-% \end{itemize}
-
-
-
-
-
 \section{Deployment auf Containerplattform}
-Nachdem im letzten Abschnitt beschrieben wurden, wie die einzelnen Stack-Komponenten implementiert wurde, wird im Folgenden auf das Deployment mithilfe von Containern im Docker Swarm Stack eingegangen. 
+Nachdem im letzten Abschnitt beschrieben wurden, wie die einzelnen Stack-Komponenten implementiert wurde, wird im Folgenden auf das Deployment mithilfe von Containern im Docker-Swarm-Stack eingegangen. 
 
 \subsection{Build}
 Hierbei werden zuerst die Buildvorgänge der einzelnen Komponenten beschrieben, im Anschluss daran wird ein Überblick über die Orchestrierung des Stacks gegeben.
 
-\subsubsection{Spring Komponenten}
+\subsubsection{Spring Komponenten \checkmark}
 
-Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in einem ersten Schritt ein Docker Image erstellt werden. Dieses kann im Anschluss als Container instanziiert werden. Zum Erstellen eines Docker-Images wird auf ein sogenannten "\emph{Dockerfile}" zurückgegriffen, das die Beschreibung des Build-Prozesses für dieses Image enthält. Da alle Spring-Projekte im Komponenten-Stack mit einem fast identischen Dockerfile versehen wurden, gilt die folgende Beschreibung in gleichem Maß für alle Spring-Projekte dieses Stacks.
+Um das Projekt im Komponenten-Stack als Dockercontainer zu deployen, muss in einem ersten Schritt ein Docker-Image erstellt werden. Dieses kann im Anschluss als Container instanziiert werden. Zum Erstellen eines Docker-Images wird auf ein sogenannten "\emph{Dockerfile}" zurückgegriffen, das die Beschreibung des Build-Prozesses für dieses Image enthält. Da alle Spring-Projekte im Komponenten-Stack mit einem fast identischen Dockerfile versehen wurden, gilt die anschließende Erläuterung in gleichem Maß für alle Spring-Projekte dieses Stacks.
 
-Damit die folgende Erklärung der genutzten Dockerfiles verständlich erläutert werden kann, folgt eine kurze Zusammenfassung der Struktur eines Docker-Images. "\emph{A Docker image is made up of filesystems layered over each other}" \cite[Seite~71]{turnbulldocker}. Als erste Schicht wird hierbei ein bootbares Filesystem eingeführt, das einem typischen Linux Bootsystem ähnelt. Anschließend kann dieses Modell mit weiteren Schichten erweitert werden. Hierfür wird der sogenannte "\emph{union mount}" Mechanismus verwendet, der es ermöglicht mehrere read-only Dateisysteme in das Root-Dateisystem zu integrieren. Bei einem später hinzugefügten Dateisystem ist es möglich auf die Unterordner der vorher hinzugefügten Systeme zuzugreifen, umgekehrt gilt dies nicht. In einer Docker-Umgebung spricht man bei diesen aufgeschichteten Dateisystemen von Docker-Images. "\emph{Images can be layered on top of one another.  The image below is called the parent image and you can traverse each layer until you reach the bottom of the image stack where the final image is called the base image.  Finally, when a container is launched from an image, Docker mounts a read-write filesystem on top of any layers below. This is where whatever processes we want our Docker container to run will execute}" \cite[Seite~71]{turnbulldocker}. In Abbildung \ref{fig:dockerImage} wurde dies auch noch einmal grafisch aufgearbeitet.
+Damit die folgende Erklärung der genutzten Dockerfiles verständlich dargestellt werden kann, folgt eine kurze Zusammenfassung der Struktur eines Docker-Images. "\emph{A Docker image is made up of filesystems layered over each other}" \cite[Seite~71]{turnbulldocker}. Als erste Schicht wird hierbei ein bootbares Filesystem eingeführt, das einem typischen Linux-Bootsystem ähnelt. Anschließend kann dieses Modell mit weiteren Schichten erweitert werden. Hierfür wird der sogenannte "\emph{union mount}" Mechanismus verwendet, der es ermöglicht mehrere read-only Dateisysteme in das Root-Dateisystem zu integrieren. Bei einem neu hinzugefügten Dateisystem ist es möglich auf die Unterordner der vorher hinzugefügten Systeme zuzugreifen, umgekehrt gilt dies nicht. In einer Docker-Umgebung spricht man bei diesen aufgeschichteten Dateisystemen von Docker-Images. "\emph{Images can be layered on top of one another.  The image below is called the parent image and you can traverse each layer until you reach the bottom of the image stack where the final image is called the base image.  Finally, when a container is launched from an image, Docker mounts a read-write filesystem on top of any layers below. This is where whatever processes we want our Docker container to run will execute}" \cite[Seite~71]{turnbulldocker}. In Abbildung \ref{fig:dockerImage} wurde dies auch noch einmal grafisch aufgearbeitet.
 
 \begin{figure}[ht!]
 	\centering
@@ -668,24 +577,129 @@ Um ein Docker-Image zu erstellen, wurde bei diesem Projekt auf eine Beschreibung
 \end{minipage}
 
 \begin{itemize}
-  \item Zeile 1: Ein Dockerfile beginnt meist mit der Angabe eines sogenannten "\emph{Baseimages}". Dies kann eine minimale Linux Distribution sein, oder wie in diesem Fall ein System auf dem bereits diverse Konfigurationen definiert wurden. Bei dem verwendeten Image, wurde eine Java Runtime sowie das Buildprogramm \emph{maven} bereits vorinstalliert. Beides wird für die Ausführung des Spring-Projekts gebraucht. 
-  \item Zeile 2: Der Buildprozess wird in der Root-Directory des Spring-Projekts ausgeführt. In diesem Verzeichnis befinden sich in einem Unterordner alle Quellcodedateien. Diese mit diesem Befehl in das das \emph{usr} Verzeichnis des zu erstellenden Images kopiert. 
-  \item Zeile 3: Da alle Spring-Projekte dieses Stacks mithilfe des Build-Tools \emph{Maven} gebaut werden, wird die \emph{pom.xml} Datei aus dem Root-Verzeichnis ebenfalls in den Container kopiert. Diese Datei enthält alle wesentlichen Metainformationen des Projekts. Dazu gehören beispielsweise sämtliche Abhängigkeit, verwendete Build-Plugins und Projektinformationen. 
+  \item Zeile 1: Ein Dockerfile beginnt mit der Angabe eines sogenannten "\emph{Baseimages}". Dies kann eine minimale Linux Distribution sein, oder wie in diesem Fall ein System auf dem bereits diverse Konfigurationen definiert wurden. Bei dem verwendeten Image, wurde eine Java Runtime sowie das Buildprogramm \emph{maven} bereits vorinstalliert. Beides wird für die Ausführung des Spring-Projekts gebraucht. 
+  \item Zeile 2: Der Buildprozess wird in dem Root-Verzeichnis des Spring-Projekts ausgeführt. Hier befinden sich in einem Unterordner alle Quellcodedateien, die mit diesem Befehl in das \emph{usr} Verzeichnis des zu erstellenden Images kopiert. 
+  \item Zeile 3: Da alle Spring-Projekte dieses Stacks mithilfe des Build-Tools \emph{Maven} gebaut werden, wird die \emph{pom.xml} Beschreibungsdatei aus dem Root-Verzeichnis ebenfalls in den Container kopiert. Diese Datei enthält alle wesentlichen Metainformationen des Projekts. Dazu gehören beispielsweise sämtliche Abhängigkeit, verwendete Build-Plugins und Projektinformationen. 
   \item Zeile 4: Der Run-Befehl ermöglicht es den nachfolgenden Shell-Befehl in einer Linux-Shell innerhalb des Containers selbst auszuführen. Hierbei wird die ausführbare .jar Datei gebaut die im späteren Verlauf im Dateisystem deployed wird.
-  \item Zeile 6: Es folgt eine erneute Anweisung zum Laden eines Base-Images, dies ist Teil eines sogenannten multi-stage Builds. Wie im letzten Abschnitt erwähnt werden beim Bauen von Docker-Images verschiedene Dateisysteme ineinander gemounted, hierbei entsteht eine Art Schichtenmodell. Bezogen auf ein Dockerfile wird mit jeder einzelnen Befehlszeile der Datei ein neues Image erstellt. Um am Ende ein möglichst kleines Docker-Images zu erhalten, wird versucht diese Schichtanzahl so minimal wie möglich zu halten. Hierbei gibt es die Möglichkeit das Bauen der ausführbaren Datei auszulagern und lediglich die fertige ausführbare Datei in den Container zu laden. Mit diesem Ansatz ist es allerdings nicht möglich, das Image direkt auf dem Server zu bauen, es sei denn die Datei liegt vor oder auf dem System wurden alle notwendigen Buildwerkzeuge installiert. Dies ist sehr impraktikabel, weswegen in der Praxis hierbei ein sogenannter "\emph{multistage build}" verwendet wird \cite[Kapitel~multi stage build]{docker-doc}. Hierbei kann auf einzelne Stufen Bezug genommen werden, und einzelne Dateien von einem Image direkt in ein anderes kopiert werden. Bezogen auf das dargestellte Dockerfile, ist es möglich die ausführbare Datei des vorherigen Buildprozesses zu kopieren ohne sämtliche Metadaten, die bei dem Buildprozess anfallen mit kopieren zu müssen.
-  \item Zeile 7: Wie im letzten Schritt erwähnt, wird hierbei die ausführbare Datei vom Buildprozess in das aktuelle Image herüberkopiert. Hierfür wird sich dem Schlüsselwort \emph{--from} bedient. Die vorher genierierten Schichten, die für im Buildprozess verwendet werden, werden bei der Erstelltung des letztendlichen Images wieder verworfen, da sie mit einem neuen Baseimage überschrieben wurden.
-  \item Zeile 8: Der Port über dem sämtliche Kommunikation mit der Außenwelt stattfindet wird freigegeben. 
+  \item Zeile 6: Es folgt eine erneute Anweisung zum Laden eines Base-Images, dies ist Teil eines sogenannten \emph{multi-stage} Builds. Wie im letzten Abschnitt erwähnt, werden beim Bauen von Docker-Images verschiedene Dateisysteme ineinander gemounted, hierbei entsteht eine Art Schichtenmodell. Bezogen auf ein Dockerfile wird mit jeder einzelnen Befehlszeile der Datei ein neues Image erstellt. Um  am Ende ein möglichst kleines Docker-Images zu erhalten, wird versucht diese Schichtanzahl so minimal wie möglich zu halten. Hierbei gibt es die Möglichkeit das Bauen der ausführbaren Datei auszulagern und lediglich die fertige ausführbare Datei in den Container zu laden. Mit diesem Ansatz ist es allerdings nicht möglich, das Image direkt auf dem Server zu bauen, es sei denn die Datei liegt vor oder auf dem System wurden alle notwendigen Buildwerkzeuge installiert. Dies ist sehr impraktikabel, weswegen in der Praxis hierbei ein sogenannter "\emph{multistage build}" verwendet wird \cite[Kapitel~multi stage build]{docker-doc}. Hierbei kann auf einzelne Stufen Bezug genommen werden, und spezifizierte Dateien von einem Image direkt in ein anderes kopiert werden. Bezogen auf das dargestellte Dockerfile, ist es möglich die ausführbare Datei des vorherigen Buildprozesses zu kopieren ohne sämtliche Metadaten, die bei dem Buildprozess anfallen ebenfalls kopieren zu müssen.
+  \item Zeile 7: Wie im letzten Schritt erwähnt, wird hierbei die ausführbare Datei vom Buildprozess in das aktuelle Image herüberkopiert. Hierfür wird sich dem Schlüsselwort \emph{--from} bedient. Die vorher generierten Schichten, die für im Buildprozess verwendet werden, werden bei der Erstellung des letztendlichen Images wieder verworfen, da sie mit einem neuen Baseimage überschrieben wurden.
+  \item Zeile 8: Der Port über dem sämtliche Kommunikation mit der Außenwelt stattfindet, wird freigegeben. 
   \item Zeile 9: Der Entrypoint ähnelt dem \emph{CMD}-Befehl stark, es ist zum Ausführungszeitpunkt des Containers allerdings schwieriger diesen zu überschreiben.
 \end{itemize}
 
 
-\paragraph{Anmerkung: Vorteile der Imageschichtung} Der wesentliche Vorteil durch die Schichtung der Images während des Buildprozesses ist der, dass es so einfacher möglich ist, Images zu cachen. Es müssen schließlich nur die Teile des Images neu gebaut werden, die sich tatsächlich geändert haben. Dazu wird die Schicht ermittelt, ab der eine erste Abweichung zum vorherigen Build festgestellt werden kann. Anschließend wird lediglich diese Schicht, sowie alle Schicht darüber neu gebaut. Die \emph{parent layer} werden allerdings weiterhin verwendet ohne neu zu bauen. Beim Erstellen von Images sollte daher Wert darauf gelegt werden, den dynamischen Teil des Buildvorgangs móglichst weit an das Ende eines Dockerfiles zu legen, um den Caching-Mechanismus der Docker-Engine bestmöglich auszunutzen.
+\paragraph{Anmerkung: Vorteile der Imageschichtung} Der wesentliche Vorteil durch die Schichtung der Images während des Buildprozesses ist der, dass es so einfacher möglich ist, Images zu cachen. Es müssen schließlich nur die Teile des Images neu gebaut werden, die sich tatsächlich geändert haben. Dazu wird die Schicht ermittelt, ab der eine erste Abweichung zum vorherigen Build festgestellt werden kann. Anschließend wird lediglich diese Schicht, sowie alle Schicht darüber neu gebaut. Die \emph{parent layer} werden allerdings weiterhin wiederverwendet. Beim Erstellen von Images sollte daher Wert darauf gelegt werden, den dynamischen Teil des Buildvorgangs möglichst weit an das Ende eines Dockerfiles zu legen, um den Caching-Mechanismus der Docker-Engine bestmöglich auszunutzen.
 
 
-\subsection{Node.js}
+\subsubsection{Node.js}
 \todo{Build Prozess erklären - Typescript Config etc., nochmal alle Komponenten durchgehen...}
 
 \todo{Falls es mit dem Platz knapp werden sollte nochmal die Build Skripte im Detail erklären}
+
+\paragraph{Überblick}
+Das Node.js-Projekt wurde mithilfe des npx "\emph{create-react-app}"-Starters initialisiert. Npx ist ein package runner für den node package manager (kurz npm). Npx ist dabei CLI-Werkzeug bei Installation von npm direkt integriert und dient zur Unterstützung zur Verwaltung von Abhängigkeiten. Im Bezug auf das Node.js Projekt ist es beispielsweise möglich hiermit ein Projekt zu bauen, das auf der Programmiersprache \emph{Typescript} basiert und nicht wie herkömmlich auf Javascript. Typescript stellt eine Erweiterung von Javascript dar, es ist also möglich Javascript-Code in einem Typescript-Projekt auszuführen. Es wurde sich für Typescript entschieden, da diese Sprache die vier wesentlichen Prinzipien objektorientierter Sprachen bereitstellt. Diese setzten sich aus der \emph{Kapselung von Code}, der \emph{Vererbung}, \emph{Abstraktion} und \emph{Polymorphie} zusammen \cite{typescript-oop}. Dies ermöglicht eine klarer strukturierte Codebasis und ist über ein objektorientiertes Modell ebenfalls einfacher mit dem Spring Boot Pendant zu vergleichen.
+
+\paragraph{Kompilieren der Sourcen}
+Ähnlich wie Java wird auch Typescript kompiliert, hierbei erfolgt die Kompilierung allerdings Javascript-Code. Die Konfiguration des Typescript-Compiler \emph{tsc} befindet sich in einer Datei namens \emph{tsconfig.json} (siehe Listing \ref{lst:tsconfig}).
+
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[style=javaStyle,caption={tsconfig.json},label=lst:tsconfig]
+  {
+  "compilerOptions": {
+
+    /* Basic Options */
+    "target": "es5",
+
+    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": ".",
+
+    /* Strict Type-Checking Options */
+    "strict": true,
+    "esModuleInterop": true,
+
+    /* Advanced Options */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
+
+\end{lstlisting}
+\end{minipage}
+
+Die wichtigesten Konfigurationsparameter im Überblick.
+
+\begin{itemize}
+  \item \emph{target}: Hierbei wird der Javascript-Standard angegeben in den die Typescript-Quellen übersetzt werden sollen
+  \item \emph{outdir}: Ausgabeverzeichnis in dem die übersetzten Javascript Dateien abgelegt werden sollen.
+  \item \emph{rootdir}: Root-Verzeichnis des Typescript-Projekts
+  \item \emph{strict}: Compilerflag hinsichtlich der Typisierung und sonstiger Javascript-Eigenheiten. Ersetzt die Notwendigkeit in jeder einzelnen Quellcodedatei einen "\emph{use strict}" Befehl angeben zu müssen um die Datei im ECMAScript strict mode zu parsen\footnote{für weiter Informationen siehe Dokumentation \cite[Kapitel~tsconfig]{typescript-doc}}.
+\end{itemize}
+
+
+Ähnlich wie bei einem Maven-Projekt eine \emph{pom.xml} Datei zum festhalten aller Projekt-Konfigurationseinstellungen verwendet wird, gibt es bei einem Typescript Projekt eine sogenannte \emph{package.json} erstellt (siehe Listing \ref{lst:package}\footnote{komplette Datei befindet sich im Anhang \ref{anh:package}}).
+
+
+\begin{lstlisting}[style=javaStyle,caption={Typescript - package.json},label=lst:package]
+  {
+  "name": "node-consumer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "author": "hoffmann",
+
+  ...
+
+  "dependencies": {
+    "@types/node": "^15.6.1",
+    "@types/pg": "^8.6.0",
+    "dotenv": "^10.0.0",
+    "fs": "^0.0.1-security",
+    "ini": "^2.0.0",
+    "libxmljs2": "^0.27.0",
+    "pg": "^8.6.0",
+    "stompit": "^1.0.0",
+    "typescript": "^4.3.2",
+    "xmldom": "^0.6.0",
+    "xpath": "^0.0.32"
+  },
+  "devDependencies": {
+    "@types/ini": "^1.3.30"
+  }
+}
+\end{lstlisting}
+
+In dem angebenen Dateiinhalt lassen sich vor allem Metainformationen des Projekts identifizieren (Projektname, Autor). Außerdem werden Abhängigkeiten des Projekts definiert. Hierbei werden die letztendlich genutzten Packges definiert. Diese sind standardmäßig Javascript Projekte. Da Typescript die Möglichkeit bietet über einen definierten \emph{any type} eine untypisierte Variante von Variablen etc. zu erstellen, können diese Bibliotheken ohne weitere Komplikationen genutzt werden. Um allerdings die Typisierungsfunktionen von Typescript sinnvoll nutzen zu können, müssen diese Informatione entweder als getrennte Abhängigkeit ebenfalls importiert werden (siehe Zeile 13 / 14) oder sie sind bereits in der importierten Bibliothek nativ enthalten. Diese Information kann über entsprechende Ausgaben des tsc Compilers ermittelt werden.
+
+\paragraph{Dockerbuild}
+Um ein Dockerimage für das Typescript-Projekt zu erstellen, wird auf folgendes Dockerfile zurückgegriffen \ref{lst:ts-dockerfile}.
+
+\begin{lstlisting}[style=bashStyle,caption={Dockerfile - Typescript Projekt},label=lst:ts-dockerfile]
+  # stage 1 building the code
+  FROM node:10.15.3 AS builder
+  WORKDIR /usr/app
+  COPY package*.json ./
+  RUN npm install
+  COPY . .
+  RUN npm run build 
+
+  # stage 2
+  FROM node:10.15.3-alpine
+  WORKDIR /usr/app
+  COPY package*.json ./
+  RUN npm install --production
+  COPY --from=builder /usr/app/dist ./dist
+  COPY --from=builder /usr/app/schema.sql .
+  COPY --from=builder /usr/app/specification.xsd .
+  CMD node dist/src/index.js
+\end{lstlisting}
+
+Dieses verhält sich relativ ähnlich zu dem der Spring-Boot-Projekte (siehe ref{} \todo{ref einbinden}). Es werden ausführbare Quellen erstellt die wiederum in einem zweiten Build-Schritt des multistage Buildverfahrens (siehe \ref{} \todo{ref einbinden}) verwendet werden. Der wesentliche Unterschied beim ersten Schritt ist der, dass hierbei nicht eine einzelne ausführbare Datei erstellt wird, sondern die entsprechenden Javascript Verzeichnisse generiert werden. Hierzu werden alle für den Build relevanten Typescript- und sonstige Quellen in einem Zwischenschritt in ein Containerimage kopiert. Anschließend erfolgt der Compileraufruf. Im zweiten Schritt werden lediglich die relevanten Quellen herüberkopiert und der Rest verworfen. 
+
 
 \subsection{Docker Swarm}
 Um den Stack zu starten wird auf verschiedene Skripte sowie Beschreibungsdateien zugegriffen. Im Folgenden wird erst die Beschreibung des Container-Netzwerks und anschließend der Build- und Start-Vorgang des Projekts beschrieben.
