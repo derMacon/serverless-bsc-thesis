@@ -3,7 +3,7 @@ Bachelorthesis 2021 - Silas Hoffmann
 
 
 LaTeX-Vorlage für Bachelor/Master-Thesis an der FH-Wedel
-(Betreuer Ulrich Hoffmann)
+(Betreuer Dennis Säring)
 
 PDF erzeugen:
 
