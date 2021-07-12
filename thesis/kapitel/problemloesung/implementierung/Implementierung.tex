@@ -485,7 +485,7 @@ Diese Komponente stellt sowohl die Funktionalität bereit Alerts vom Alert-Manag
 \end{lstlisting}
 
 
-\subsection{Docker-Scaler}
+\subsection{Docker-Scaler \checkmark}
 Dieses Open Source Projekt\footnote{\url{https://thomasjpfan.github.io/docker-scaler}} bietet eine Rest-Schnittstelle über die es möglich ist einen zugrunde liegenden Docker-Swarm zu skalieren. Die komplette Anfrage kann innerhalb einer einzigen POST-Anfrage abgeschickt werden. In diesem Projekt wurde hierfür der folgende Endpunkt verwendet.
 
 \begin{itemize}
@@ -590,18 +590,13 @@ Um ein Docker-Image zu erstellen, wurde bei diesem Projekt auf eine Beschreibung
 
 \paragraph{Anmerkung: Vorteile der Imageschichtung} Der wesentliche Vorteil durch die Schichtung der Images während des Buildprozesses ist der, dass es so einfacher möglich ist, Images zu cachen. Es müssen schließlich nur die Teile des Images neu gebaut werden, die sich tatsächlich geändert haben. Dazu wird die Schicht ermittelt, ab der eine erste Abweichung zum vorherigen Build festgestellt werden kann. Anschließend wird lediglich diese Schicht, sowie alle Schicht darüber neu gebaut. Die \emph{parent layer} werden allerdings weiterhin wiederverwendet. Beim Erstellen von Images sollte daher Wert darauf gelegt werden, den dynamischen Teil des Buildvorgangs möglichst weit an das Ende eines Dockerfiles zu legen, um den Caching-Mechanismus der Docker-Engine bestmöglich auszunutzen.
 
-
 \subsubsection{Node.js}
-\todo{Build Prozess erklären - Typescript Config etc., nochmal alle Komponenten durchgehen...}
-
-\todo{Falls es mit dem Platz knapp werden sollte nochmal die Build Skripte im Detail erklären}
 
 \paragraph{Überblick}
-Das Node.js-Projekt wurde mithilfe des npx "\emph{create-react-app}"-Starters initialisiert. Npx ist ein package runner für den node package manager (kurz npm). Npx ist dabei CLI-Werkzeug bei Installation von npm direkt integriert und dient zur Unterstützung zur Verwaltung von Abhängigkeiten. Im Bezug auf das Node.js Projekt ist es beispielsweise möglich hiermit ein Projekt zu bauen, das auf der Programmiersprache \emph{Typescript} basiert und nicht wie herkömmlich auf Javascript. Typescript stellt eine Erweiterung von Javascript dar, es ist also möglich Javascript-Code in einem Typescript-Projekt auszuführen. Es wurde sich für Typescript entschieden, da diese Sprache die vier wesentlichen Prinzipien objektorientierter Sprachen bereitstellt. Diese setzten sich aus der \emph{Kapselung von Code}, der \emph{Vererbung}, \emph{Abstraktion} und \emph{Polymorphie} zusammen \cite{typescript-oop}. Dies ermöglicht eine klarer strukturierte Codebasis und ist über ein objektorientiertes Modell ebenfalls einfacher mit dem Spring Boot Pendant zu vergleichen.
+Das Node.js-Projekt wurde mithilfe des npx "\emph{create-react-app}"-Starters initialisiert. Npx ist ein package runner für den node package manager (kurz npm). Npx stellt dabei ein CLI-Werkzeug bereit, welche bei Installation von npm direkt mit ausgeliefert wird und dient zur Unterstützung zur Verwaltung von Abhängigkeiten. Im Bezug auf das Node.js-Projekt ist es beispielsweise möglich hiermit ein Projekt zu initialisieren, das auf der Programmiersprache \emph{Typescript} basiert und nicht wie herkömmlich, auf Javascript. Typescript stellt eine Erweiterung von Javascript dar, es ist demnach möglich Javascript-Code in einem Typescript-Projekt auszuführen. Es wurde sich für Typescript entschieden, da diese Sprache die vier wesentlichen Prinzipien objektorientierter Sprachen bereitstellt. Diese setzten sich aus der \emph{Kapselung von Code}, der \emph{Vererbung}, \emph{Abstraktion} und \emph{Polymorphie} zusammen \cite{typescript-oop}. Dies ermöglicht eine klarer strukturierte Codebasis und ist über ein objektorientiertes Modell ebenfalls einfacher mit dem Spring Boot Pendant zu vergleichen.
 
 \paragraph{Kompilieren der Sourcen}
-Ähnlich wie Java wird auch Typescript kompiliert, hierbei erfolgt die Kompilierung allerdings Javascript-Code. Die Konfiguration des Typescript-Compiler \emph{tsc} befindet sich in einer Datei namens \emph{tsconfig.json} (siehe Listing \ref{lst:tsconfig}).
-
+Ähnlich wie Java wird auch ein Typescript-Projekt kompiliert, hierbei erfolgt die Kompilierung allerdings in Javascript-Code. Die Konfiguration des Typescript-Compiler \emph{tsc} befindet sich in einer Datei namens \emph{tsconfig.json} (siehe Listing \ref{lst:tsconfig}).
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[style=javaStyle,caption={tsconfig.json},label=lst:tsconfig]
@@ -632,14 +627,13 @@ Das Node.js-Projekt wurde mithilfe des npx "\emph{create-react-app}"-Starters in
 Die wichtigesten Konfigurationsparameter im Überblick.
 
 \begin{itemize}
-  \item \emph{target}: Hierbei wird der Javascript-Standard angegeben in den die Typescript-Quellen übersetzt werden sollen
-  \item \emph{outdir}: Ausgabeverzeichnis in dem die übersetzten Javascript Dateien abgelegt werden sollen.
-  \item \emph{rootdir}: Root-Verzeichnis des Typescript-Projekts
-  \item \emph{strict}: Compilerflag hinsichtlich der Typisierung und sonstiger Javascript-Eigenheiten. Ersetzt die Notwendigkeit in jeder einzelnen Quellcodedatei einen "\emph{use strict}" Befehl angeben zu müssen um die Datei im ECMAScript strict mode zu parsen\footnote{für weiter Informationen siehe Dokumentation \cite[Kapitel~tsconfig]{typescript-doc}}.
+  \item \emph{target}: Hierbei wird der Javascript-Standard angegeben, in den die Typescript-Quellen übersetzt werden sollen.
+  \item \emph{outdir}: Ausgabeverzeichnis in dem die übersetzten Javascript-Dateien abgelegt werden sollen.
+  \item \emph{rootdir}: Root-Verzeichnis des Typescript-Projekts.
+  \item \emph{strict}: Compilerflag hinsichtlich der Typisierung und sonstiger Javascript-Eigenheiten. Ersetzt die Notwendigkeit, in jeder einzelnen Quellcodedatei einen "\emph{use strict}" Befehl angeben zu müssen, um die Datei im ECMAScript \emph{strict mode} zu parsen\footnote{für weiter Informationen siehe Dokumentation \cite[Kapitel~tsconfig]{typescript-doc}}.
 \end{itemize}
 
-
-Ähnlich wie bei einem Maven-Projekt eine \emph{pom.xml} Datei zum festhalten aller Projekt-Konfigurationseinstellungen verwendet wird, gibt es bei einem Typescript Projekt eine sogenannte \emph{package.json} erstellt (siehe Listing \ref{lst:package}\footnote{komplette Datei befindet sich im Anhang \ref{anh:package}}).
+Ähnlich wie bei einem Maven-Projekt eine \emph{pom.xml} Datei verwendet wird, um die Projekt-Konfigurationseinstellungen festzuhalten, wird bei einem Typescript-Projekt eine sogenannte \emph{package.json} erstellt (siehe Listing \ref{lst:package}\footnote{komplette Datei befindet sich im Anhang \ref{anh:package}}).
 
 
 \begin{lstlisting}[style=javaStyle,caption={Typescript - package.json},label=lst:package]
@@ -673,7 +667,7 @@ Die wichtigesten Konfigurationsparameter im Überblick.
 }
 \end{lstlisting}
 
-In dem angebenen Dateiinhalt lassen sich vor allem Metainformationen des Projekts identifizieren (Projektname, Autor). Außerdem werden Abhängigkeiten des Projekts definiert. Hierbei werden die letztendlich genutzten Packges definiert. Diese sind standardmäßig Javascript Projekte. Da Typescript die Möglichkeit bietet über einen definierten \emph{any type} eine untypisierte Variante von Variablen etc. zu erstellen, können diese Bibliotheken ohne weitere Komplikationen genutzt werden. Um allerdings die Typisierungsfunktionen von Typescript sinnvoll nutzen zu können, müssen diese Informatione entweder als getrennte Abhängigkeit ebenfalls importiert werden (siehe Zeile 13 / 14) oder sie sind bereits in der importierten Bibliothek nativ enthalten. Diese Information kann über entsprechende Ausgaben des tsc Compilers ermittelt werden.
+In dem angegebenen Dateiinhalt lassen sich vor allem Metainformationen des Projekts identifizieren (Projektname, Autor). Außerdem werden Projekt-Abhängigkeiten definiert, wobei die letztendlich genutzten Packages mit den entsprechenden Versionsnummern in einem dedizierten Format aufgezählt werden. Diese sind standardmäßig Javascript Projekte. Da Typescript dennoch die Möglichkeit bietet, über einen definierten \emph{any type} eine untypisierte Variante von Variablen etc. zu erstellen, können diese Bibliotheken ohne weitere Konfiguration genutzt werden. Um allerdings die Typisierungsfunktionen von Typescript sinnvoll nutzen zu können, müssen diese Informationen entweder als getrennte Abhängigkeit getrennt importiert werden (siehe Zeile 13 / 14) oder sie sind bereits in der importierten Bibliothek enthalten und können nativ genutzt werden. Zur Überprüfung kann die Ausgaben des TSC-Compilers zurate gezogen werden.
 
 \paragraph{Dockerbuild}
 Um ein Dockerimage für das Typescript-Projekt zu erstellen, wird auf folgendes Dockerfile zurückgegriffen \ref{lst:ts-dockerfile}.
@@ -698,22 +692,21 @@ Um ein Dockerimage für das Typescript-Projekt zu erstellen, wird auf folgendes 
   CMD node dist/src/index.js
 \end{lstlisting}
 
-Dieses verhält sich relativ ähnlich zu dem der Spring-Boot-Projekte (siehe ref{} \todo{ref einbinden}). Es werden ausführbare Quellen erstellt die wiederum in einem zweiten Build-Schritt des multistage Buildverfahrens (siehe \ref{} \todo{ref einbinden}) verwendet werden. Der wesentliche Unterschied beim ersten Schritt ist der, dass hierbei nicht eine einzelne ausführbare Datei erstellt wird, sondern die entsprechenden Javascript Verzeichnisse generiert werden. Hierzu werden alle für den Build relevanten Typescript- und sonstige Quellen in einem Zwischenschritt in ein Containerimage kopiert. Anschließend erfolgt der Compileraufruf. Im zweiten Schritt werden lediglich die relevanten Quellen herüberkopiert und der Rest verworfen. 
+Dieses verhält sich relativ ähnlich zu dem der Spring-Boot-Projekte (siehe ref{} \todo{ref einbinden}). Es werden ausführbare Quellen erstellt, die wiederum in einem zweiten Build-Schritt des multistage Buildverfahrens (siehe \ref{} \todo{ref einbinden}) verwendet werden. Der wesentliche Unterschied beim ersten Schritt ist der, dass hierbei nicht eine einzelne ausführbare Datei erstellt wird, sondern die entsprechenden Javascript-Verzeichnisse generiert werden. Hierzu werden alle für den Build relevanten Typescript- und sonstige Quellen in einem Zwischenschritt in einem Containerimage abgelegt. Anschließend erfolgt der Compileraufruf. Im zweiten Schritt werden lediglich die relevanten Quellen herüberkopiert und der Rest verworfen. 
 
 
-\subsection{Docker Swarm}
-Um den Stack zu starten wird auf verschiedene Skripte sowie Beschreibungsdateien zugegriffen. Im Folgenden wird erst die Beschreibung des Container-Netzwerks und anschließend der Build- und Start-Vorgang des Projekts beschrieben.
+\subsection{Docker Swarm \checkmark}
+Um den Stack zu starten, wird auf verschiedene Skripte sowie Beschreibungsdateien zugegriffen. Im Folgenden wird erst die Beschreibung des Container-Netzwerks und anschließend der Build- sowie Start-Vorgang des Projekts beschrieben.
 
 \subsubsection{Docker-Compose}
 \paragraph{Einleitung}
-Es ist möglich ein Netzwerk von Containern manuell über das CLI der Docker-Engine zu starten, hierbei können Mounts bestimmter Verzeichnisse angelegt, Kommunikations-Netzwerke definiert und Port freigegeben werden. Mithilfe von Shell-Skripten wäre es möglich diese Schritte zu automatisieren. Dieses Vorgehen erscheint aber schon bei kleineren Projekten sehr impraktikabel und unübersichtlich, hierbei wird daher auf Werkzeuge wie zum Beispiel \emph{Docker-Compose}\footnote{\url{https://github.com/docker/compose}} zurückgegriffen. Dieses Werkzeug bietet die Möglichkeit über ein Beschreibungssprache einen Stack zu definieren in dem sämtliche Abhängigkeiten bereits aufgelöst werden können. 
+Es ist möglich, ein Netzwerk von Containern manuell über das CLI der Docker-Engine zu starten, hierbei können Mounts bestimmter Verzeichnisse angelegt, Kommunikations-Netzwerke definiert und Ports freigegeben werden. Mithilfe von Shell-Skripten wäre es möglich, diese Schritte zu automatisieren. Dieses Vorgehen erscheint aber schon bei kleineren Projekten sehr impraktikabel und unübersichtlich, hierbei wird daher auf Werkzeuge wie zum Beispiel \emph{Docker-Compose}\footnote{\url{https://github.com/docker/compose}} zurückgegriffen. Dieses Tool bietet die Möglichkeit über eine Beschreibungssprache einen Stack zu definieren, in dem sämtliche Abhängigkeiten bereits aufgelöst werden können. 
 
 \paragraph{Container Networking}
-Container werden hierbei in Clustern organisiert die es ermöglichen mithilfe des \emph{Docker-Link} Mechanismus die Container über ein definiertes Netzwerk miteinander in Verbindung treten zu lassen. "\emph{The Docker server acts as a virtual bridge and the containers are clients behind it}" \cite[Seite~13]{oreilly-docker}. Jeder Container besitzt ein eigenes virutelles Ethernet Interface, das eine eigene IP-Adresse allokiert und mit der beschriebenen Docker-Bridge verbunden ist. "\emph{Docker lets you bind ports on the host to the container so that the outside world can reach your container}". Hierbei wird ein lokales Netzwerk allokiert über das alle Container direkt miteinander kommunizieren können.
+Container werden hierbei in Clustern organisiert die es ermöglichen mithilfe des \emph{Docker-Link}-Mechanismus die Container über ein definiertes Netzwerk miteinander in Verbindung treten zu lassen. "\emph{The Docker server acts as a virtual bridge and the containers are clients behind it}" \cite[Seite~13]{oreilly-docker}. Jeder Container besitzt ein eigenes virutelles Ethernet Interface, das eine eigene IP-Adresse allokiert und mit der beschriebenen Docker-Bridge verbunden ist. "\emph{Docker lets you bind ports on the host to the container so that the outside world can reach your container}". Hierbei wird ein lokales Netzwerk allokiert über das alle Container direkt miteinander kommunizieren können.
 
 \paragraph{Stack-Konfiguration}
 Um beim Beispiel des \emph{Suppliers} zu bleiben folgt eine kurze Zusammenfassung der Stack-Konfiguration für den Spring-Supplier-Container. Die gesamte Docker-Compose Konfigurationsdatei befindet sich ebenfalls im Anhang (siehe Listing \ref{lst:dockerCompose}).
-
 
 \begin{lstlisting}[style=bashStyle,caption={Docker Compose - Ausschnitt Supplier Definition},label=lst:dockerCompose]
 
@@ -743,14 +736,13 @@ Um beim Beispiel des \emph{Suppliers} zu bleiben folgt eine kurze Zusammenfassun
   ...
 
 \end{lstlisting}
-
-Die Konfigurationsdatei wurde im yaml Dateiformat erfasst, wobei es hier eine Key-Value Verbindung zwischen dem Namen eines zu setzenden Konfigurationsparameters und dem definierten Wert gibt.
+Die Konfigurationsdatei wurde im yaml Dateiformat erfasst, wobei es hier ein Key-Value Mapping zwischen dem Namen eines zu setzenden Konfigurationsparameters und dem definierten Wert gibt.
 
 \begin{itemize}
-  \item \emph{image}: über diesen Schlüsselwert wird der Name des zugrunde liegenden Images für den zu erstellenden Container gesetzt
-  \item \emph{build}: gibt an in welchem Verzeichnis die Quelltextdateien liegen. Über das CLI des compose Werkzeugs ist es möglich nicht auf das vorhandene Image bei Containererstellung zurückzugreifen, sondern das Image neu zu bauen. Hierbei wird auf diesen Konfigurationsparameter zurückgegriffen.
-  \item \emph{networks}: es wird ein Netzwerk referenziert in dem dieser Container agieren soll. Alle Container mit denen er in kommuniziert werden den gleichen Konfigurationsparameter gesetzt haben. 
-  \item \emph{environment}: hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen. Hierbei ist es irrelevant ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13), für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
+  \item \emph{image}: über diesen Schlüsselwert wird der Name des zugrunde liegenden Images für den zu erstellenden Container gesetzt.
+  \item \emph{build}: gibt an, in welchem Verzeichnis die Quelltextdateien liegen. Über das CLI des compose-Werkzeugs ist es möglich, nicht auf das vorhandene Image bei Containererstellung zurückzugreifen, sondern das Image neu zu bauen. Hierbei wird auf diesen Konfigurationsparameter zurückgegriffen.
+  \item \emph{networks}: es wird ein Netzwerk referenziert, in dem dieser Container agieren soll. Alle Container, mit denen er in kommuniziert werden den gleichen Konfigurationsparameter gesetzt haben. 
+  \item \emph{environment}: hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen, es ist irrelevant, ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13), für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
 \end{itemize}
 
 Neben den wesentlichen beschriebenen Konfigurationsparameter gilt es noch die \emph{volume} Definition (siehe Listing \ref{lst:composeVolumes}) zu erwähnen. 
@@ -770,19 +762,17 @@ Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts z
 	\label{fig:dockerImage}
 \end{figure}
 
-Daten, die über Volumes persistiert werden sind vom Betriebssystem des Hosts komplett unabhängig. Die Daten können dabei entweder in dem \emph{writeable layer} des Containers selbst gespeichert werden\footnote{Erinnerung: Alle Schichten des Images werden als \emph{read-only} Systeme deployed, erst während der Initialierungsphase des Containers wird eine weitere Schicht hinzugefügt, die während der Containerlaufzeit bearbeitet werden kann.}. Diese Daten werden allerdings verworfen, sobald der Container gelöscht wird. Um Daten auch weiterhin zu behalten und in neue Container-Instanzen laden zu können wird hierbei auf Volumes zurückgegriffen. Es gibt zwei Varianten von Volumes \cite[Kapitel~/storage/volumes]{docker-doc}: 
+Daten, die über Volumes persistiert werden sind vom Betriebssystem des Hosts komplett unabhängig. Die Daten können dabei entweder in dem \emph{writeable layer} des Containers selbst gespeichert werden\footnote{Erinnerung: Alle Schichten des Images werden als \emph{read-only} Systeme deployed, erst während der Initialisierungsphase des Containers wird eine weitere Schicht hinzugefügt, die während der Containerlaufzeit bearbeitet werden kann.}. Diese Daten werden allerdings verworfen, sobald der Container gelöscht wird. Um Daten auch weiterhin zu behalten und in neue Container-Instanzen laden zu können, wird hierbei auf Volumes zurückgegriffen. Es gibt zwei Varianten von Volumes \cite[Kapitel~/storage/volumes]{docker-doc}: 
 
 \begin{enumerate}
   \item \emph{Named volumes}: have a specific source from outside the container, for example \verb+awesome:/bar+.
   \item \emph{Anonymous volumes}: have no specific source so when the container is deleted, instruct the Docker Engine daemon to remove them.
 \end{enumerate}
 
-Im Projekt wurde auf anonymous volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes}). Diese werden direkt vom Docker-Daeomon verwaltet wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit auf sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, das auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
-
+Im Projekt wurde auf anonyme Volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes}). Diese werden direkt vom Docker-Daeomon verwaltet, wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit auf sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, welches auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
 
 \paragraph{Docker Swarm} 
-Mit diesem Werkzeug ist es möglich den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform}}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Hierbei können mehrere Maschinen derartig agieren, dass es für den Anwender so aussieht, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren ohne, dass die restlichen Stack-Komopnenten hiervon beeinflusst werden. Um dies nutzen zu können muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm Werkzeug allerdings nur teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das setzen von Umgebungsvariablen mithilfe definierter Umgebungsvariablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben Daten mithilfe von Umgebungsvariablen zu setzen, die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich diverser Anmeldedaten, zum Beispiel bei Datenbanken etc. katastrophal. Um dennoch in der Lage zu sein bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit das Docker-Compose Werkzeug selbst als Präprozessor zu verwenden. Hierbei gibt es die Möglichkeit das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umzuwandeln und die Umgebungsvariablen direkt mit den im System hinterlegten Werten auszuwechseln. Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein swarm auf der Hostmaschine initialisiert werden und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert (siehe Auszug \ref{summary-start-stack-services}, komplettes Skript im Anhang unter \ref{start-stack-services}).
-
+Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform}}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Dabei können mehrere Maschinen derartig agieren, dass es für den Anwender den Anschein erweckt, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das Skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren ohne, dass die restlichen Stack-Komopnenten hiervon beeinflusst werden. Um dies nutzen zu können muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm-Werkzeug allerdings lediglich teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das Setzen von Umgebungsvariablen mithilfe definierter Variablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben Umgebungsvariablen zu über Variablen des Buildsystems zu definieren, die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich sensitiver Daten, zum Beispiel bei Anmeldedaten für Datenbanken etc. katastrophal. Um dennoch in der Lage zu sein bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit das Docker-Compose-Werkzeug selbst als Präprozessor zu verwenden. Dabei wird das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umgewandelt und die Umgebungsvariablen direkt mit den im System hinterlegten Werten ausgewechselt. Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein Swarm auf der Hostmaschine initialisiert, und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert (siehe Auszug \ref{summary-start-stack-services}, komplettes Skript im Anhang unter \ref{start-stack-services}).
 
 \begin{lstlisting}[style=bashStyle,caption={start-stack-services.sh},label=lst:summary-start-stack-services]
 
@@ -824,12 +814,11 @@ Mit diesem Werkzeug ist es möglich den definierten Komponentenstack in einer sk
 \end{lstlisting}
 % \end{landscape}
 
-
 \section{Implementierung Lasttest}
-Nachdem im letzten Abschnitt auf die Konfiguration des Stacks eingegangen wurde, wird im Folgenden darauf eingegangen welche Szenarien für die Messdatenerhebung durchgeführt wurden und unter welchen Bedingungen das System diese bearbeitet hat.
+Nachdem im letzten Abschnitt auf die Konfiguration des Stacks eingegangen wurde, wird im Folgenden erklärt, welche Szenarien für die Messdatenerhebung durchgeführt wurden und unter welchen Bedingungen das System diese bearbeitet hat.
 
 \subsection{Testszenarien}
-Für die Erhebung der Messdaten wurde auf die in \ref{} \todo{Ref einbinden} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese nach und nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit kleineren weniger Nachrichten in das System eingepflegt wurde, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueue} zeigt die Daten des Message Brokers. 
+Für die Erhebung der Messdaten wurde auf die in \ref{} \todo{Ref einbinden} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese der Riehe nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit weniger Nachrichten in das System eingepflegt wurde, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueue} zeigt die Daten des Message Brokers. 
 
 \begin{figure}[ht!]
 	\centering
@@ -838,9 +827,9 @@ Für die Erhebung der Messdaten wurde auf die in \ref{} \todo{Ref einbinden} bes
 	\label{fig:benchmarkQueues}
 \end{figure}
 
-Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bearbeitet. Dies ist daran zu erkennen, dass die \emph{persistencequeue} entsprechend viele Einträge verwaltet hat. Die Hälfte ging wurde jeweils von der Node.js- sowie Spring-Boot-Komponente bearbeitet (siehe \emph{nodequeue} sowie \emph{springqueue}). Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu \ref{ss:bash}).
+Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bearbeitet. Dies ist daran zu erkennen, dass die \emph{persistencequeue} entsprechend viele Einträge verwaltet hat. Die Hälfte wurde jeweils von der Node.js- sowie Spring-Boot-Komponente bearbeitet (siehe \emph{nodequeue} sowie \emph{springqueue}). Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu \ref{ss:bash}).
 
-Das zweite Testszenario betrifft die direkt Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash}). Hierbei wurde der Aufruf mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insegesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
+Das zweite Testszenario betrifft die direkt Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash}). Der Aufrufd wurde mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insgesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
 
 \subsection{Testbedingungen}
 % \begin{itemize}
@@ -876,7 +865,3 @@ Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folge
     \bottomrule
   \end{tabular}
 \end{table}
-
-
-\subsection{Zusammenfassung}
-\todo{schreiben}
