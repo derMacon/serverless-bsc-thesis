@@ -1,4 +1,4 @@
-\chapter{Ergebnisanalyse \checkmark}
+\chapter{Ergebnisanalyse}
 \label{ch:ergebnisanalyse}
 
 \todo{Verweis auf Anhang mit allen Tabellen für Metrikinformationen, wird im Intro erwähnt}
@@ -31,7 +31,7 @@ Nachdem die Implementierung des Komponentenstacks im letzten Abschnitt detaillie
 
 \todo{Messwerte im Anhang noch einmal gesammelt darstellen}
 
-\section{Ergebnisse \checkmark}
+\section{Ergebnisse}
 
 % \begin{itemize}
 %   \item Vorstellung der erhaltenen Daten
@@ -42,7 +42,7 @@ Nachdem die Implementierung des Komponentenstacks im letzten Abschnitt detaillie
 Für die Messung der folgenden Ergebnisse wurden in erster Linie zwei Lastentests durchgeführt. Der Erste bezog sich auf eine Skalierung als Reaktion auf Payment-Nachrichten, die vom System empfangen wurden. Die zweite Messung erfolgte zu direkt veranlassten Skalierungsschritten über eine gesonderte Schnittstelle vom Skalierer-Proxy-Service, die komplett auf eingehende Payment-Nachrichten verzichtet, dadurch allerdings auch das beschriebene Stufenmodell außer Kraft setzt\footnote{siehe Abschnitt \ref{}} \todo{Referenz in Footnote einbinden}. Diese zweite Messung ermöglichte erst die genaue Übersicht über die Containeranzahl im Bezug zur Skalierungszeit (siehe Abbildung \ref{fig:specContainers}).
 
 
-\subsection{Latenzzeit \checkmark}
+\subsection{Latenzzeit}
 Die wichtigsten Messdaten bezüglich der Leistungsfähigkeit des Systems beziehen sich auf den Datendurchsatz beziehungsweise die entsprechende Latenzzeit. In der Tabelle \ref{tab:latency} wurden diese für die beiden betrachteten Backendtechnologien gegenübergestellt. Alle Angaben wurden in Millisekunden erfasst. Das System benötigt zur Bearbeitung einer eingegangenen Nachricht durch einen Node.js Konsumenten im Schnitt 38.4 Sekunden, während sich dieser Wert bei Spring Boot auf 61.8 Sekunden beläuft. Diese Werte bilden lediglich einen Durchschnitt aller erhaltenen Metriken ab, eine genauere Aufteilung bezüglich des Zusammenhangs zu den Skalierungsgrößen erfolgt im nächsten Abschnitt (siehe \todo{Ref einfuegen}). Der Gesamtdurchschnitt setzt sich aus zwei Zeitangaben der Pipeline zusammen: 
 
 \begin{enumerate}
@@ -50,11 +50,11 @@ Die wichtigsten Messdaten bezüglich der Leistungsfähigkeit des Systems beziehe
   \item Verarbeitungsdauer: Diese Metrik beschreibt den Zeitraum zwischen Acknowledgement durch den Konsumer, dass die Nachricht erhalten wurde, sowie dem Abspeichern des extrahierten Wertes durch den Konsumenten in der Datenbank. Dieser Werte beläuft sich bei beiden Implementierungen auf etwas über drei Sekunden. Bei dieser Metrik liegt der Fokus allerdings auf dem minimalen Zeitunterschied im Millisekundenbereich, da in beiden Implementierungen eine künstliche Verlangsamung (\emph{Sleep-Funktion}) eingebaut wurde um die erhaltenen Messwerte besser nachvollziehen zu können. Bei Node.js liegt die tatsächliche Verarbeitungsdauer bei 388 Millisekunden \emph{(total 3388)}, während sie bei Spring Boot bei 29 Millisekunden liegt \emph{(total 3029)}.
 \end{enumerate}
 
-\subsection{Skalierungsdauer \checkmark}
+\subsection{Skalierungsdauer}
 Diese Gruppe von Metriken bezieht sich auf die genauen Zeiträume, die benötigt werden, um einen Container mit der entsprechenden Implementierung hochzufahren. Die ermittelten Zeiten stellen im Folgenden die durchschnittlichen Initialisierungszeiten eines einzelnen Containers dar. Sie beziehen sich nicht auf die Gesamtdauer der Initialisierungsphase aller beteiligten Container.
 
 
-\paragraph{Aufschlüsselung nach Services \checkmark}
+\paragraph{Aufschlüsselung nach Services}
 Die abstrakteste Metrik bezieht sich auf den durchschnittlichen Zeitraum zum Initialisieren der Container eines bestimmten Services. Hierbei wird zwischen der Node.js sowie Spring-Boot-Komponente zum Konsumieren der Eingangsnachrichten unterschieden. Die Container, welche eine Node.js-Instanz beinhalten, benötigen im Schnitt 6.6 Sekunden zum Hochfahren, während diejenigen mit einer Spring-Instanz 35.3 Sekunden benötigen. Diese verhältnismäßig großen Zeiträume lassen sich unter anderem auf die Anzahl der hochgefahrenen Instanzen zurückführen. Eine genauere Aufschlüsselung dieses Prozesses erfolgt in den nächsten Abschnitten.
 
 \begin{figure}
@@ -126,13 +126,13 @@ Die abstrakteste Metrik bezieht sich auf den durchschnittlichen Zeitraum zum Ini
 	\end{minipage}
 \end{figure}
 
-\paragraph{Aufschlüsselung nach Skalierungsstufe \checkmark}
+\paragraph{Aufschlüsselung nach Skalierungsstufe}
 Um einen beispielhaften Skalierungsalgorithmus zu implementieren, wurde ein Regelsatz verfasst, der vom Alert-Manager zur Laufzeit automatisch in einem festgelegten Intervall ausgewertet wird. Um diesen Regelsatz zu Vorführungszwecken nicht unnötig ausführlich zu gestalten, wurde das Hinzufügen neuer Instanzen in Stufen organisiert. 
 
 Im durchgeführten Testszenario betrug die Grenze zum Überschreiten der ersten Stufe eine Anzahl von 15, für die zweite Stufe 30 und für die dritte Stufe 100 unbeantwortete Nachrichten in der jeweiligen Warteschlange. Wenn im Folgenden von einem "\emph{Burst}" gesprochen wird, ist hiermit das Überschreiten einer dieser Grenzen gemeint. Bei dem kleinstmöglichen Burst bezüglich der Warteschlange der Node.js-Komponente, nimmt das System im Schnitt 2.9 Sekunden zum Starten der Container in Anspruch um der Arbeitslast nach Skalierung mit insgesamt neuen 5 Containern-Instanzen zu begegnen. Bei der Spring-Boot-Komponente wurde hierfür ein Wert von 8.1 Sekunden gemessen. Im mittleren Grenzintervall wurde bezüglich Node.js eine Initialisierungsdauer von 3.8 Sekunden und aufseiten von Spring 16.0 Sekunden festgestellt um nach der Skalierung mit 10 Instanzen zu arbeiten. Beim höchsten Burst kam es bei der Node.js-Komponente zu einer Initialisierungsphase von 6.9 Sekunden und bezüglich Spring zu 36.6 Sekunden. Hierbei sollen am Ende 30 Containerinstanzen des Konsumenten einsatzbereit sein. Da beim Skalierungsalgorithmus mit den beschriebenen Stufen gearbeitet wird, kann hierbei nicht genau gesagt werden, wie viele Container tatsächlich im Endeffekt initialisiert wurden, da stets mit den Differenzen zwischen den Stufen gearbeitet wird. Wenn zum Beispiel bereits \emph{n} Container laufen und neue Nachrichten einen Burst verursachen, sollen nur die benötigten Instanzen kreiert werden, um genau die fehlende Anzahl zu decken. Die genaue Übersicht nach parallelen Instanziierungen wurde im Paragraphen (siehe Abschnitt \ref{par:specContainer} \todo{ref pruefen}) genauer beschrieben.
 
 
-\paragraph{Aufschlüsselung nach Containeranzahl \checkmark}
+\paragraph{Aufschlüsselung nach Containeranzahl}
 \label{par:specContainer}
 Die detaillierteste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gleichzeitig hochfahrender Container (siehe \ref{fig:specContainers}). Wie im Graphen erkennbar, handelt es sich um ein lineares Wachstum. Mit jedem zusätzlichen zeitgleich erstellten Container, dauert der Initialisierungsprozess bei der Spring-Implementierung im Schnitt 1611 Millisekunden länger. Bei der Node.js Implementierung liegt dieser Wert bei 194 Millisekunden. So dauert das Initialisieren eines einzelnen neuen Containers bei der Spring-Boot-Komponente 4,8 Sekunden während sich dieser Wert bei der Node.js-Koponente lediglich 2,6 Sekunden beläuft. Um diese nach Containeranzahl aufgeschlüsselten Werte zu erhalten, wurde nicht wie bei den anderen Skalierungstests auf die öffentliche Schnittstelle mittels Nachrichtengenerierung zurückgegriffen, es wurde stattdessen eine interne Schnittstelle mittels dediziertem Skript verwendet um möglichst störungsfreien Zugriff auf die orchestrierende Komponente des Stacks zu erlangen. Die nachfolgenden Metriken wurden allerdings durch die öffentliche Schnittstelle generiert.
 
@@ -152,7 +152,7 @@ Die detaillierteste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gl
 \end{wrapfigure}
 
 
-\paragraph{Zeitliche Aufschlüsselung \checkmark}
+\paragraph{Zeitliche Aufschlüsselung}
 Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurde diverse Panels zur zeitlichen Übersicht bereitgestellt. Diese wurden jedoch vor allem zu Kontrollzwecken implementiert. Diese visuelle Darstellung stellte sich während der Entwicklungszeit als sehr hilfreich dar, um Fehler frühzeitig zu erkennen und beheben zu können. Für die Auswertung der Ergebnisse haben diese allerdings wenig Relevanz. Der Vollständigkeit halber soll an dieser Stelle dennoch eine kurze Zusammenfassung der zeitbasierten Messwerte erfolgen. Für alle bisher behandelten Metriken gibt es Panels im Grafana Dashboard. Da die zeitliche Erfassung in Grafana selbst allerdings intervallbasierte Abfragen stellt, sind diese im Vergleich zu den Werten, welche in der Datenbank durch das System generiert und abgelegt wurden, sehr ungenau. Selbstverständlich wurde in der bisherigen Analyse ausschließlich auf die persistierten Daten zurückgegriffen. Bezüglich der Konsumenten wurde neben dem zusammengefassten durchschnittlichen Startverhalten auch der jeweils aktuelle Initialisierungszeitpunkt dargestellt. Hierbei war eine klare Korrelation zwischen der Anzahl der parallel startenden Konsumenten mit der erhöhten Initialisierungsdauer zu beobachten. Außerdem wurden diverse Metriken aus dem Activemq-Broker selbst ausgelesen. So ist es zum Beispiel möglich nachzuvollziehen, wie viele Nachrichten sich zu einem gegebenen Zeitpunkt nicht nur in einer bestimmten Warteschlange sondern auch innerhalb des ganzen Systems befinden. Außerdem wurde die zeitliche Abfolge zwischen einem Burst an unbeantworteten Nachrichten und dem Anstieg der Containerinstanzen in einem Dashboard-Panel dargestellt.
 
 \begin{figure}[ht!]
@@ -163,19 +163,19 @@ Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurde diverse Panels zur zei
 \end{figure}
 
 
-\section{Analyse \checkmark}
+\section{Analyse}
 
 % \begin{itemize}
 %   \item Interpretation / Analyse der Daten
 %   \item Begruendung fuer Verhalten suchen
 % \end{itemize}
 
-\subsection{Latenzzeit \checkmark}
+\subsection{Latenzzeit}
 Hinsichtlich der Latenzzeit überrascht vor allem die deutliche Diskrepanz zwischen der Initialisierungsdauer der unterschiedlichen Technologien. Durch die Unterteilung der Pipeline in die zwei Messwerte ist erkennbar, dass diese auf die zeitliche Dauer bis zum Nachrichteneingang zurückzuführen ist. Hierbei läuft die Dauer der Initialisierungsphasen weit auseinander (siehe Abschnitt \ref{ss:skalierungsdauer}).
 
 Bezüglich der Verarbeitungsgeschwindigkeit ist die Spring-Boot-Komponente jedoch im Vergleich schneller. Dies ist auf die Natur einer kompilierten Sprache zurückzuführen. Java Code wird im Vorwege in entsprechenden Bytecode übersetzt. Dieser Bytecode kann von der JVM interpretiert werden. Um die Performance zu steigern werden mithilfe des JIT-Compilers einzelne Methoden zur Laufzeit in Maschinencode umgewandelt, die direkt auf dem Prozessor ausgeführt werden können. Eine Skriptsprache wie Javascript stellt diese Performancevorteile nicht zur Verfügung wobei der Javascript-Code innerhalb der Node.js-Komponente zur Laufzeit direkt interpretiert wird\todo{nochmal checken ob Teil mit JIT Compiler korrekt}. Da in den betrachteten Komponenten nur minimale Logik verbaut wurde, ist der festgestellte zeitliche Unterschied in der Bearbeitungsdauer mit 359  Millisekunden zwar nicht derartig gravierend wie der Unterschied hinsichtlich der Initialisierungsphase der Container, allerdings lässt sich dadurch auch erkennen, dass die Spring Komponente durchschnittliche 13 mal schneller arbeitet als die Node.js Komponente. In Anbetracht der Komplexität der realen Banking-Anwendung gilt es ein spezifisches Konzept für das Regelwerk zum Starten der Container zu entwerfen. Hierbei muss eine Untersuchung bezüglich der Rentabilität eines neuen startenden Containers gegenüber eines laufenden Containers evaluiert werden. Diese Untersuchung kann sich aus mehreren Aspekten zusammensetzen. Dabei könnte zum Beispiel betrachtet werden, wie viele Nachrichten eine bereits einsatzfähige Komponente verarbeiten kann, bevor eine neu initialisierte Komponente bereit ist Nachrichten entgegenzunehmen. Ebenfalls ist die Wahrscheinlichkeit, dass eine bereits laufende Komponente während der Bearbeitung abstürzt geringer, als die einer neu startenden Komponente (fehleranfälliger Verbindungsaufbau). Diese Wahrscheinlichkeit sowie der beschriebenen Initialisierungsoverhead müssen bei der Ermittlung der idealen Threshholds zur Skalierung des Systems betrachtet werden.
 
-\subsection{Skalierungsdauer \checkmark}
+\subsection{Skalierungsdauer}
 \label{ss:skalierungsdauer}
 Besonders auffällig ist, dass bei beiden Technologien das Initialisieren einzelner Container deutlich schneller abläuft, als wenn mehrere Container gleichzeitig hochfahren oder eine gewisse Anzahl an Container bereits laufen. Dies lässt sich auf die geteilten Resourcen der Container zurückführen. In der Cloud wird hinsichtlich parallel arbeitender Container auch von "\emph{noisy neighbors}" gesprochen \cite[Seite~67 ff.]{oreilly-docker}. Dieses Konzept beschreibt ein generelles Problem bezüglich Cloud-Systemen. Im Gegensatz zu traditionellen virtuellen Maschinen ist es bei Docker-Containern nicht möglich, den verfügbaren Speicher sowie CPU-Zeit direkt über den Container zu regulieren. Hierbei muss auf die \emph{cgroup} Funktionalität des Linux-Kernels zurückgegriffen werden. "\emph{Control groups, usually referred to as cgroups, are a Linux kernel feature which allow processes to be organized into hierarchical groups whose usage of various types of resources can then be limited and monitored}" \cite{man-cgroups}. Dies wurde beim Prototypen nicht konfiguriert. Insbesondere die Initialisierungsphase von neuen Containern, lässt sich hierdurch optimieren. Im folgenden Abschnitt folgt eine kurze Diskussion über die verfügbaren Möglichkeiten diesbezüglich (siehe Abschnitt \ref{par:resOpt}).
 
@@ -216,7 +216,7 @@ Im nächsten Schritt folgt der Verarbeitungsschritt der \emph{Pre-Initialization
 Diese Beschreibung sollte lediglich einen kurzen Einblick über die Möglichkeiten welche durch den Initialisierungsprozess dem Anwender zur Verfügung gestellt werden. Hierbei ist es nicht nur möglich, genau nachzuvollziehen, in welcher Phase sich eine Bean momentan befindet. Der Prozess bietet ebenfalls die Möglichkeit, mithilfe spezifizierter Schnittstellen an einer beliebigen Stelle eigene Logikbausteine zu integrieren. Um der Philosophie des Spring-Frameworks gerecht zu werden, braucht es auch einen solch komplexen Aufbau. 
 
 
-\subsection{Zusammenfassung \checkmark}
+\subsection{Zusammenfassung}
 Es folgt eine kurze Zusammenfassung des letzten Abschnitts.
 
 \begin{itemize}
@@ -237,10 +237,10 @@ Es folgt eine kurze Zusammenfassung des letzten Abschnitts.
 	\end{itemize}
 \end{itemize}
 
-\section{Diskussion \checkmark}
+\section{Diskussion}
 Im letzten Abschnitt wurde auf die zwei wesentlichen Kenndaten der ermittelten Metriken eingegangen. Dabei wurden mögliche Begründungen für die erhaltenen Messdaten präsentiert. Es folgte außerdem ein kurzer Exkurs zum Initialisierungsprozess einer Spring-Bean. Generell stellt die lange Initialisierungsphase der Spring-Komponenten ein ernsthaftes Problem dar. Welche Schritte zur Optimierung dieses Verhaltens durch die zugrunde Technologie ermöglicht werden und inwiefern das System dies mithilfe der schnellen Verarbeitungsdauer auszugleichen vermag, wird im folgenden Abschnitt beschrieben. 
 
-\subsection{Spring-Bean - Optimierung der Initialisierungsphase \checkmark}
+\subsection{Spring-Bean - Optimierung der Initialisierungsphase}
 \label{ss:spring-perf}
 
 Die deutliche längere Initialisierungsphase der Spring-Komponente lässt sich in erster Linie auf die beschriebene Komplexität der einzelnen Anwendungsschritte zurückführen. Um einem derart mächtigem Framework wie Spring Boot gerecht zu werden, benötigt es einen ähnlich ausgeprägten Initialisierungsmechanismus für den Spring-Container und allen damit verbundenen Anforderungen. Da das Projekt allerdings verschiedene Abhängigkeiten aufweist, wird auch der Initialisierungsprozess entsprechend erweitert. Mit dem Befehl \verb+mvn spring-boot:run -Ddebug+ können zum Beispiel alle automatischen Konfigurationsschritte ausgegeben werden. Wie im Artikel \cite{spring-perf} beschrieben ist es durchaus möglich einige der Konfigurationen wegzulassen, wenn die dazugehörigen Komponenten nicht genutzt werden. 
@@ -248,7 +248,7 @@ Die deutliche längere Initialisierungsphase der Spring-Komponente lässt sich i
 Es ist außerdem denkbar, auf einen anderen Servlet-Container wie "\emph{Undertow}" zuzugreifen. Dieser stellt eine leichtgewichtigere Implementierung eines Webservers bereit und ermöglicht dadurch eine Performancsteigerung. Dennoch wurde sich für den Prototypen dagegen entschieden weder einzelne Konfigurationen manuell zu entfernen noch die Container-Implementierung zu wechseln, da sich das Projekt auch nach Bearbeitung der Thesis eventuell weiterentwickelt und als Beispielprojekt gelten könnte. Hierbei gilt es darauf zu achten auch zukünftig vermeidbare Fehlerfälle zu vermeiden.
 
 
-\subsection{Ressourcenoptimierung \checkmark}
+\subsection{Ressourcenoptimierung}
 \label{par:resOpt}
 Docker bietet nativ die Möglichkeit sowohl Speicher als auch CPU-Ressourcen für spezifische Container oder den gesamten Stack zu regulieren. Dadurch könnten unter anderem mehr Ressourcen für das Hochfahren neuer Container zur Verfügung gestellt werden.
 
@@ -256,11 +256,11 @@ Bezüglich des Aufteilens der zugewiesenen CPU-Zeit modelliert Docker intern ein
 
 Neben der Anpassung der Rechenleistung ist es ebenfalls möglich den verfügbaren Speicher eines Containers zu modifizieren. "\emph{While constraining the CPU only impacts the application’s priority for CPU time, the memory limit is a hard limit}" \cite[Seite~68 ff.]{oreilly-docker}. Bei einem unausgelasteten System würde auch eine niedrige Anzahl an CPU-Shares in einem größeren Anteil von Rechenleistung resultieren, bei der Begrenzung des Speichers gibt es diese Option nicht. Eine feingranularere Anpassung der System-Ressourcen ist außerdem mit den sogenannten "\emph{user limits (ulimits)}" möglich.
 
-\subsection{Optimierte Ausführungsreihenfolge \checkmark}
+\subsection{Optimierte Ausführungsreihenfolge}
 Um die gesamte Startzeit bei gleichzeitigem Starten von Node.js und Spring Containern minimieren zu können, wäre es ebenfalls angebracht eine Strategie hinsichtlich der Reihenfolge der Services zu entwickeln. In der Analyse der Daten war zu erkennen, dass ein Spring-Container im Schnitt 13 Mal schneller arbeitet als ein Node-Container. Um diesen Unterschied auszugleichen sollten entsprechend mehr Node Container gestartet werden um hierbei einen Ausgleich zu schaffen. Bereits während dem Hochfahrprozess der einzelnen Container sollte ein ähnliches Verhältnis eingehalten werden. Bisher find hier eine strikte Trennung der Services statt, es wurden also entweder \emph{n} Spring-Container und / oder \emph{n} Node-Container gestartet, eine Vermischung der Anfragen würde die Effizienz des Systems hinsichtlich des Datendurchsatzes sowie der Latenzzeit steigern. Dies in Kombination mit den vorher vorgestellten Stellschrauben zur Ressourcenoptimierung bietet eine solide Basis für das Optimierungspotenzial der Initialisierungs- sowie Verarbeitungsphase der Anwendung.
 
 
-\subsection{Aussagen über Produktivumgebung \checkmark}
+\subsection{Aussagen über Produktivumgebung}
 Die Aussagen, die während der Analyse der Daten getroffen wurden, sind hinsichtlich eines Systems in einer Produktivumgebung nur in Teilen aussagekräftig. Ein wesentliches Hauptkriterium der ISO-Norm 25010 \todo{ref einbinden} wurde hierbei vernachlässigt, denn es wurde nur sehr eingeschränkt auf die Verfügbarkeit des Systems und dem \emph{Design for failure} eingegangen. Wenn zentrale Komponenten ausfallen gibt es lediglich ein definiertes Default-Verhalten des Orchestrators. So wird versucht die Komponente selbst, sowie sämtliche Kommunikationspartner neu zu starten. Dieses Verhalten hat vor allem Einfluss auf den Initialisierungszeitraum eines Containers. Da beide betrachteten Technologien auf eigene Weise Mechanismen zum erneuten Verbindungsaufbau im Falle eines Ausfalls zur Verfügung stellen, ist diese Betrachtung für die reine Evaluierung der Technologie von nicht allzu großer Bedeutung. Im Zweifelsfall wird ein Container mehrmals gestartet, die grundlegenden Messdaten lassen sich bereits an einem störungsfreien Ablauf ablesen. Falls es zu einem späteren Zeitpunkt während der Portierung der Banking-Anwendung hin zu einer der betrachteten Technologien kommen sollte, muss dieses Fehlerverhalten jedoch ausgiebig getestet werden um späteres unerwartetes Verhalten zu vermeiden. 
 
 Damit das Verhalten des Systems bezüglich Ausfalls bestimmter Komponenten betrachtet werden kann, stehen unterschiedliche Werkzeuge zur Verfügung. Ein etabliertes Werkzeug stellt das open source Projekt "\emph{Chaos Monkey\footnote{\url{https://github.com/Netflix/chaosmonkey}}}" dar, das von Netflix entwickelt und veröffentlicht wurde. Es ist allerdings auch möglich Werkzeuge für spezifische Orchestrator zu nutzen (Übersicht \cite[Seite~369]{continous-delivery}). Diese Art von Werkzeugen ermöglicht das kontrollierte Aussetzen bestimmter Netzwerkverbindungen sowie das Herunterfahren ganzer Services über einen festgelegten Zeitraum. 
@@ -268,11 +268,11 @@ Damit das Verhalten des Systems bezüglich Ausfalls bestimmter Komponenten betra
 Die Aussage, dass die Spring-Komponente durchschnittliche 13 Mal schneller arbeitet als das Node.js-Pendant ist für den beschriebenen Anwendungsfall zwar korrekt, allerdings wurden hierbei lediglich die erläuterten Schritte abgearbeitet (siehe Abschnitt \ref{} \todo{ref einbinden}). Auf das Laufzeitverhalten einer komplexeren Anwendung kann hierbei nicht geschlossen werden. Eventuell lässt sich dieser Unterschied lediglich auf einen Verbindungsaufbau oder Ähnliches zurückführen wobei die restliche Logik hiervon nicht betroffen ist. Dies lässt sich mithilfe weiterer Timestamps innerhalb der Komponenten ermitteln.
 
 
-\subsection{Beurteilung der Technologien hinsichtlich des beschriebenen Usecases \checkmark}
+\subsection{Beurteilung der Technologien hinsichtlich des beschriebenen Usecases}
 Der Fokus der Thesis liegt auf dem Start-up-Verhalten der Komponenten. Hierbei ist festzustellen, dass Node.js einen deutlichen Vorteil gegenüber dem Spring-Boot-Framework vorzuweisen hat. Im Banking-Bereich ist dies unabdingbar. Die Performanz lässt sich allerdings zum gegenwärtigen Zeitpunkt nur eingeschränkt beurteilen. Mit den erhaltenen Daten zeichnet sich hierbei im Gesamtbild für den Anwendungsfall des Unternehmens jedoch eine Empfehlung für die Verwendung neuwertiger Skript-Technologien aus. 
 
 
-\subsection{Zusammenfassung \checkmark}
+\subsection{Zusammenfassung}
 
 \todo{Schauen ob Begriff "Servlet-Container" irgendwo erklärt wurde...}
 
