@@ -1,4 +1,4 @@
-\section{Anforderungen an Prototypen \checkmark}
+\section{Anforderungen an den Prototypen}
 \label{sec:anforderungProto}
 % \begin{itemize}
 %   \item einmal als spring boot und einer weiteren variante mit einer cloud-native technologie -> hier wurde vorgegeben mit serverless zu arbeiten.
@@ -10,7 +10,7 @@ Hinsichtlich der Skalierung soll es beispielsweise möglich sein, anhand festgel
 
 
 
-\subsection{Festlegung fiktiver Workflow \checkmark}
+\subsection{Festlegung eines fiktiven Workflows}
 \label{ss:fiktiverWorkflow}
 
 Der Prototyp soll eine bereits bestehende Applikation nachbilden, welche die Zahlungsabwicklung sogenannter Echtzeitüberweisungen durchführt. "\emph{Die Echtzeitüberweisung (englisch Instant Payment) ist eine Zahlungsart, bei der Guthaben innerhalb weniger Sekunden dem Empfänger final gutgeschrieben werden. Inzwischen gibt es in zahlreichen Ländern weltweit Echtzeitzahlungssysteme. Im einheitlichen Euro-Zahlungsverkehrsraum, dem sogenannten Sepa-Raum, gibt es seit 21. November 2017 einen entsprechenden Standard: Die Sepa Instant Payments (SCTInst) sind 24 Stunden an 365 Tagen im Jahr verfügbar. Die Gutschrift muss in maximal 10 Sekunden erfolgen, faktisch werden die meisten Transaktionen allerdings in weniger als 3 Sekunden durchgeführt}" \cite{instpay-def}.
@@ -57,10 +57,10 @@ Sobald eine neue Nachricht eingetroffen ist, sollen drei Arbeitsschritte ausgef�
 
 \end{enumerate}
 
-\subsection{Artefaktbasierte Technologie \checkmark}
+\subsection{Artefaktbasierte Technologie}
 Wie bereits angedeutet, wird die aktuell laufende Java-Enterprise Applikation mit dem moderneren Spring Boot Framework ersetzt. Spring Boot bietet im Kern sehr ähnliche Funktion und kann in gewisser Hinsicht als eine modernere Version des JEE Standards angesehen werden. Der Austausch ist vor allem hinsichtlich der zu gewinnenden Messwerte / Ergebnisse sinnvoll um einen aktuelleren Referenzpunkt bezüglich der service-basierten Struktur zu erlagen.
 
-\subsection{Skriptbasierte Technologie \checkmark}
+\subsection{Skriptbasierte Technologie}
 
 % \begin{itemize}
 %   \item  4.2.2 spring boot 4.2.3 serverless -> so bekommt der prof schon beim draufgucken auf das inhaltsverzeichnis die story mit….
@@ -69,7 +69,7 @@ Wie bereits angedeutet, wird die aktuell laufende Java-Enterprise Applikation mi
 Um bezüglich des Spring Boot Frameworks einen sinnvollen Vergleichspunkt anzusetzen, wird dem eine Skript-Technologie gegenübergestellt, da diese im \emph{Cloud Native} Bereich ebenfalls sehr häufig verwendet werden. "\emph{Eine native Cloud-Anwendung (NCA) ist ein Programm, das speziell für eine Cloud-Computing-Architektur entwickelt wurde. NCA nutzen die Vorteile von Cloud-Computing-Frameworks, die aus lose gekoppelten Cloud-Services zusammengesetzt sind.}" \cite{def-nca}. Mit dieser doch abstrakt gehaltenen Definition, sind hinsichtlich der verarbeitenden Komponenten in erster Linie die modernen Skript-Frameworks gemeint. Hierbei existieren mehrere Alternativen, wo es seitens des Arbeitgebers ebenfalls keinerlei genaue Vorgaben hinsichtlich des spezifischen Frameworks beziehungsweise der zu nutzenden Technologie gab, um allerdings ein möglichst repräsentatives Bild zu schaffen, wurde hierbei auf das Node.js Backend-Framework ausgewählt, da dies als eines der am weitest verbreiteten Frameworks in diesem Bereich gilt. Sowohl die Node.js als auch Spring Boot Komponenten sollen jeweils die beschriebenen Arbeitsschritte implementieren.
 
 
-\section{Anfoderungen an Containerplattform / Orchestrierungsplattform \checkmark}
+\section{Anforderungen an die Containerplattform / Orchestrierungsplattform}
 \label{sec:anforderungPlattform}
 
 Unter dem Begriff des "emph{Containers}" wird in der Entwicklercommunity meist ein "emph{Docker-Container}" verstanden. Dies ist allerdings nicht zwangsweise korrekt. Allgemein beschreibt dieser Begriff in der Softwareentwicklung ein abstraktes Konzept auf Betriebssystem-Level zur Virtualisierung oder Prozessisolation. Es gibt zahlreiche Implementierungen wie beispielsweise CoreOS's "\emph{rkt}" oder Microsoft's "\emph{Hyper-V}". Docker stellt hierbei lediglich eine weitere Implementierung dieser Technologie dar \cite[Seite~63 ff.]{continuous-deliverty}. Dennoch hat sich Docker gegenüber anderen Implementierungen vor allem über die einfache Benutzerführung sowie die zentralisierten Mechanismen zum \emph{Teilen}, \emph{pullen} und \emph{pushen} durchgesetzt. Die generelle Funktionsweise sowie Vorteile von Docker wurden bereits relativ ausführlich erläutert. Da die Docker Technologie von allen vorgestellten Implementierungen am weitesten verbreitet ist, soll diese auch im Prototypen Verwendung finden. 
@@ -80,7 +80,7 @@ Eine Containerplattform zeichnet sich allerdings neben der genutzten Implentieru
 
 Da es im Cluster vermehrt zur Ausführung mehrerer Instanzen des gleichen Images kommen kann, ist es nicht mehr möglich einen Service mit einer spezifischen IP-Adresse zu versehen. Bei untereinander abhängigen Services braucht es einen Kommunikationsmechanismus zwischeneinander. Dieser wird durch einen "\emph{Discovery Service}" organisiert. Ein solcher Service ist neben dem Vermitteln von Anfragen auch in der Lage Konfigurationsänderungen der einzelnen Services im System zu organisieren sowie die Verfügbarkeit der jeweiligen Instanzen zu prüfen \cite[Seite~45 ff.]{soffelsaswarm}.
 
-\paragraph{Zusammenfassung \checkmark}
+\paragraph{Zusammenfassung}
 \begin{itemize}
   \item Wesentliche Anforderungen Container
   \begin{itemize}
@@ -99,8 +99,8 @@ Da es im Cluster vermehrt zur Ausführung mehrerer Instanzen des gleichen Images
 \end{itemize}
 
 
-\section{Anforderungen an Lasttest \checkmark}
+\section{Anforderungen an den Lasttest}
 Es soll möglich sein, das System in einem einheitlichen Format mit Nachrichten zu versorgen. Hierfür benötigt man eine Benutzerschnittstelle, die es ermöglicht dem Benutzer möglichst aussagekräftige Befehle ohne allzu viel Konfigurationsaufwand zur Verfügung zu stellen. Diese Befehle müssen anschließend intern wiederum in detaillierte Nachrichten umgewandelt werden, welche durch das System gereicht werden können. Hierfür gibt es die Möglichkeit einer Benutzeroberfläche im Browser oder der Festlegung eines Formats im Body einer Http-Anfrage an eine REST-Api. Eine Skalierung auf mehrere Systeme sollte zwar einmal testweise erfolgen, für die Generierung der Metriken ist dies allerdings eher hinderlich, da es die Ergebnisse verfälschen könnte. Diese Verfälschung könnte auftreten, da es dem Design der Orchestrierungsplattform geschuldet ist, dass der Anwender wenig Einfluss auf die Ressourcenzuteilung hat. Hierbei kann es passieren, dass eine leistungsschwächere Maschine deutlich weniger Anfragen zugewiesen bekommt. Dies könnte man zwar dadurch umgehen, dass man zwei exakt gleichbestückte Server für den Lastentest verwendet. Hierbei würden im Nachhinein allerdings im besten Fall die gleichen Ergebnisse erlangt werden, wie bei Testlauf auf einer einzelnen Maschine.
 
-\section{Anforderungen Visualisierung und Monitoring zur Unterstützung der Auswertung \checkmark}
+\section{Anforderungen die Visualisierung und das Monitoring zur Unterstützung der Auswertung}
 Es muss möglich sein, Messwerte automatisch vom System generieren zu lassen. Dazu müssen die Datensätze persistent hinterlegt werden, um auch im Nachhinein nachvollziehen zu können wie die Metriken entstanden sind. Außerdem muss eine grafische Aufarbeitung erfolgen. Diese Visualisierung soll in Echtzeit oder einem zeitlich festgelegten Intervall aktualisiert werden können. Bezüglich des genauen Werkzeugs werden keinerlei Vorgaben gegeben, um dem Benutzer jedoch jeglichen Installationsaufwand zu ersparen wäre eine webbasierte Darstellung von Vorteil.
