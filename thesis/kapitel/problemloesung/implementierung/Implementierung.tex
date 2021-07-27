@@ -31,7 +31,7 @@ Diese Komponente ist in der Lage, die vereinfachten Anfragen des Benutzers zu in
 
 \subsubsection{Broker}
 \label{ss:broker}
-Ein Message-Broker stellt die Funktionalität bereit, Nachrichten über ein gegebenes Protokoll an mehrere Konsumenten zu vermitteln. Hierzu wurde eine Implementierung von Apache namens "\emph{Active MQ\footnote{\url{https://github.com/apache/activemq}}}" gewählt. Diese besitzt zwei Betriebsmodi, einmal das Arbeiten mit einer \emph{Topic} sowie mit einer \emph{Queue}. Eine Topic stellt ein \emph{Publisher-Subscriber-Muster} bereit, in dem alle eingehenden Nachrichten an alle registrierten Konsumenten verschickt werden \cite[Seite~33 ff.]{activemq-snyder}. Demgegenüber steht eine \emph{Queue} (Warteschlange), die eingehende Nachrichten lediglich an einen einzelnen Konsumenten übermittelt, wobei der Broker hierbei als eine Art Load Balancer\footnote{Erklärung \emph{Load Balancer} siehe Abschnitt \ref{sec:loadbalancer}} agiert. In dem Prototypen wurde hierbei stets auf Warteschlangen zurückgegriffen, da eingehende Nachrichten stets von einer einzelnen Komponenteninstanz beantwortet werden. Bevor die Nachrichten jedoch aus einer der beiden Datenstrukturen entfernt werden, muss der betreffende Konsument eine \emph{Acknowledgement-Nachricht} an den Broker schicken, um zu signalisieren, dass die Nachricht nicht nur angenommen, sondern auch korrekt verarbeitet werden konnte. Je nach Empfangskomponente wird dieses Acknowledgement direkt von der verwendeten Library geschickt oder aber im Programmcode selbst explizit gesetzt. Es gilt weiterhin noch hervorzuheben, dass die eingeschriebenen Konsumenten bei neuen Nachrichten stets benachrichtigt werden und es clientseitig keine Logik braucht, um zum Beispiel event- oder intervallbasiert eine Abfrage an den Broker zu steuern. Da diese Komponente ebenfalls den Einstiegspunkt für das Monitoring System \emph{Prometheus} (siehe Abschnitt \ref{ss:prometheus}) darstellt, benötigt der Broker eine Schnittstelle über die er diesem Tool Messdaten zur Verfügung stellen kann. Die von ActiveMq bereitgestellt Schnittstelle nennt sich "\emph{Java Management Extension API (JMX)}" und ist die Standard-API zur Verwaltung von Java Applikationen \cite[Seite~331 ff.]{activemq-snyder}.
+Ein Message-Broker stellt die Funktionalität bereit, Nachrichten über ein gegebenes Protokoll an mehrere Konsumenten zu vermitteln. Hierzu wurde eine Implementierung von Apache namens "\emph{Active MQ\footnote{\url{https://github.com/apache/activemq}}}" gewählt. Diese besitzt zwei Betriebsmodi, einmal das Arbeiten mit einer \emph{Topic} sowie mit einer \emph{Queue}. Eine Topic stellt ein \emph{Publisher-Subscriber-Muster} bereit, in dem alle eingehenden Nachrichten an alle registrierten Konsumenten verschickt werden \cite[Seite~33 ff.]{activemq-snyder}. Demgegenüber steht eine \emph{Queue} (Warteschlange), die eingehende Nachrichten lediglich an einen einzelnen Konsumenten übermittelt, wobei der Broker hierbei als eine Art Load Balancer\footnote{Erklärung \emph{Load Balancer} siehe Abschnitt \ref{sec:loadbalancer} \nameref{sec:loadbalancer}} agiert. In dem Prototypen wurde hierbei stets auf Warteschlangen zurückgegriffen, da eingehende Nachrichten stets von einer einzelnen Komponenteninstanz beantwortet werden. Bevor die Nachrichten jedoch aus einer der beiden Datenstrukturen entfernt werden, muss der betreffende Konsument eine \emph{Acknowledgement-Nachricht} an den Broker schicken, um zu signalisieren, dass die Nachricht nicht nur angenommen, sondern auch korrekt verarbeitet werden konnte. Je nach Empfangskomponente wird dieses Acknowledgement direkt von der verwendeten Library geschickt oder aber im Programmcode selbst explizit gesetzt. Es gilt weiterhin noch hervorzuheben, dass die eingeschriebenen Konsumenten bei neuen Nachrichten stets benachrichtigt werden und es clientseitig keine Logik braucht, um zum Beispiel event- oder intervallbasiert eine Abfrage an den Broker zu steuern. Da diese Komponente ebenfalls den Einstiegspunkt für das Monitoring System \emph{Prometheus} (siehe Abschnitt \ref{ss:prometheus} \nameref{ss:prometheus}) darstellt, benötigt der Broker eine Schnittstelle über die er diesem Tool Messdaten zur Verfügung stellen kann. Die von ActiveMq bereitgestellt Schnittstelle nennt sich "\emph{Java Management Extension API (JMX)}" und ist die Standard-API zur Verwaltung von Java Applikationen \cite[Seite~331 ff.]{activemq-snyder}.
 
 
 \subsubsection{Consumer}
@@ -72,17 +72,13 @@ Wenn es zum Alert durch den Alert Manager kommt, wird in einer Produktivumgebung
 Diese Komponente ist nicht Kernbestandteil des Komponenten-Stacks. Sie dient lediglich während der Entwicklungszeit dazu, die Scaler-API zu emulieren. So ist es zum Beispiel möglich lokal eine Instanz des Scaler-Proxy Projekts in einer beliebigen IDE als Standard Spring Projekt auszuführen. Sämtliche Skalierungs-Anfragen können von dieser Komponente angenommen werden, da sie auf dem gleichen Port wie der "\emph{echte}" Scaler läuft, wobei sie dabei ebenfalls in der Lage ist diverse Rückgabenachrichten an den Klienten zu übergeben.
 
 
-
-
 \subsection{Input}
 \label{ss:Input}
 
 Der Benutzer besitzt die Möglichkeit, sowohl über eine Benutzeroberfläche als auch über Bash-Skripte Benchmark Anfragen an das System zu stellen. Im Folgenden wird beides im Detail erläutert.
 
-\subsubsection{Bash}
 \label{ss:bash}
-
-\paragraph{Aufbau}
+\subsubsection{Aufbau}
 In der folgenden Abbildung ist der Aufbau des Bash-Projektes dargestellt. Der Benutzer besitzt drei Möglichkeiten, Anfragen an das System zu stellen. Für jeden Einstiegspunkt wurde ein entsprechendes Bash-Skript zur Verfügung gestellt.
 
 \begin{figure}[ht!]
@@ -93,12 +89,12 @@ In der folgenden Abbildung ist der Aufbau des Bash-Projektes dargestellt. Der Be
 \end{figure}
 
 \begin{itemize}
-  \item \emph{direct-scaling.sh}: bietet die Möglichkeit eine direkte Skalierungsanfrage an das System zu senden, ohne Payment-Messages verwenden zu müssen. Als Parameter werden die Skalierungsanzahl sowie die Wiederholungen erwartet (genauere Erklärung siehe \ref{erklaerungDirScal}).
-  \item \emph{curl-benchmark.sh}: sendet eine Skalierungsanfrage mit dem Dateiinhalt einer Datei, dessen Pfad als Eingabeparameter verarbeitet wird. Die Datei besitzt die Dateiendung \emph{.benchmark}, wobei der Inhalt einer spezifizierten Grammatik folgt (siehe \ref{lst:instruction-grammar}).
-  \item \emph{generate-traffic.sh}: dient als vereinfachter Einstiegspunkt für den Benutzer. Hierbei werden rekursiv alle verfügbaren \emph{.benchmark} Dateien der Directory und übergibt diese der Reihe nach dem \emph{curl-benchmark} Skript.
+  \item \emph{direct-scaling.sh}: bietet die Möglichkeit eine direkte Skalierungsanfrage an das System zu senden, ohne Payment-Messages verwenden zu müssen. Als Parameter werden die Skalierungsanzahl sowie die Wiederholungen erwartet (genauere Erklärung siehe \ref{erklaerungDirScal} \nameref{erklaerungDirScal}).
+  \item \emph{curl-benchmark.sh}: sendet eine Skalierungsanfrage mit dem Dateiinhalt einer Datei, dessen Pfad als Eingabeparameter verarbeitet wird. Die Datei besitzt die Dateiendung \emph{.benchmark}, wobei der Inhalt einer spezifizierten Grammatik folgt (siehe \ref{lst:instruction-grammar} \nameref{lst:instruction-grammar}).
+  \item \emph{generate-traffic.sh}: dient als vereinfachter Einstiegspunkt für den Benutzer. Hierbei werden rekursiv alle verfügbaren \emph{.benchmark} Dateien des Verzeichnisses der Reihe nach dem \emph{curl-benchmark} Skript übergeben.
 \end{itemize}
 
-Im folgenden Listing (siehe \ref{verb:scriptStruct}) ist ein Auszug der Projekt-Struktur abgebildet. Neben den genannten Skripts sind sämtliche \emph{.benchmark} Dateien nach Services in Unterordner aufgeteilt worden. Die \emph{.env} Datei beinhaltet die Verbindungsdaten zum Komponenten-Stack. Diese müssen bei der ersten Ausführung vom Benutzer angeglichen werden. Im Wesentlichen beschränkt sich dies auf die IP-Adresse des Systems, falls der Benutzer in der Stack-Konfiguration entsprechende Änderungen vornimmt, sind diese an dieser Stelle ebenfalls zu vermerken.
+Im folgenden Listing (siehe Listing \ref{verb:scriptStruct} \nameref{verb:scriptStruct}) ist ein Auszug der Projekt-Struktur abgebildet. Neben den genannten Skripts sind sämtliche \emph{.benchmark} Dateien nach Services in Unterordner aufgeteilt worden. Die \emph{.env} Datei beinhaltet die Verbindungsdaten zum Komponenten-Stack. Diese müssen bei der ersten Ausführung vom Benutzer angeglichen werden. Im Wesentlichen beschränkt sich dies auf die IP-Adresse des Systems, falls der Benutzer in der Stack-Konfiguration entsprechende Änderungen vornimmt, sind diese an dieser Stelle ebenfalls zu vermerken.
 
 \label{verb:scriptStruct}
 \begin{minipage}{\linewidth}
@@ -119,9 +115,9 @@ Im folgenden Listing (siehe \ref{verb:scriptStruct}) ist ein Auszug der Projekt-
 \end{lstlisting}
 \end{minipage}
 
+\subsubsection{Manuelles Skalieren}
 \label{erklaerungDirScal}
-\paragraph{Manuelles Skalieren}
-Hierfür wird auf ein Bash-Skript namens "\emph{direct-scaling}" zurückgegriffen. Das Skript nimmt zwei Parameter entgegen. Der Erste beschreibt die Anzahl der Instanzen, zu der das System skaliert werden soll, wobei hierbei eine inkrementelle Erhöhung von einer Instanz pro Durchlauf durchgeführt wird. Der zweite Parameter gibt die Wiederholungen dieser testweisen Skalierung an. Der Aufruf \verb+./direct-scaling.sh 10 20+ resultiert beispielsweise darin, das sowohl für den Node.js als auch Spring Boot Service jeweils 10 Skalierungsschritte durchgeführt werden. Wenn zum Beispiel bereits ein Node.js-Container läuft, wird im ersten Test eine weitere Instanz angefordert. Sobald die beiden Instanzen verfügbar sind, wird der Alert-Manager durch die Prometheus-Komponente angewiesen die überflüssige Instanz zu löschen. Sobald wieder ein einziger Container läuft, wird dieser Schritt neunzehn weitere Male wiederholt. Anschließend erfolgt die nächste Skalierung bei der nun zwei neue Container kreiert werden sollen, anstatt wie vorher nur ein weiterer. Auch hier folgen 20 Wiederholungen. Diese Schritte werden solange durchgeführt bis zehn Container zwanzig Mal instanziiert wurden.
+Hierfür wird auf ein Bash-Skript namens "\emph{direct-scaling}" zurückgegriffen. Das Skript nimmt zwei Parameter entgegen. Der Erste beschreibt die Anzahl der Instanzen, zu der das System skaliert werden soll, wobei hierbei eine inkrementelle Erhöhung von einer Instanz pro Durchlauf durchgeführt wird. Der zweite Parameter gibt die Wiederholungen dieser testweisen Skalierung an. Der Aufruf \verb+./direct-scaling.sh 10 20+ resultiert beispielsweise darin, dass sowohl für den Node.js als auch Spring Boot Service jeweils 10 Skalierungsschritte durchgeführt werden. Wenn zum Beispiel bereits ein Node.js-Container läuft, wird im ersten Test eine weitere Instanz angefordert. Sobald die beiden Instanzen verfügbar sind, wird der Alert-Manager durch die Prometheus-Komponente angewiesen die überflüssige Instanz zu löschen. Sobald wieder ein einziger Container läuft, wird dieser Schritt neunzehn weitere Male wiederholt. Anschließend erfolgt die nächste Skalierung bei der nun zwei neue Container kreiert werden sollen, anstatt wie vorher nur ein weiterer. Auch hier folgen 20 Wiederholungen. Diese Schritte werden solange durchgeführt bis zehn Container zwanzig Mal instanziiert wurden.
 
 \label{lst:direct-scaling}
 \begin{minipage}{\linewidth}
@@ -145,7 +141,8 @@ do
 done
 \end{lstlisting}
 \end{minipage}
-\paragraph{Skalieren mithilfe von Grammatik}
+
+\subsubsection{Skalieren mithilfe einer Grammatik}
 Das beschriebene Skript sowie der zugrunde liegende Http-Endpunkt bieten eine Möglichkeit, das Skalieren als Reaktion auf unbeantwortete Nachrichten zu umgehen. Um jedoch einen herkömmlichen Testdurchlauf zu starten, greift der Benutzer auf einen Endpunkt vom \emph{Supplier} zurück: 
 
 \begin{verbatim}
@@ -156,7 +153,7 @@ Das beschriebene Skript sowie der zugrunde liegende Http-Endpunkt bieten eine M�
     "http://$API_HOST:$API_PORT/api/v1/parser/benchmark"
 \end{verbatim}
 
-Es handelt sich hierbei um eine POST-Anfrage. Im Body wird der Dateiinhalt eines für diesen Zweck verfassten Skripts angeheftet. Im Projekt wurden diverse Beispiele verfasst. Diese liegen im Ordner \emph{./requests} und tragen die Dateiendung "\emph{.benchmark}". Der Inhalt korrespondiert zu einer spezifizierten Grammatik (siehe Listing \ref{lst:instruction-grammar}).
+Es handelt sich hierbei um eine POST-Anfrage. Im Body wird der Dateiinhalt eines für diesen Zweck verfassten Skripts angeheftet. Im Projekt wurden diverse Beispiele verfasst. Diese liegen im Ordner \emph{./requests} und tragen die Dateiendung "\emph{.benchmark}". Der Inhalt korrespondiert zu einer spezifizierten Grammatik (siehe Listing \ref{lst:instruction-grammar} \nameref{lst:instruction-grammar}).
 
 \label{lst:instruction-grammar}
 \begin{verbatim}
@@ -168,10 +165,10 @@ Es handelt sich hierbei um eine POST-Anfrage. Im Body wird der Dateiinhalt eines
   duration    := [0-9]+
 \end{verbatim}
 
-Es können beliebig viele Batchanfragen den Anfragenbody angeheftet werden. Eine Batch stellt in diesem Zusammenhang eine Gruppe an Skalierungsanfragen an einen bestimmten Service dar, wobei diese mindestens eine Skalierungsinstruktion enthalten müssen. In diesem System gibt es zwei wesentliche Skalierungsinstruktionen: 
+Es können beliebig viele Batchanfragen an dem Anfragenbody angeheftet werden. Eine Batchanfrage stellt in diesem Zusammenhang eine Gruppe von Skalierungsanfragen an einen bestimmten Service dar, wobei diese mindestens eine Skalierungsinstruktion enthalten müssen. In diesem System gibt es zwei wesentliche Skalierungsinstruktionen: 
 
 \begin{enumerate}
-  \item BENCHMARK: Nimmt zwei Parameter entgegen. Der erste spezifiziert, wie viele neue Instanzen erstellt werden sollen, während der Zweite angibt, über welchen Zeitraum dies geschehen soll. Alle numerischen Angaben müssen einen positiven Ganzzahlwert enthalten. Da das System selbstständig in der Lage sein soll diese Instanzen wiederum auf ein gesetztes Minimum zu minimieren, wurde sich aktiv dagegen entschieden, das Herunterskalieren in die Grammatik aufzunehmen, um dem Benutzer eine möglichst schlicht gehaltene Schnittstelle zur Verfügung zu stellen.
+  \item BENCHMARK: Nimmt zwei Parameter entgegen. Der erste spezifiziert, wie viele neue Instanzen erstellt werden sollen, während der Zweite angibt, über welchen Zeitraum dies geschehen soll. Alle numerischen Angaben müssen einen positiven Ganzzahlwert enthalten. Da das System selbstständig in der Lage sein soll diese Instanzen wiederum auf ein gesetztes Minimum zu minimieren, wurde sich aktiv dagegen entschieden, das Herunterskalieren in die Grammatik aufzunehmen, um dem Benutzer eine möglichst einfach gehaltene Schnittstelle zur Verfügung zu stellen.
   \item WAIT: Diese Instruktion erwartet lediglich einen einzigen Parameter, der angibt wie viele Millisekunden gewartet werden soll, bevor die nächste Instruktion dem System übergeben wird. 
 \end{enumerate}
 
@@ -179,8 +176,8 @@ Es können beliebig viele Batchanfragen den Anfragenbody angeheftet werden. Eine
 Damit der Benutzer allerdings direkt Anfragen ausführen kann, ohne sich mit der Grammatik beschäftigen zu müssen, wurde ein weiterer Skript-Aufsatz 
 für das \emph{curl-benchmark} Skript entwickelt. Dieses trägt den Namen "\emph{generate-traffic.sh}" und sucht rekursiv absteigend in der eigenen Directory nach Dateien mit der entsprechenden Endung. Anschließend werden diese Skripte an das \emph{curl-benchmark} der Reihe nach als Parameter übergeben.
 
-\paragraph{Benutzeroberfläche}
-Im Rahmen dieser Thesis wurde die Benutzeroberfläche mithilfe des Javascript-Frameworks \emph{React.js} entwickelt. Es ist möglich über diverse Select-Felder die voreingestellten Pfad, sowie Payment Optionen auszuwählen. Außerdem ist es möglich, die Anzahl sowie die Zeitspanne der Anfrage zu spezifizieren. Beim Initialisierungsprozess dieses Projekts starten zuallererst alle dargestellten React-Komponenten. React.js ist ein komponentenbasiertes Framework, hierbei werden sämtliche visuellen Elemente als einzelne Komponenten betrachtet, wobei es möglich ist diese Komponenten zu gruppieren und somit neue Komponenten zu formen. Außerdem ermöglicht das Framework diesen Komponenten einen sogenannten \emph{State} anzuheften, in dem Daten hinterlegt werden können. Wenn diese an irgendeiner Stelle modifiziert werden, erkennt React dies und rendert die betroffene Komponente sowie alle untergeordneten Komponenten neu. Dies ist insbesondere hilfreich um die Formulareinträge direkt abzuspeichern. Bei der Initialisierung versucht die Frontend-Komponente die darzustellenden Optionen vom \emph{Supplier} zu fetchen. Dieser beantwortet diese Anfrage mit den Daten, die im Anschluss in der Oberfläche angezeigt werden. Wenn der Benutzer darauf folgend Daten auswählt beziehungsweise Daten in die Felder einträgt, werden hierfür zugeschnittene Eventhandler-Funktionen ausgelöst. Diese Eventhander registrieren die Datenauswahl und speichern sie direkt im State der Komponente ab. Wenn der Benutzer nun auf den Button zum Absenden der Anfrage klickt, muss hierbei lediglich der State ausgelesen werden und an die entsprechende Backend-API-Schnittstelle geschickt werden. In Abbildung \ref{fig:reactUi} wurde hierfür der aktuelle Stand der Oberfläche dargestellt.
+\subsubsection{Benutzeroberfläche}
+Im Rahmen dieser Thesis wurde die Benutzeroberfläche mithilfe des Javascript-Frameworks \emph{React.js} entwickelt. Es ist möglich über diverse Select-Felder die voreingestellten Pfaden, sowie Payment Optionen auszuwählen. Außerdem ist es möglich, die Anzahl sowie die Zeitspanne der Anfrage zu spezifizieren. Beim Initialisierungsprozess dieses Projekts starten zuallererst alle dargestellten React-Komponenten. React.js ist ein komponentenbasiertes Framework, hierbei werden sämtliche visuellen Elemente als einzelne Komponenten betrachtet, wobei es möglich ist, diese Komponenten zu gruppieren und somit neue Komponenten zu formen. Außerdem ermöglicht das Framework diesen Komponenten einen sogenannten \emph{State} anzuheften, in dem Daten hinterlegt werden können. Wenn diese an irgendeiner Stelle modifiziert werden, erkennt React dies und rendert die betroffene Komponente sowie alle untergeordneten Komponenten neu. Dies ist insbesondere hilfreich um die Formulareinträge direkt abzuspeichern. Bei der Initialisierung versucht die Frontend-Komponente die darzustellenden Optionen vom \emph{Supplier} zu fetchen. Dieser beantwortet diese Anfrage mit den Daten, die im Anschluss in der Oberfläche angezeigt werden. Wenn der Benutzer darauf folgend Daten auswählt beziehungsweise Daten in die Felder einträgt, werden hierfür zugeschnittene Eventhandler-Funktionen ausgelöst. Diese Eventhander registrieren die Datenauswahl und speichern sie direkt im State der Komponente ab. Wenn der Benutzer nun auf den Button zum Absenden der Anfrage klickt, muss hierbei lediglich der State ausgelesen werden und an die entsprechende Backend-API-Schnittstelle geschickt werden. In Abbildung \ref{fig:reactUi} \nameref{fig:reactUi} wurde hierfür der aktuelle Stand der Oberfläche dargestellt.
 
 \begin{figure}[ht!]
 	\centering
@@ -189,15 +186,13 @@ Im Rahmen dieser Thesis wurde die Benutzeroberfläche mithilfe des Javascript-Fr
 	\label{fig:reactUi}
 \end{figure}
 
-Während der Entwicklungszeit des restlichen Systems, wurde das Arbeiten mit der Benutzeroberfläche allerdings vermehrt zum Flaschenhals. Sobald ein neues Feature oder ein neuer Datensatz in eine Anfrage integriert wurde oder sich das zugrunde liegende Datenmodell änderte, war es jedes Mal ein großer Aufwand dies ebenfalls in der Oberfläche anzupassen. Da die vorher spezifizierte Grammatik sowie die zugrunde liegende API einen deutlich flexibleren Ansatz und eine komplexere Ablauflogik ermöglichen wurde sich bereits relativ früh in der Entwicklung dagegen entschlossen diesen Ansatz der grafischen Benutzerführung weiterzuverfolgen. Die Oberfläche dient hierbei eher als ein \emph{Proof of concept} um darzustellen, wie ein solches Projekt konfiguriert werden muss. Da dem skriptbasierten Ansatz dieselben API-Schnittstellen zugrunde liegen wie dem oberflächenbasierten Ansatz, ist es ohne Probleme möglich das aktuelle React-Projekt den überarbeiteten Gegebenheiten anzupassen, falls dies in Zukunft gewünscht sein sollte.
+Während der Entwicklungszeit des restlichen Systems wurde das Arbeiten mit der Benutzeroberfläche allerdings vermehrt zum Flaschenhals. Sobald ein neues Feature oder ein neuer Datensatz in eine Anfrage integriert wurde oder sich das zugrunde liegende Datenmodell änderte, war es jedes Mal ein großer Aufwand dies ebenfalls in der Oberfläche anzupassen. Da die vorher spezifizierte Grammatik sowie die zugrunde liegende API einen deutlich flexibleren Ansatz und eine komplexere Ablauflogik ermöglichen wurde sich bereits früh in der Entwicklung entschlossen diesen Ansatz der grafischen Benutzerführung weiterzuverfolgen. Die Oberfläche dient hierbei eher als ein \emph{Proof of concept}, um darzustellen, wie ein solches Projekt konfiguriert werden muss. Da dem skriptbasierten Ansatz dieselben API-Schnittstellen zugrunde liegen wie dem oberflächenbasierten Ansatz, ist es ohne Probleme möglich das aktuelle React-Projekt den überarbeiteten Gegebenheiten anzupassen, falls dies in Zukunft gewünscht sein sollte.
 
 
 \subsection{Supplier Backend}
 Bei dieser Komponente handelt es sich um ein Spring Projekt, dessen Aufgabe es ist, Benutzeranfragen in Nachrichten zu übersetzen, die vom System interpretiert und verarbeitet werden können. Die Schnittstelle für den Benutzer besteht hierbei aus einer REST-API, die über Tools wie zum Beispiel curl angesprochen werden kann.
 
-\subsubsection{Implementierung}
-
-\paragraph{Generelle Spring Projektübersicht}
+\subsubsection{Generelle Spring Projektübersicht}
 Da diese Komponente bezüglich der Struktur eines Spring-Projekts alle wesentlichen Merkmale besitzt, wird die genutzte Projektstruktur an dieser Stelle etwas näher erläutert. 
 
 \label{verb:supplierStruct}
@@ -228,7 +223,7 @@ Da diese Komponente bezüglich der Struktur eines Spring-Projekts alle wesentlic
 \end{lstlisting}
 \end{minipage}
 
-Das Muster, nach dem sämtliche Komponenten des Komponenten-Stacks entwickelt wurden, wird als \emph{Layered Architecture Pattern} oder \emph{n-tier pattern} bezeichnet \cite{oreilly-layered-arch}. Es stellt einen weitverbreiteten Standard in Java Enterprise Applikationen dar und zeichnet sich durch die klare Unterteilung der verschiedenen Hierarchien aus (siehe Abbildung \ref{fig:layeredArchitecture}). Sämtliche Packages innerhalb der Spring-Projekte finden sich innerhalb einer der Schichten wieder. Es sei ebenfalls hervorzuheben, dass sämtliche Schichten stets nur mit ihren direkt angrenzenden Schichten kommunizieren. Dies stellt ein weitaus übersichtlicheres Design sicher.
+Das Muster, nach dem sämtliche Komponenten des Komponenten-Stacks entwickelt wurden, wird als \emph{Layered Architecture Pattern} oder \emph{n-tier pattern} bezeichnet \cite{oreilly-layered-arch}. Es stellt einen weitverbreiteten Standard in Java Enterprise Applikationen dar und zeichnet sich durch die klare Unterteilung der verschiedenen Hierarchien aus (siehe Abbildung \ref{fig:layeredArchitecture}). Sämtliche Packages innerhalb der Spring-Projekte finden sich innerhalb einer der Schichten wieder. Es sei ebenfalls hervorzuheben, dass sämtliche Schichten stets nur mit ihren direkt angrenzenden Schichten kommunizieren. Dies stellt ein übersichtliches Design sicher.
 
 \begin{figure}[ht!]
 	\centering
@@ -239,24 +234,25 @@ Das Muster, nach dem sämtliche Komponenten des Komponenten-Stacks entwickelt wu
 
 
 \begin{itemize}
-  \item \emph{controller}: Dieses Package stellt alle Klassen bereit, welche direkt vom Benutzer angesprochen werden. Typischerweise handelt es sich zumindest im implementierten Stack um Rest-Schnittstellen, aber auch andere Typen (Soap, etc.) bieten entsprechende Implementierung an. Klassen dieses Packages werden allgemeinhin als Controller bezeichnet und bilden eine erste Interaktionsschicht, welche keinerlei Business-Logik enthält. Bei diesem Package handelt es sich um einen Teil des Presentation-Layers. Die Daten werden angenommen aber nicht direkt verarbeitet. Dies geschieht in sogenannten Services, die spezifische Funktionalität implementieren. Controller dienen hierbei als ein Verteiler der eingehenden Nachrichten an diese Services. Die Service-Instanzen werden den Controllern über den Spring-Context mittels Dependency Injection \todo{checken ob dependency injection irgendwo schon erklärt wurde}bereitgestellt, sodass sich der Entwickler selbst sich nicht mit der Instanziierung etc. zu beschäftigen braucht. 
+  \item \emph{controller}: Dieses Package stellt alle Klassen bereit, welche direkt vom Benutzer angesprochen werden. Typischerweise handelt es sich zumindest im implementierten Stack um Rest-Schnittstellen, aber auch andere Typen (Soap, etc.) bieten entsprechende Implementierung an. Klassen dieses Packages werden allgemeinhin als Controller bezeichnet und bilden eine erste Interaktionsschicht, welche keinerlei Business-Logik enthält. Bei diesem Package handelt es sich um einen Teil des Presentation-Layers. Die Daten werden angenommen aber nicht direkt verarbeitet. Dies geschieht in sogenannten Services, die spezifische Funktionalität implementieren. Controller dienen hierbei als Verteiler der eingehenden Nachrichten an diese Services. Die Service-Instanzen werden den Controllern über den Spring-Context mittels Dependency Injection\footnote{Dependency Injection: Verwendung von Objektinstanzen, welche durch einen IoC Container verwaltet werden.} bereitgestellt, sodass sich der Entwickler selbst nicht mit der Instanziierung etc. zu beschäftigen braucht. 
 
-  \item \emph{service}: Dieses Package enthält ausschließlich Service-Implementierungen. Ein Service stellt einen logischen Funktionsbaustein der Anwendung dar und kann über den Spring-Context bereitgestellt werden.
+  \item \emph{service}: Dieses Package enthält ausschließlich Service-Implementierungen. Ein Service stellt einen logischen Funktionsbaustein der Anwendung dar und kann über den Spring-Context bereitgestellt werden. Services werden dem \emph{Business Layer} des Schichtenmodells zugeordnet.
 
-  \item \emph{repository}: Spring bietet über entsprechende Dependency-Starter-Konfigurationen die JPA Implementierung \emph{Hibernate} als nativen Support für die Anbindung an eine Datenbank. Dieses Package enthält Interfaces welche die Treiberschnittstelle beerben. Mithilfe spezifizierter Namenskonventionen ist es möglich Methodensignaturen für Datenbankanfragen zu gestalten. Das Framework generiert hieraus die entsprechenden SQL-Abfragen.
+  \item \emph{repository}: Spring bietet über entsprechende Dependency-Starter-Konfigurationen die JPA Implementierung \emph{Hibernate} als nativen Support für die Anbindung an eine Datenbank. Dieses Package enthält Interfaces welche die Treiberschnittstelle beerben. Mithilfe spezifizierter Namenskonventionen ist es möglich Methodensignaturen für Datenbankanfragen zu gestalten. Das Framework generiert hieraus die entsprechenden SQL-Abfragen. Klassen dieses Packages lassen sich dem \emph{Persistence Layer} des Modells zuordnen.
 
-  \item \emph{config}: Klassen dieses Packages konfigurieren instanziieren beziehungsweise konfigurieren Spring-Beans. Es gibt bei vielen voreingestellten Spring-Komponenten die Möglichkeit Beans über Annotations in der implementierenden Klasse zu erzeugen, in bestimmten Situation wird jedoch Zugriff auf die Instanz selbst zum Initialisierungszeitpunkt gebraucht um entsprechende Konfigurationsschritte zu unternehmen. Dies geschieht standardmäßig in diesem Package.
+  \item \emph{config}: Klassen dieses Packages instanziieren, beziehungsweise konfigurieren Spring-Beans. Es gibt bei vielen voreingestellten Spring-Komponenten die Möglichkeit Beans über Annotations in der implementierenden Klasse zu erzeugen. In bestimmten Situationen wird jedoch Zugriff auf die Instanz selbst zum Initialisierungszeitpunkt gebraucht um entsprechende Konfigurationsschritte zu unternehmen. Dies geschieht standardmäßig in diesem Package. Da dieses Package lediglich eine unterstützende Funktion einnimmt, wird es im Schichtenmodell nicht direkt aufgeführt. Um jedoch eine übersichtliche Projektstruktur zu gewährleisten, werden diese Klassen nicht in Packages der zu konfigurierenden Komponenten mit eingefügt, sondern gesondert angelegt.
 
-  \item \emph{model}: Klassen, welche lediglich zum Abbilden bestimmter Datensätze genutzt werden, residieren in diesem Package. Hierbei ist es irrelevant ob es sich um JPA-Entitäten oder herkömmliche POJOs handelt.
+  \item \emph{model}: Klassen, welche lediglich zum Abbilden bestimmter Datensätze genutzt werden, residieren in diesem Package. Hierbei ist es irrelevant, ob es sich um JPA-Entitäten oder herkömmliche POJOs handelt. Da es sich bei der Funktionalität der Klassen dieses Packages ebenfalls um eine unterstützende Funktion handelt, wird es ebenfalls nicht direkt im Schichtenmodell aufgeführt.
 
-  \item \emph{properties}: Spring bietet die Möglichkeit Daten aus den Konfigurationsdateien innerhalb der Resources direkt in den Application-Context zu laden.
+  \item \emph{properties}: Spring bietet die Möglichkeit Daten aus den Konfigurationsdateien innerhalb der Resources direkt in den Application-Context zu laden. Diese Klassen bilden eine Unterkategorie der beschriebenen Konfigurationsklassen.
   
-  \item \emph{utils}: Klassen, die lediglich mit Business-Logik gefüllt sind und nicht vom Spring-Container verwaltet werden, sondern direkt im Programmcode instanziiert oder aufgerufen werden, residieren in diesem Package.
+  \item \emph{utils}: Klassen, die lediglich mit Business-Logik gefüllt sind und nicht vom Spring-Container verwaltet werden, sondern direkt im Programmcode instanziiert oder aufgerufen werden, residieren in diesem Package. Bei der Funktionalität der Klassen dieses Packages handelt es sich in der Regel um statische Hilfsmethoden die von Instanzen des \emph{Business Layers} verwendet werden.
   
-  \item \emph{resources}: Die genutzte Verbindungs-Konfiguration zwischen Komponenten des Stacks werden innerhalb der \emph{.properties} Dateien verwaltet. Es ist möglich auf diese Information über den Dependency-Injection-Mechanismus innerhalb der Klassen zuzugreifen.
+  \item \emph{resources}: Die genutzte Verbindungs-Konfiguration zwischen Komponenten des Stacks werden innerhalb der \emph{.properties} Dateien verwaltet. Es ist möglich auf diese Information über den Dependency-Injection-Mechanismus innerhalb der Klassen zuzugreifen. Die hierbei hinterlegten Daten können zum Buildzeitpunkt direkt in das Artifact eingebunden werden. Sie stehen zur Laufzeit zur Verfügung und stellen ähnlich wie die Klassen des \emph{model} packages lediglich relevante Daten dar, beinhalten allerdings keine zusätliche Programmlogik. 
 
 \end{itemize}
-\paragraph{Programmfluss}
+
+\subsubsection{Programmfluss}
 Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:supplierUml}) wurden ein Teil der Klassen des Suppliers dargestellt. Es wurde sich hierbei auf die wesentlichen Logikbausteine konzentriert. 
 
 \begin{figure}[ht!]
@@ -266,9 +262,9 @@ Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:supplierUml}) wurden ein Tei
 	\label{fig:supplierUml}
 \end{figure}
 
-Es gibt im primär zwei Einstiegspunkte für den Programmfluss. Der Benutzer möchte mithilfe der Benutzeroberfläche oder eines \emph{curl}-Aufrufs neue Nachrichten generieren, oder es wird auf die Dateiinhalte, die einer Grammatik folgen zurückgegriffen. Bei beiden Endpunkten wird im Controller eine Instanz vom Typ \emph{ParsedInstruction} erstellt. Diese enthält alle relevanten Informationen, die vom verarbeitenden \emph{BenchmarkService} gebraucht werden. Bei der API-Anfrage durch den Curl-Aufruf lässt sich das Instanziieren direkt über das Parsen vom empfangenen Json umsetzen, während bei der Grammatik ein weiterer Service (\emph{RequestParserService}) verwendet wird, der aus der erhaltenen Grammatik diverse \emph{ParsedInstruction} Instanzen erstellt.
+Es gibt primär drei Einstiegspunkte für den Programmfluss. Der Benutzer möchte mithilfe der Benutzeroberfläche oder eines Curl-Aufrufs neue Nachrichten generieren, oder es wird auf die Dateiinhalte, die einer Grammatik folgen zurückgegriffen. Bei beiden Endpunkten wird im Controller eine Instanz vom Typ \emph{ParsedInstruction} erstellt. Diese enthält alle relevanten Informationen, die vom verarbeitenden \emph{BenchmarkService} gebraucht werden. Bei der API-Anfrage durch den Curl-Aufruf lässt sich das Instanziieren direkt über das Parsen vom empfangenen JSON umsetzen, während bei der Grammatik ein weiterer Service (\emph{RequestParserService}) verwendet wird, der aus der erhaltenen Grammatik diverse \emph{ParsedInstruction} Instanzen erstellt.
 
-Wie im UML-Diagramm zu erkennen, werden aus der erhaltenen Instruktionsinstanz über verschiedene Generator-Implementierungen diverse Callbacks erstellt, die zum Absetzen der Nachrichten in das System genutzt werden. Ein Auszug des zugrunde liegenden Codes folgt in Listing \ref{lst:supplierServiceImpl};
+Wie im UML-Diagramm zu erkennen, werden aus der erhaltenen Instruktionsinstanz über verschiedene Generator-Implementierungen diverse Callbacks erstellt, die zum Absetzen der Nachrichten in das System genutzt werden. Ein Auszug des zugrunde liegenden Codes folgt in Listing \ref{lst:supplierServiceImpl} \nameref{lst:supplierServiceImpl};
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[style=javaStyle,caption={Supplier - Service},label=lst:supplierServiceImpl]
@@ -305,7 +301,8 @@ Wie im UML-Diagramm zu erkennen, werden aus der erhaltenen Instruktionsinstanz �
 \end{lstlisting}
 \end{minipage}
 
-In dem beschriebenen Listing ist zu erkennen, wie diese Generatoren genutzt werden. Sie extrahieren aus der gegebenen Instruktionsinstanz die jeweils relevanten Werte für ihren Anwendungsfall (Zeile 5 -- 9) und können bei der Erstellung der Nachrichten als Callback verwendet werden, und dynamisch neue Werte erstellen (Zeile 16 -- 21). Der Grund warum hierbei auf diese Callback-Struktur zurückgegriffen wurde, ist der, dass die gegebenen Werte in der Instruktion selbst als Instruktionen verstanden werden sollen.
+In dem beschriebenen Listing ist zu erkennen, wie diese Generatoren genutzt werden. Sie extrahieren aus der gegebenen Instruktionsinstanz die jeweils relevanten Werte für ihren Anwendungsfall (Zeile 5 -- 9) und können bei der Erstellung der Nachrichten als Callback verwendet werden, und dynamisch neue Werte erstellen (Zeile 16 -- 21). Hierbei wurde auf diese Callback-Struktur zurückgegriffen, da die gegebenen Werte in der Instruktion selbst als Instruktionen verstanden werden sollen.
+
 \paragraph{Beispiel xPathSupplier} 
 Der XPath gibt an, welches XML-Element bei der Verarbeitung durch den Konsumer im Detail extrahiert werden soll (bspw. IBAN, Betrag etc.). Es ist jedoch auch möglich, dass der Benutzer bei der API-Anfrage hierbei keinen genauen XPath angibt sondern möchte, dass hierbei ein beliebiges Element extrahiert werden soll. Dazu wird der Wert "\emph{Randomize}" in die Instruktion eingetragen. Dies ist sinnvoll um etwas Variation in die spätere Verarbeitung zu bekommen um bessere Messwerte erzielen zu könnnen. Im System wurden hierfür beispielhaft einige XPath Pfade manuell hinterlegt. Der Supplier hat intern Zugriff auf diese Sammlung. Je nachdem ob ein spezifischer Wert ausgegeben werden oder dieser variieren soll, wird stets der selbe Wert oder aber unterschiedliche Werte ausgegeben. Ähnliches gilt für die anderen verfügbaren Generator-Instanzen.
 
@@ -313,14 +310,14 @@ Der XPath gibt an, welches XML-Element bei der Verarbeitung durch den Konsumer i
 
 Im folgenden UML-Diagramm ist die grundlegende Klassenstruktur der beteiligten Logikbausteine des Spring-Konsumenten zu erkennen. Da das Node.js-Projekt einen sehr ähnlichen Aufbau besitzt, wird im Folgenden lediglich der Ablauf der Spring Komponente zusammengefasst. Sämtliche Informationen lassen sich jedoch nahtlos auf die Node.js-Umgebung übertragen. 
 
-\begin{figure}[ht!]
+Der Einstiegspunkt für den Spring-Konsumenten stellt der \emph{AmqService} dar. Nachrichten werden mithilfe dieser Komponente aus der Warteschlange des ActiveMq Brokers ausgelesen und an den \emph{WorkerService} delegiert. Über eine \emph{ObjectMapper} Instanz wird aus dem übergebenen String eine Objektinstanz eines Datenobjektes (\emph{InputPaymentMessage}) generiert (siehe Listing \ref{lst:consumerLogic}). Dieses Objekt wird an einen weiteren Service übergeben, der ein Element entsprechend der Vorgaben im Datenobjekt extrahiert. Wenn das zugrunde liegende XML nicht XSD-konform ist oder das Element zum spezifizierten Pfad nicht gefunden werden kann, wird eine Null-Referenz ausgegeben. Es folgt ein Nullcheck, bevor die Nachricht der Persistenzschicht übergeben wird.
+
+\begin{figure}[b!]
 	\centering
 	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/consumer-uml}
 	\caption[Consumer UML]{Consumer UML}
 	\label{fig:consumerUml}
 \end{figure}
-
-Der Einstiegspunkt für den Spring-Konsumenten stellt der \emph{AmqService} dar. Nachrichten werden mithilfe dieser Komponente aus der Warteschlange des ActiveMq Brokers ausgelesen und an den \emph{WorkerService} delegiert. Über eine \emph{ObjectMapper} Instanz wird aus dem übergebenen String eine Objektinstanz eines Datenobjektes (\emph{InputPaymentMessage}) geniert (siehe Listing \ref{lst:consumerLogic}). Dieses Objekt wird an einen weiteren Service übergeben, der ein Element entsprechend der Vorgaben im Datenobjekt extrahiert. Wenn das zugrunde liegende XML nicht XSD konform ist oder das Element zum spezifizierten Pfad nicht gefunden werden kann, wird eine Null-Referenz ausgegeben. Es folgt ein Nullcheck bevor die Nachricht der Persistenzschicht übergeben wird.
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[style=javaStyle,caption={WorkerService - Konsumer Logik},label=lst:consumerLogic]
@@ -458,7 +455,7 @@ Diese Komponente ist in diesem Projekt sehr unkompliziert gehalten. Es wird ledi
 
 \subsection{Scaler Proxy}
 
-Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml}) wird die grundlegende Klassenstruktur der Scaler-Proxy-Komponente zusammengefasst. 
+Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml} \nameref{fig:proxyScalerUml}) wird die grundlegende Klassenstruktur der Scaler-Proxy-Komponente zusammengefasst. 
 
 \begin{figure}[ht!]
 	\centering
@@ -467,7 +464,7 @@ Im folgenden UML-Diagramm (siehe Abbildung \ref{fig:proxyScalerUml}) wird die gr
 	\label{fig:proxyScalerUml}
 \end{figure}
 
-Diese Komponente stellt sowohl die Funktionalität bereit Alerts vom Alert-Manager als auch direkte Skalierungsanfragen vom Benutzer selbst anzunehmen. Für beide Szenarien gibt es einen entsprechenden Endpunkt. Beide Typen von Anfragen werden intern allerdings erst in ein Zwischenformat überführt, das wiederum vom \emph{RequestService} interpretiert werden kann. Die wesentliche Kernfunktionalität dieses Services wurde in Listing \ref{lst:proxyDelegate} dargestellt. Bei der Implementierung des Regelwerks in der Prometheus-Komponente wurde erwähnt, dass es einen Mechanismus zum Skalieren über mehrere Stufen des Models von der Proxy-Komponente geben muss (siehe Abschnitt \ref{prometheus:skalierungsmechanismus}). Dies wurde in der Proxy-Komponente über ein Acknowledgement der einzelnen hochgefahrenen Container ermöglicht. Es wird intern eine Liste von Skalierungsinstruktionen verwaltet. Jeder Container, der im Zuge einer der Instruktionen gestartet wird, generiert eine ID, die diesen Container identifiziert und gibt diese dem Proxy-Service über eine Rest-Schnittstelle bekannt. Dadurch kann die Proxy-Komponente festzustellen, ob sich das System aktuell in einem Skalierungsprozess befindet oder nicht. Wenn nun neue Skalierungsinstruktionen eingespeist werden (zum Beispiel in einer der beschriebenen Übergangsphasen in der Tabelle), dann ist es der Komponente möglich mithilfe einer einfachen Überprüfung der Liste diese zu verwerfen (Zeile 2). Im Anschluss wird über sämtliche generierten Skalierungsinstruktionen iteriert. Die verwaltete Liste wird mit neuen Einträgen gefüllt und die Anfragen werden an die Skalierungs-API geschickt, die als letztes Abstraktionslevel ohne weitere Funktionalität die Skalierung für den Benutzer übernimmt. 
+Diese Komponente stellt sowohl die Funktionalität bereit Alerts vom Alert-Manager als auch direkte Skalierungsanfragen vom Benutzer selbst anzunehmen. Für beide Szenarien gibt es einen entsprechenden Endpunkt. Beide Typen von Anfragen werden intern allerdings erst in ein Zwischenformat überführt, das wiederum vom \emph{RequestService} interpretiert werden kann. Die wesentliche Kernfunktionalität dieses Services wurde in Listing \ref{lst:proxyDelegate} dargestellt. Bei der Implementierung des Regelwerks in der Prometheus-Komponente wurde erwähnt, dass es einen Mechanismus zum Skalieren über mehrere Stufen des Models von der Proxy-Komponente geben muss (siehe Abschnitt \ref{prometheus:skalierungsmechanismus} \nameref{prometheus:skalierungsmechanismus}). Dies wurde in der Proxy-Komponente über ein Acknowledgement der einzelnen hochgefahrenen Container ermöglicht. Es wird intern eine Liste von Skalierungsinstruktionen verwaltet. Jeder Container, der im Zuge einer der Instruktionen gestartet wird, generiert eine ID, die diesen Container identifiziert und gibt diese dem Proxy-Service über eine Rest-Schnittstelle bekannt. Dadurch kann die Proxy-Komponente festzustellen, ob sich das System aktuell in einem Skalierungsprozess befindet oder nicht. Wenn nun neue Skalierungsinstruktionen eingespeist werden (zum Beispiel in einer der beschriebenen Übergangsphasen in der Tabelle), dann ist es der Komponente möglich mithilfe einer einfachen Überprüfung der Liste diese zu verwerfen (Zeile 2). Im Anschluss wird über sämtliche generierten Skalierungsinstruktionen iteriert. Die verwaltete Liste wird mit neuen Einträgen gefüllt und die Anfragen werden an die Skalierungs-API geschickt, die als letztes Abstraktionslevel ohne weitere Funktionalität die Skalierung für den Benutzer übernimmt. 
 
 \begin{lstlisting}[style=javaStyle,caption={Proxy Scaler - RequestService},label=lst:proxyDelegate]
   public boolean delegate(List<ScalingInstruction> instructions) {
@@ -512,7 +509,7 @@ Dieses Werkzeug wird zur Erstellung von Graphen hinsichtlich erhaltener Metriken
 	\label{fig:prometheusDatasource}
 \end{figure}
 
-Über die in Prometheus deklarierten \emph{Targets} (überwachten Komponenten) können die wichtigen Informationen ausgelesen werden. Die Abbildung \ref{fig:grafanaOverview} zeigt hierbei auf wie das fertige Dashboard aussieht. Die Aufnahme wurde zum Zeitpunkt der Benchmarks-Test, die als Grundlage für diese Analyse verwendet wurden, getätigt. Es lassen sich alle Metriken der Ergebnisanalyse (siehe Abschnitt \ref{ch:ergebnisanalyse}) in diesem Dashboard wiederfinden. 
+Über die in Prometheus deklarierten \emph{Targets} (überwachten Komponenten) können die wichtigen Informationen ausgelesen werden. Die Abbildung \ref{fig:grafanaOverview} zeigt hierbei auf wie das fertige Dashboard aussieht. Die Aufnahme wurde zum Zeitpunkt der Benchmarks-Test, die als Grundlage für diese Analyse verwendet wurden, getätigt. Es lassen sich alle Metriken der Ergebnisanalyse (siehe Abschnitt \ref{ch:ergebnisanalyse} \nameref{ch:ergebnisanalyse}) in diesem Dashboard wiederfinden. 
 
 \begin{figure}
 	\centering
@@ -521,7 +518,7 @@ Dieses Werkzeug wird zur Erstellung von Graphen hinsichtlich erhaltener Metriken
 	\label{fig:grafanaOverview}
 \end{figure}
 
-Um ein Dashboard zu erstellen, wird auf das Webinterface der Komponente selbst zugegriffen. Es gibt hierbei zwar auch die Möglichkeit Dashboards im Json-Format einzulesen sowie zu exportieren, der Einfachheit halber wurde in diesem Projekt allerdings hierauf verzichtet. In der folgenden Abbildung ist zu erkennen, wie die Konfiguration einer Dashboard-Komponente über das Webinterface funktioniert (siehe Abbildung \ref{fig:grafanaPromQl}). 
+Um ein Dashboard zu erstellen, wird auf das Webinterface der Komponente selbst zugegriffen. Es gibt hierbei zwar auch die Möglichkeit Dashboards im Json-Format einzulesen sowie zu exportieren, der Einfachheit halber wurde in diesem Projekt allerdings hierauf verzichtet. In der folgenden Abbildung ist zu erkennen, wie die Konfiguration einer Dashboard-Komponente über das Webinterface funktioniert (siehe Abbildung \ref{fig:grafanaPromQl} \nameref{fig:grafanaPromQl}). 
 
 \begin{figure}
 	\centering
@@ -530,7 +527,7 @@ Um ein Dashboard zu erstellen, wird auf das Webinterface der Komponente selbst z
 	\label{fig:grafanaPromQl}
 \end{figure}
 
-Das wesentliche Formularelement, das während der Konfiguration verwendet wird, stellt die Anfrage an die definierte Datasource dar (\emph{query}). Hierbei wird auf eine Anfragesprache namens \emph{PromQL} zurückgegriffen um verschiedene Metriken auslesen zu können. In der Abbildung ist beispielsweise zu erkennen, dass bei einem Messagebroker mit dem Namen "\emph{localhost}" eine Warteschlang (engl. emph{queue}) mit dem Namen "\emph{springqueue}" mit der Adresse "\emph{activemq:8080}" die aktuelle Größe der Warteschlange ausgeben soll\footnote{Die hier genutzte Anfrage lässt sich zum Beispiel bei der ActiveMq-Dokumentation nachlesen \url{https://docs.splunk.com/Observability/gdi/activemq/activemq.html}}. Diese Anfrage wird in einem konfigurierbaren Intervall wiederholt (hier alle 15 Sekunden). Es ist auch möglich mehrere Anfragen pro Graph zu definieren um mehrere Werte gegenüberzustellen, sowie mehrere Anfrageergebnisse zu verknüpfen. Die erhaltenen Daten werden anschließend automatisch in einem Graphen dargestellt (siehe Abbildung \ref{fig:graphEx}). 
+Das wesentliche Formularelement, das während der Konfiguration verwendet wird, stellt die Anfrage an die definierte Datasource dar (\emph{query}). Hierbei wird auf eine Anfragesprache namens \emph{PromQL} zurückgegriffen um verschiedene Metriken auslesen zu können. In der Abbildung ist beispielsweise zu erkennen, dass bei einem Messagebroker mit dem Namen "\emph{localhost}" eine Warteschlang (engl. emph{queue}) mit dem Namen "\emph{springqueue}" mit der Adresse "\emph{activemq:8080}" die aktuelle Größe der Warteschlange ausgeben soll\footnote{Die hier genutzte Anfrage lässt sich zum Beispiel bei der ActiveMq-Dokumentation nachlesen \url{https://docs.splunk.com/Observability/gdi/activemq/activemq.html}}. Diese Anfrage wird in einem konfigurierbaren Intervall wiederholt (hier alle 15 Sekunden). Es ist auch möglich mehrere Anfragen pro Graph zu definieren um mehrere Werte gegenüberzustellen, sowie mehrere Anfrageergebnisse zu verknüpfen. Die erhaltenen Daten werden anschließend automatisch in einem Graphen dargestellt (siehe Abbildung \ref{fig:graphEx} \nameref{fig:graphEx}). 
 
 \begin{figure}
 	\centering
@@ -598,7 +595,7 @@ Um ein Docker-Image zu erstellen, wurde bei diesem Projekt auf eine Beschreibung
 Das Node.js-Projekt wurde mithilfe des npx "\emph{create-react-app}"-Starters initialisiert. Npx ist ein package runner für den node package manager (kurz npm). Npx stellt dabei ein CLI-Werkzeug bereit, welche bei Installation von npm direkt mit ausgeliefert wird und dient zur Unterstützung zur Verwaltung von Abhängigkeiten. Im Bezug auf das Node.js-Projekt ist es beispielsweise möglich hiermit ein Projekt zu initialisieren, das auf der Programmiersprache \emph{Typescript} basiert und nicht wie herkömmlich, auf Javascript. Typescript stellt eine Erweiterung von Javascript dar, es ist demnach möglich Javascript-Code in einem Typescript-Projekt auszuführen. Es wurde sich für Typescript entschieden, da diese Sprache die vier wesentlichen Prinzipien objektorientierter Sprachen bereitstellt. Diese setzten sich aus der \emph{Kapselung von Code}, der \emph{Vererbung}, \emph{Abstraktion} und \emph{Polymorphie} zusammen \cite{typescript-oop}. Dies ermöglicht eine klarer strukturierte Codebasis und ist über ein objektorientiertes Modell ebenfalls einfacher mit dem Spring Boot Pendant zu vergleichen.
 
 \paragraph{Kompilieren der Sourcen}
-Ähnlich wie Java wird auch ein Typescript-Projekt kompiliert, hierbei erfolgt die Kompilierung allerdings in Javascript-Code. Die Konfiguration des Typescript-Compiler \emph{tsc} befindet sich in einer Datei namens \emph{tsconfig.json} (siehe Listing \ref{lst:tsconfig}).
+Ähnlich wie Java wird auch ein Typescript-Projekt kompiliert, hierbei erfolgt die Kompilierung allerdings in Javascript-Code. Die Konfiguration des Typescript-Compiler \emph{tsc} befindet sich in einer Datei namens \emph{tsconfig.json} (siehe Listing \ref{lst:tsconfig} \nameref{lst:tsconfig}).
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[style=javaStyle,caption={tsconfig.json},label=lst:tsconfig]
@@ -635,7 +632,7 @@ Die wichtigesten Konfigurationsparameter im Überblick.
   \item \emph{strict}: Compilerflag hinsichtlich der Typisierung und sonstiger Javascript-Eigenheiten. Ersetzt die Notwendigkeit, in jeder einzelnen Quellcodedatei einen "\emph{use strict}" Befehl angeben zu müssen, um die Datei im ECMAScript \emph{strict mode} zu parsen\footnote{für weiter Informationen siehe Dokumentation \cite[Kapitel~tsconfig]{typescript-doc}}.
 \end{itemize}
 
-Ähnlich wie bei einem Maven-Projekt eine \emph{pom.xml} Datei verwendet wird, um die Projekt-Konfigurationseinstellungen festzuhalten, wird bei einem Typescript-Projekt eine sogenannte \emph{package.json} erstellt (siehe Listing \ref{lst:package}, die komplette Datei befindet sich im Anhang \ref{anh:package}).
+Ähnlich wie bei einem Maven-Projekt eine \emph{pom.xml} Datei verwendet wird, um die Projekt-Konfigurationseinstellungen festzuhalten, wird bei einem Typescript-Projekt eine sogenannte \emph{package.json} erstellt (siehe Listing \ref{lst:package} \nameref{lst:package}, die komplette Datei befindet sich im Anhang \ref{anh:package}).
 
 
 \begin{lstlisting}[style=javaStyle,caption={Typescript - package.json},label=lst:package]
@@ -708,7 +705,7 @@ Es ist möglich, ein Netzwerk von Containern manuell über das CLI der Docker-En
 Container werden hierbei in Clustern organisiert die es ermöglichen mithilfe des \emph{Docker-Link}-Mechanismus die Container über ein definiertes Netzwerk miteinander in Verbindung treten zu lassen. "\emph{The Docker server acts as a virtual bridge and the containers are clients behind it}" \cite[Seite~13]{oreilly-docker}. Jeder Container besitzt ein eigenes virutelles Ethernet Interface, das eine eigene IP-Adresse allokiert und mit der beschriebenen Docker-Bridge verbunden ist. "\emph{Docker lets you bind ports on the host to the container so that the outside world can reach your container}". Hierbei wird ein lokales Netzwerk allokiert über das alle Container direkt miteinander kommunizieren können.
 
 \paragraph{Stack-Konfiguration}
-Um beim Beispiel des \emph{Suppliers} zu bleiben folgt eine kurze Zusammenfassung der Stack-Konfiguration für den Spring-Supplier-Container. Die gesamte Docker-Compose Konfigurationsdatei befindet sich ebenfalls im Anhang (siehe Listing \ref{lst:dockerCompose}).
+Um beim Beispiel des \emph{Suppliers} zu bleiben folgt eine kurze Zusammenfassung der Stack-Konfiguration für den Spring-Supplier-Container. Die gesamte Docker-Compose Konfigurationsdatei befindet sich ebenfalls im Anhang (siehe Listing \ref{lst:dockerCompose} \nameref{lst:dockerCompose}).
 
 \begin{lstlisting}[style=bashStyle,caption={Docker Compose - Ausschnitt Supplier Definition},label=lst:dockerCompose]
 
@@ -747,7 +744,7 @@ Die Konfigurationsdatei wurde im yaml Dateiformat erfasst, wobei es hier ein Key
   \item \emph{environment}: hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen, es ist irrelevant, ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13), für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
 \end{itemize}
 
-Neben den wesentlichen beschriebenen Konfigurationsparameter gilt es noch die \emph{volume} Definition (siehe Listing \ref{lst:composeVolumes}) zu erwähnen. 
+Neben den wesentlichen beschriebenen Konfigurationsparameter gilt es noch die \emph{volume} Definition (siehe Listing \ref{lst:composeVolumes} \nameref{lst:composeVolumes}) zu erwähnen. 
 
 
 \begin{lstlisting}[style=bashStyle,caption={Docker Compose - Volume Definition},label=lst:composeVolumes]
@@ -771,10 +768,10 @@ Daten, die über Volumes persistiert werden sind vom Betriebssystem des Hosts ko
   \item \emph{Anonymous volumes}: have no specific source so when the container is deleted, instruct the Docker Engine daemon to remove them.
 \end{enumerate}
 
-Im Projekt wurde auf anonyme Volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes}). Diese werden direkt vom Docker-Daeomon verwaltet, wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit auf sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, welches auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
+Im Projekt wurde auf anonyme Volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes} \nameref{lst:composeVolumes}). Diese werden direkt vom Docker-Daeomon verwaltet, wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit auf sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, welches auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
 
 \paragraph{Docker Swarm}
-Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform}}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Dabei können mehrere Maschinen derartig agieren, dass es für den Anwender den Anschein erweckt, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das Skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren ohne, dass die restlichen Stack-Komopnenten hiervon beeinflusst werden. Um dies nutzen zu können muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm-Werkzeug allerdings lediglich teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das Setzen von Umgebungsvariablen mithilfe definierter Variablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben Umgebungsvariablen zu über Variablen des Buildsystems zu definieren, die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich sensitiver Daten, zum Beispiel bei Anmeldedaten für Datenbanken etc. katastrophal. Um dennoch in der Lage zu sein bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit das Docker-Compose-Werkzeug selbst als Präprozessor zu verwenden. Dabei wird das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umgewandelt und die Umgebungsvariablen direkt mit den im System hinterlegten Werten ausgewechselt. Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein Swarm auf der Hostmaschine initialisiert, und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert (siehe Auszug \ref{summary-start-stack-services}, komplettes Skript im Anhang unter \ref{start-stack-services}).
+Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform} \nameref{sec:anforderungPlattform}}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Dabei können mehrere Maschinen derartig agieren, dass es für den Anwender den Anschein erweckt, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das Skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren ohne, dass die restlichen Stack-Komopnenten hiervon beeinflusst werden. Um dies nutzen zu können muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm-Werkzeug allerdings lediglich teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das Setzen von Umgebungsvariablen mithilfe definierter Variablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben Umgebungsvariablen zu über Variablen des Buildsystems zu definieren, die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich sensitiver Daten, zum Beispiel bei Anmeldedaten für Datenbanken etc. katastrophal. Um dennoch in der Lage zu sein bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit das Docker-Compose-Werkzeug selbst als Präprozessor zu verwenden. Dabei wird das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umgewandelt und die Umgebungsvariablen direkt mit den im System hinterlegten Werten ausgewechselt. Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein Swarm auf der Hostmaschine initialisiert, und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert (siehe Auszug \ref{summary-start-stack-services} \nameref{summary-start-stack-services}, komplettes Skript im Anhang unter \ref{start-stack-services}).
 
 \begin{lstlisting}[style=bashStyle,caption={start-stack-services.sh},label=lst:summary-start-stack-services]
 
@@ -820,7 +817,7 @@ Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer s
 Nachdem im letzten Abschnitt auf die Konfiguration des Stacks eingegangen wurde, wird im Folgenden erklärt, welche Szenarien für die Messdatenerhebung durchgeführt wurden und unter welchen Bedingungen das System diese bearbeitet hat.
 
 \subsection{Testszenarien}
-Für die Erhebung der Messdaten wurde auf die in \ref{} \todo{Ref einbinden} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese der Riehe nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit weniger Nachrichten in das System eingepflegt wurde, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueue} zeigt die Daten des Message Brokers. 
+Für die Erhebung der Messdaten wurde auf die in \ref{} \todo{Ref einbinden} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese der Riehe nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit weniger Nachrichten in das System eingepflegt wurde, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueue} \nameref{fig:benchmarkQueue} zeigt die Daten des Message Brokers. 
 
 \begin{figure}[ht!]
 	\centering
@@ -833,7 +830,7 @@ Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bea
 
 Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu \ref{ss:bash}).
 
-Das zweite Testszenario betrifft die direkt Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash}). Der Aufrufd wurde mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insgesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
+Das zweite Testszenario betrifft die direkt Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash} \nameref{ss:bash}). Der Aufrufd wurde mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insgesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
 
 \subsection{Testbedingungen}
 % \begin{itemize}
@@ -843,7 +840,7 @@ Das zweite Testszenario betrifft die direkt Skalierung mithilfe des Skripts \emp
 %   \item chaos monkey / Stoerfaelle erlaeutern
 % \end{itemize}
 
-Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde (siehe Tabelle \ref{tab:serverSpecs}). 
+Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde (siehe Tabelle \ref{tab:serverSpecs} \nameref{tab:serverSpecs}). 
 
 \renewcommand\theadalign{bc}
 \renewcommand\theadfont{\bfseries}
