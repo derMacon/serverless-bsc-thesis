@@ -847,7 +847,7 @@ Für die Erhebung der Messdaten wurde auf die in \ref{ss:Input} beschriebenen Sk
 
 Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bearbeitet. Dies ist daran zu erkennen, dass die \emph{persistencequeue} entsprechend viele Einträge verwaltet hat. Die Hälfte wurde jeweils von der Node.js- sowie Spring-Boot-Komponente bearbeitet (siehe \emph{nodequeue} sowie \emph{springqueue}). In der Praxis muss ein System allerdings eine deutlich höhere Last verarbeiten können. Das Produktivsystem des Unternehmens ist in der Lage 1000 Nachrichten pro Sekunde verarbeiten zu können. In entsprechenden Lasttests wird dies über einen Zeitraum von einer Stunde oder mehr getestet. Für diesen Prototypen ist die genannte Anzahl allerdings völlig ausreichend um einen Überblick über das System zu bekommen. Außerdem wurde in den verarbeitenden Komponenten des Prototypens eine künstliche Verlangsamung hinzugefügt um eine bessere Nachvollziehbarkeit zu gewährleisten, welche in der Produktivumgebung natürlich entfällt.
 
-Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu \ref{ss:bash}).
+Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu \ref{ss:bash} \nameref{ss:bash}).
 
 Das zweite Testszenario betrifft die direkte Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash} \nameref{ss:bash}). Der Aufruf wurde mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insgesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
 
@@ -859,7 +859,7 @@ Das zweite Testszenario betrifft die direkte Skalierung mithilfe des Skripts \em
 %   \item chaos monkey / Stoerfaelle erlaeutern
 % \end{itemize}
 
-Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde (siehe Tabelle \ref{tab:serverSpecs} \nameref{tab:serverSpecs}). 
+Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde. 
 
 \renewcommand\theadalign{bc}
 \renewcommand\theadfont{\bfseries}
@@ -868,8 +868,6 @@ Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folge
 
 \begin{table}[ht!]
   \centering
-  \caption{Server Specs}
-  \label{tab:serverSpecs}
   \bigskip
   \begin{tabular}{ c l }
     \toprule
@@ -884,4 +882,6 @@ Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folge
     Distro & CentOS 8\\
     \bottomrule
   \end{tabular}
+  \caption{Server Specs}
+  \label{tab:serverSpecs}
 \end{table}

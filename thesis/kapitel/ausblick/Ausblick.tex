@@ -1,4 +1,9 @@
 \chapter{Ausblick}
 
-\todo{Im Ausblick erwähnen, dass es möglich ist Datenbanken, Broker etc. zu skalieren, Gegenstand der nächsten Arbeit...}
-\todo{Chaos Monkey Betrachtung an Ende der Thesis packen}
+Nachdem im letzten Abschnitt eine Zusammenfassung der gesamten Thesis beschrieben wurde, folgt ein Ausblick für den Fortbestand dieses Projekt und die hieraus erlangten Erkenntnisse.
+
+Wie bereits in der Diskussion (siehe Abschnitt \ref{sec:diskussion} \nameref{sec:diskussion}) beschrieben, lassen sich die erlangten Ergebnisse nicht zwangsweise auf eine Produktivumgebung übertragen. Es wurde hierbei in erster Linie ermittelt, wie sich die Start-up-Zeiten in einem störungsfreien System verhalten. In einem nächsten Schritt gilt es, mögliche Konfigurationen in einem störungsbehafteten System zu testen. Außerdem wäre es möglich, einen noch effizienteren Start-up-Prozess zu gestalten und somit die Initialisierungsdauer weiter verkürzen. Dies kann über die Docker-Runtime selbst, die Ausführungsreihenfolge oder weitere Konfigurationsmechanismen in den zugrunde liegenden Technologien selbst geschehen. Auch können weitere Komponenten wie zum Beispiel der verwendete Broker oder die Datenbanken skaliert werden, was ebenfalls einen deutlichen Performanceanstieg mit sich führen würde.
+
+Außerdem gilt es weitere vorgestellte Aspekte der ISO-Norm zu untersuchen. Beispielsweise könnte sollte ein solches System in der Lage sein, trotz dem Ausfall einiger Komponenten weiterhin in einem stabilen Zustand zu agieren. Dies kann über verschiedene Werkzeuge getestet werden und stellt einen wesentlichen Faktor für den weiteren Auswahlprozess dar. 
+
+Diese Thesis soll als ein erster Schritt zur Evaluierung verschiedener cloudfähiger Technologien betrachtet werden. Je nach Usecase der Anwendung müssen im entsprechenden Bereich weitere Systemkomponenten entworfen und spezifischere Tests entworfen werden. In dieser Ausarbeitung erfolgte lediglich ein erster Einblick in eine mögliche Konfiguration eines Komponentenstacks, den es in Zukunft für das jeweilige Anwendungsgebiet zu erweitern und zu verfeinern gilt.

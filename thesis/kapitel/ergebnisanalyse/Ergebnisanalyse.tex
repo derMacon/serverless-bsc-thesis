@@ -7,9 +7,9 @@ Nachdem die Implementierung des Komponentenstacks im letzten Abschnitt detaillie
 
 \label{tab:latency}
 \begin{table}[ht!]
-  \vspace{-8mm}
+%   \vspace{-8mm}
   \centering
-  \hspace{1cm}
+%   \hspace{1cm}
   \begin{tabular}{@{}lc@{}}
     \toprule
     Metrik & Dauer \\
@@ -129,15 +129,16 @@ Die abstrakteste Metrik bezieht sich auf den durchschnittlichen Zeitraum zum Ini
 \label{par:skalierungsstufe}
 Um einen beispielhaften Skalierungsalgorithmus zu implementieren, wurde ein Regelsatz verfasst, der vom Alert-Manager zur Laufzeit automatisch in einem festgelegten Intervall ausgewertet wird. Um diesen Regelsatz zu Vorführungszwecken nicht unnötig ausführlich zu gestalten, wurde das Hinzufügen neuer Instanzen in Stufen organisiert. 
 
-Im durchgeführten Testszenario betrug die Grenze zum Überschreiten der ersten Stufe eine Anzahl von 15, für die zweite Stufe 30 und für die dritte Stufe 100 unbeantwortete Nachrichten in der jeweiligen Warteschlange. Wenn im Folgenden von einem "\emph{Burst}" gesprochen wird, ist hiermit das Überschreiten einer dieser Grenzen gemeint. Bei dem kleinstmöglichen Burst bezüglich der Warteschlange der Node.js-Komponente, nimmt das System im Schnitt 2.9 Sekunden zum Starten der Container in Anspruch um der Arbeitslast nach Skalierung mit insgesamt neuen 5 Containern-Instanzen zu begegnen. Bei der Spring-Boot-Komponente wurde hierfür ein Wert von 8.1 Sekunden gemessen. Im mittleren Grenzintervall wurde bezüglich Node.js eine Initialisierungsdauer von 3.8 Sekunden und seitens Spring 16.0 Sekunden festgestellt um nach der Skalierung mit 10 Instanzen zu arbeiten. Beim höchsten Burst kam es bei der Node.js-Komponente zu einer Initialisierungsphase von 6.9 Sekunden und bezüglich Spring zu 36.6 Sekunden. Hierbei sollen am Ende 30 Containerinstanzen des Konsumenten einsatzbereit sein. Da beim Skalierungsalgorithmus mit den beschriebenen Stufen gearbeitet wird, kann hierbei nicht genau gesagt werden, wie viele Container tatsächlich im Endeffekt initialisiert wurden, da stets mit den Differenzen zwischen den Stufen gearbeitet wird. Wenn zum Beispiel bereits \emph{n} Container laufen und neue Nachrichten einen Burst verursachen, sollen nur die benötigten Instanzen kreiert werden, um genau die fehlende Anzahl zu decken. Die genaue Übersicht nach parallelen Instanziierungen wurde im Paragraphen (siehe Abschnitt \ref{par:specContainer} \todo{ref pruefen}) genauer beschrieben.
+Im durchgeführten Testszenario betrug die Grenze zum Überschreiten der ersten Stufe eine Anzahl von 15, für die zweite Stufe 30 und für die dritte Stufe 100 unbeantwortete Nachrichten in der jeweiligen Warteschlange. Wenn im Folgenden von einem "\emph{Burst}" gesprochen wird, ist hiermit das Überschreiten einer dieser Grenzen gemeint. Bei dem kleinstmöglichen Burst bezüglich der Warteschlange der Node.js-Komponente, nimmt das System im Schnitt 2.9 Sekunden zum Starten der Container in Anspruch um der Arbeitslast nach Skalierung mit insgesamt neuen 5 Containern-Instanzen zu begegnen. Bei der Spring-Boot-Komponente wurde hierfür ein Wert von 8.1 Sekunden gemessen. Im mittleren Grenzintervall wurde bezüglich Node.js eine Initialisierungsdauer von 3.8 Sekunden und seitens Spring 16.0 Sekunden festgestellt um nach der Skalierung mit 10 Instanzen zu arbeiten. Beim höchsten Burst kam es bei der Node.js-Komponente zu einer Initialisierungsphase von 6.9 Sekunden und bezüglich Spring zu 36.6 Sekunden. Hierbei sollen am Ende 30 Containerinstanzen des Konsumenten einsatzbereit sein. Da beim Skalierungsalgorithmus mit den beschriebenen Stufen gearbeitet wird, kann hierbei nicht genau gesagt werden, wie viele Container tatsächlich im Endeffekt initialisiert wurden, da stets mit den Differenzen zwischen den Stufen gearbeitet wird. Wenn zum Beispiel bereits \emph{n} Container laufen und neue Nachrichten einen Burst verursachen, sollen nur die benötigten Instanzen kreiert werden, um genau die fehlende Anzahl zu decken. Die genaue Übersicht nach parallelen Instanziierungen wurde im folgenden Paragraphen genauer beschrieben (siehe Abschnitt \ref{par:specContainer} \nameref{par:specContainer}).
 
 
 \paragraph{Aufschlüsselung nach Containeranzahl}
 \label{par:specContainer}
 Die detaillierteste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gleichzeitig hochfahrender Container (siehe \ref{fig:specContainers}). Wie im Graphen erkennbar, handelt es sich um ein lineares Wachstum. Mit jedem zusätzlichen zeitgleich erstellten Container, dauert der Initialisierungsprozess bei der Spring-Implementierung im Schnitt 1611 Millisekunden länger. Bei der Node.js Implementierung liegt dieser Wert bei 194 Millisekunden. So dauert das Initialisieren eines einzelnen neuen Containers bei der Spring-Boot-Komponente 4,8 Sekunden, während sich dieser Wert bei der Node.js-Koponente lediglich auf 2,6 Sekunden beläuft. Um diese nach Containeranzahl aufgeschlüsselten Werte zu erhalten, wurde nicht wie bei den anderen Skalierungstests auf die öffentliche Schnittstelle mittels Nachrichtengenerierung zurückgegriffen, es wurde stattdessen eine interne Schnittstelle mittels dediziertem Skript verwendet um möglichst störungsfreien Zugriff auf die orchestrierende Komponente des Stacks zu erlangen. Die nachfolgenden Metriken wurden allerdings durch die öffentliche Schnittstelle generiert.
 
-\begin{wrapfigure}[16]{l}{0.53\textwidth}
-  \vspace{-12mm}
+\begin{figure}[ht!]
+% \begin{wrapfigure}[16]{l}{0.53\textwidth}
+%   \vspace{-12mm}
   \centering
   \caption[Startzeit Container - Anzahl spezifisch]{Anzahlspezifisch}
   \label{fig:specContainers}
@@ -149,18 +150,12 @@ Die detaillierteste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gl
       \addlegendentry{Node.js}
     \end{axis}
   \end{tikzpicture}
-\end{wrapfigure}
+% \end{wrapfigure}
+\end{figure}
 
 
 \paragraph{Zeitliche Aufschlüsselung}
 Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurden diverse Panels zur zeitlichen Übersicht bereitgestellt. Diese wurden jedoch vor allem zu Kontrollzwecken implementiert. Diese visuelle Darstellung stellte sich während der Entwicklungszeit als sehr hilfreich dar, um Fehler frühzeitig zu erkennen und beheben zu können. Für die Auswertung der Ergebnisse haben diese allerdings wenig Relevanz. Der Vollständigkeit halber soll an dieser Stelle dennoch eine kurze Zusammenfassung der zeitbasierten Messwerte erfolgen. Für alle bisher behandelten Metriken gibt es Panels im Grafana Dashboard. Da die zeitliche Erfassung in Grafana selbst allerdings intervallbasierte Abfragen stellt, sind diese im Vergleich zu den Werten, welche in der Datenbank durch das System generiert und abgelegt wurden, sehr ungenau. Selbstverständlich wurde in der bisherigen Analyse ausschließlich auf die persistierten Daten zurückgegriffen. Bezüglich der Konsumenten wurde neben dem zusammengefassten durchschnittlichen Startverhalten auch der jeweils aktuelle Initialisierungszeitpunkt dargestellt. Hierbei war eine klare Korrelation zwischen der Anzahl der parallel startenden Konsumenten mit der erhöhten Initialisierungsdauer zu beobachten. Außerdem wurden diverse Metriken aus dem Activemq-Broker selbst ausgelesen. So ist es zum Beispiel möglich nachzuvollziehen, wie viele Nachrichten sich zu einem gegebenen Zeitpunkt nicht nur in einer bestimmten Warteschlange sondern auch innerhalb des ganzen Systems befinden. Außerdem wurde die zeitliche Abfolge zwischen einem Burst an unbeantworteten Nachrichten und dem Anstieg der Containerinstanzen in einem Dashboard-Panel dargestellt.
-
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=\linewidth]{kapitel/problemloesung/implementierung/_img/grafana-dashboard-01}
-	\caption[]{Grafana Dashboard}
-	\label{fig:grafanaScreenshot01}
-\end{figure}
 
 
 \section{Analyse}
@@ -220,7 +215,9 @@ Im nächsten Schritt folgt der Verarbeitungsschritt der \emph{Pre-Initialization
 Diese Beschreibung sollte lediglich einen kurzen Einblick über die Möglichkeiten geben, welche durch den Initialisierungsprozess dem Anwender zur Verfügung gestellt werden. Hierbei ist es nicht nur möglich, genau nachzuvollziehen, in welcher Phase sich eine Bean momentan befindet. Der Prozess bietet ebenfalls die Möglichkeit, mithilfe spezifizierter Schnittstellen an einer beliebigen Stelle eigene Logikbausteine zu integrieren. Um der Philosophie des Spring-Frameworks gerecht zu werden, braucht es auch einen solch komplexen Aufbau. 
 
 
+\begin{minipage}{\textwidth}
 \subsection{Zusammenfassung}
+
 Es folgt eine kurze Zusammenfassung des letzten Abschnitts.
 
 \begin{itemize}
@@ -240,8 +237,10 @@ Es folgt eine kurze Zusammenfassung des letzten Abschnitts.
 		\item Verarbeitungsschritte schaffen Nachvollziehbarkeit
 	\end{itemize}
 \end{itemize}
+\end{minipage}
 
 \section{Diskussion}
+\label{sec:diskussion}
 Im letzten Abschnitt wurde auf die zwei wesentlichen Kenndaten der ermittelten Metriken eingegangen. Dabei wurden mögliche Begründungen für die erhaltenen Messdaten präsentiert. Es folgte außerdem ein kurzer Exkurs zum Initialisierungsprozess einer Spring-Bean. Generell stellt die lange Initialisierungsphase der Spring-Komponenten ein ernsthaftes Problem dar. Welche Schritte zur Optimierung dieses Verhaltens durch die zugrunde liegende Technologie ermöglicht werden und inwiefern das System dies mithilfe der schnellen Verarbeitungsdauer auszugleichen vermag, wird im folgenden Abschnitt beschrieben. 
 
 \subsection{Spring-Bean - Optimierung der Initialisierungsphase}
@@ -249,7 +248,7 @@ Im letzten Abschnitt wurde auf die zwei wesentlichen Kenndaten der ermittelten M
 
 Die deutlich längere Initialisierungsphase der Spring-Komponente lässt sich in erster Linie auf die beschriebene Komplexität der einzelnen Anwendungsschritte zurückführen. Um einem derart mächtigem Framework wie Spring Boot gerecht zu werden, benötigt es einen ähnlich ausgeprägten Initialisierungsmechanismus für den Spring-Container und allen damit verbundenen Anforderungen. Da das Projekt allerdings verschiedene Abhängigkeiten aufweist, wird auch der Initialisierungsprozess entsprechend erweitert. Mit dem Befehl \verb+mvn spring-boot:run -Ddebug+ können zum Beispiel alle automatischen Konfigurationsschritte ausgegeben werden. Wie im Artikel \cite{spring-perf} beschrieben, ist es durchaus möglich, einige der Konfigurationen wegzulassen, wenn die dazugehörigen Komponenten nicht genutzt werden. 
 
-Es ist außerdem denkbar, auf einen anderen Servlet-Container wie "\emph{Undertow}" zuzugreifen. Dieser stellt eine leichtgewichtigere Implementierung eines Webservers bereit und ermöglicht dadurch eine Performancesteigerung. Dennoch wurde sich für den Prototypen dagegen entschieden, weder einzelne Konfigurationen manuell zu entfernen, noch die Container-Implementierung zu wechseln, da sich das Projekt auch nach Bearbeitung der Thesis eventuell weiterentwickelt und als Beispielprojekt gelten könnte. Hierbei gilt es darauf zu achten auch zukünftig vermeidbare Fehlerfälle zu vermeiden.
+Es ist außerdem denkbar, auf einen anderen Servlet-Container\footnote{Definition Servlet Container \cite{servlet-container-def}} wie "\emph{Undertow}" zuzugreifen. Dieser stellt eine leichtgewichtigere Implementierung eines Webservers bereit und ermöglicht dadurch eine Performancesteigerung. Dennoch wurde sich für den Prototypen dagegen entschieden, weder einzelne Konfigurationen manuell zu entfernen, noch die Container-Implementierung zu wechseln, da sich das Projekt auch nach Bearbeitung der Thesis eventuell weiterentwickelt und als Beispielprojekt gelten könnte. Hierbei gilt es darauf zu achten auch zukünftig vermeidbare Fehlerfälle zu vermeiden.
 
 
 \subsection{Ressourcenoptimierung}
@@ -265,7 +264,7 @@ Um die gesamte Startzeit bei gleichzeitigem Starten von Node.js und Spring Conta
 
 
 \subsection{Aussagen über Produktivumgebung}
-Die Aussagen, die während der Analyse der Daten getroffen wurden, sind hinsichtlich eines Systems in einer Produktivumgebung nur in Teilen aussagekräftig. Ein wesentliches Hauptkriterium der ISO-Norm 25010 \todo{ref einbinden} wurde hierbei vernachlässigt, denn es wurde nur sehr eingeschränkt auf die Verfügbarkeit des Systems und dem \emph{Design for failure} eingegangen. Wenn zentrale Komponenten ausfallen, gibt es lediglich ein definiertes Default-Verhalten des Orchestrators. So wird versucht, die Komponente selbst sowie sämtliche Kommunikationspartner neu zu starten. Dieses Verhalten hat vor allem Einfluss auf den Initialisierungszeitraum eines Containers. Da beide betrachteten Technologien auf eigene Weise Mechanismen zum erneuten Verbindungsaufbau im Falle eines Ausfalls zur Verfügung stellen, ist diese Betrachtung für die reine Evaluierung der Technologie von nicht allzu großer Bedeutung. Im Zweifelsfall wird ein Container mehrmals gestartet, die grundlegenden Messdaten lassen sich bereits an einem störungsfreien Ablauf ablesen. Falls es zu einem späteren Zeitpunkt während der Portierung der Banking-Anwendung hin zu einer der betrachteten Technologien kommen sollte, muss dieses Fehlerverhalten jedoch ausgiebig getestet werden um späteres unerwartetes Verhalten zu vermeiden. 
+Die Aussagen, die während der Analyse der Daten getroffen wurden, sind hinsichtlich eines Systems in einer Produktivumgebung nur in Teilen aussagekräftig. Ein wesentliches Hauptkriterium der ISO-Norm 25010 wurde hierbei vernachlässigt, denn es wurde nur sehr eingeschränkt auf die Verfügbarkeit des Systems und dem \emph{Design for failure} eingegangen. Wenn zentrale Komponenten ausfallen, gibt es lediglich ein definiertes Default-Verhalten des Orchestrators. So wird versucht, die Komponente selbst sowie sämtliche Kommunikationspartner neu zu starten. Dieses Verhalten hat vor allem Einfluss auf den Initialisierungszeitraum eines Containers. Da beide betrachteten Technologien auf eigene Weise Mechanismen zum erneuten Verbindungsaufbau im Falle eines Ausfalls zur Verfügung stellen, ist diese Betrachtung für die reine Evaluierung der Technologie von nicht allzu großer Bedeutung. Im Zweifelsfall wird ein Container mehrmals gestartet, die grundlegenden Messdaten lassen sich bereits an einem störungsfreien Ablauf ablesen. Falls es zu einem späteren Zeitpunkt während der Portierung der Banking-Anwendung hin zu einer der betrachteten Technologien kommen sollte, muss dieses Fehlerverhalten jedoch ausgiebig getestet werden um späteres unerwartetes Verhalten zu vermeiden. 
 
 Damit das Verhalten des Systems bezüglich eines Ausfalls bestimmter Komponenten betrachtet werden kann, stehen unterschiedliche Werkzeuge zur Verfügung. Ein etabliertes Werkzeug stellt das open source Projekt "\emph{Chaos Monkey\footnote{\url{https://github.com/Netflix/chaosmonkey}}}" dar, das von Netflix entwickelt und veröffentlicht wurde. Es ist allerdings auch möglich Werkzeuge für spezifische Orchestrator zu nutzen (Übersicht \cite[Seite~369]{continuous-delivery}). Diese Art von Werkzeugen ermöglicht das kontrollierte Aussetzen bestimmter Netzwerkverbindungen sowie das Herunterfahren ganzer Services über einen festgelegten Zeitraum. 
 
@@ -278,7 +277,7 @@ Der Fokus der Thesis liegt auf dem Start-up-Verhalten der Komponenten. Hierbei i
 
 \subsection{Zusammenfassung}
 
-\todo{Schauen ob Begriff "Servlet-Container" irgendwo erklärt wurde...}
+Es folgt eine kurze Zusammenfassung des letzten Abschnitts.
 
 \begin{itemize}
 	\item lange Startzeit der Spring Komponente auf Initialisierungsphase zurückzuführen
