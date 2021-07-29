@@ -134,7 +134,7 @@ Im durchgeführten Testszenario betrug die Grenze zum Überschreiten der ersten 
 
 \paragraph{Aufschlüsselung nach Containeranzahl}
 \label{par:specContainer}
-Die detaillierteste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gleichzeitig hochfahrender Container (siehe \ref{fig:specContainers}). Wie im Graphen erkennbar, handelt es sich um ein lineares Wachstum. Mit jedem zusätzlichen zeitgleich erstellten Container, dauert der Initialisierungsprozess bei der Spring-Implementierung im Schnitt 1611 Millisekunden länger. Bei der Node.js Implementierung liegt dieser Wert bei 194 Millisekunden. So dauert das Initialisieren eines einzelnen neuen Containers bei der Spring-Boot-Komponente 4,8 Sekunden, während sich dieser Wert bei der Node.js-Koponente lediglich auf 2,6 Sekunden beläuft. Um diese nach Containeranzahl aufgeschlüsselten Werte zu erhalten, wurde nicht wie bei den anderen Skalierungstests auf die öffentliche Schnittstelle mittels Nachrichtengenerierung zurückgegriffen, es wurde stattdessen eine interne Schnittstelle mittels dediziertem Skript verwendet um möglichst störungsfreien Zugriff auf die orchestrierende Komponente des Stacks zu erlangen. Die nachfolgenden Metriken wurden allerdings durch die öffentliche Schnittstelle generiert.
+Die detaillierteste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gleichzeitig hochfahrender Container (siehe \ref{fig:specContainers} \nameref{fig:specContainers}). Wie im Graphen erkennbar, handelt es sich um ein lineares Wachstum. Mit jedem zusätzlichen zeitgleich erstellten Container, dauert der Initialisierungsprozess bei der Spring-Implementierung im Schnitt 1611 Millisekunden länger. Bei der Node.js Implementierung liegt dieser Wert bei 194 Millisekunden. So dauert das Initialisieren eines einzelnen neuen Containers bei der Spring-Boot-Komponente 4,8 Sekunden, während sich dieser Wert bei der Node.js-Koponente lediglich auf 2,6 Sekunden beläuft. Um diese nach Containeranzahl aufgeschlüsselten Werte zu erhalten, wurde nicht wie bei den anderen Skalierungstests auf die öffentliche Schnittstelle mittels Nachrichtengenerierung zurückgegriffen, es wurde stattdessen eine interne Schnittstelle mittels dediziertem Skript verwendet um möglichst störungsfreien Zugriff auf die orchestrierende Komponente des Stacks zu erlangen. Die nachfolgenden Metriken wurden allerdings durch die öffentliche Schnittstelle generiert.
 
 \begin{figure}[ht!]
 % \begin{wrapfigure}[16]{l}{0.53\textwidth}
@@ -155,7 +155,41 @@ Die detaillierteste Metrik beschreibt die Zeiten aufgeschlüsselt nach Anzahl gl
 
 
 \paragraph{Zeitliche Aufschlüsselung}
-Wie in Bild \ref{fig:grafanaScreenshot01} zu sehen, wurden diverse Panels zur zeitlichen Übersicht bereitgestellt. Diese wurden jedoch vor allem zu Kontrollzwecken implementiert. Diese visuelle Darstellung stellte sich während der Entwicklungszeit als sehr hilfreich dar, um Fehler frühzeitig zu erkennen und beheben zu können. Für die Auswertung der Ergebnisse haben diese allerdings wenig Relevanz. Der Vollständigkeit halber soll an dieser Stelle dennoch eine kurze Zusammenfassung der zeitbasierten Messwerte erfolgen. Für alle bisher behandelten Metriken gibt es Panels im Grafana Dashboard. Da die zeitliche Erfassung in Grafana selbst allerdings intervallbasierte Abfragen stellt, sind diese im Vergleich zu den Werten, welche in der Datenbank durch das System generiert und abgelegt wurden, sehr ungenau. Selbstverständlich wurde in der bisherigen Analyse ausschließlich auf die persistierten Daten zurückgegriffen. Bezüglich der Konsumenten wurde neben dem zusammengefassten durchschnittlichen Startverhalten auch der jeweils aktuelle Initialisierungszeitpunkt dargestellt. Hierbei war eine klare Korrelation zwischen der Anzahl der parallel startenden Konsumenten mit der erhöhten Initialisierungsdauer zu beobachten. Außerdem wurden diverse Metriken aus dem Activemq-Broker selbst ausgelesen. So ist es zum Beispiel möglich nachzuvollziehen, wie viele Nachrichten sich zu einem gegebenen Zeitpunkt nicht nur in einer bestimmten Warteschlange sondern auch innerhalb des ganzen Systems befinden. Außerdem wurde die zeitliche Abfolge zwischen einem Burst an unbeantworteten Nachrichten und dem Anstieg der Containerinstanzen in einem Dashboard-Panel dargestellt.
+Wie in Bild \ref{fig:grafanaOverview} auf Seite \pageref{fig:grafanaOverview} zu erkennen ist, wurden diverse Panels zur zeitlichen Übersicht bereitgestellt. Diese wurden jedoch vor allem zu Kontrollzwecken implementiert. Diese visuelle Darstellung stellte sich während der Entwicklungszeit als sehr hilfreich dar, um Fehler frühzeitig zu erkennen und beheben zu können. Für die Auswertung der Ergebnisse haben diese allerdings wenig Relevanz. Der Vollständigkeit halber soll an dieser Stelle dennoch eine kurze Zusammenfassung der zeitbasierten Messwerte erfolgen. Für alle bisher behandelten Metriken gibt es Panels im Grafana Dashboard. Da die zeitliche Erfassung in Grafana selbst allerdings intervallbasierte Abfragen stellt, sind diese im Vergleich zu den Werten, welche in der Datenbank durch das System generiert und abgelegt wurden, sehr ungenau. Selbstverständlich wurde in der bisherigen Analyse ausschließlich auf die persistierten Daten zurückgegriffen. Bezüglich der Konsumenten wurde neben dem zusammengefassten durchschnittlichen Startverhalten auch der jeweils aktuelle Initialisierungszeitpunkt dargestellt. Hierbei war eine klare Korrelation zwischen der Anzahl der parallel startenden Konsumenten mit der erhöhten Initialisierungsdauer zu beobachten. Außerdem wurden diverse Metriken aus dem Activemq-Broker selbst ausgelesen. So ist es zum Beispiel möglich nachzuvollziehen, wie viele Nachrichten sich zu einem gegebenen Zeitpunkt nicht nur in einer bestimmten Warteschlange sondern auch innerhalb des ganzen Systems befinden. Außerdem wurde die zeitliche Abfolge zwischen einem Burst an unbeantworteten Nachrichten und dem Anstieg der Containerinstanzen in einem Dashboard-Panel dargestellt.
+
+\paragraph{Zusammenfassung}
+
+Es folgt eine Zusammenfassung des letzten Abschnitts.
+
+\begin{itemize}
+	\item Zwei Lasttests
+	\begin{itemize}
+		\item Skalierung als Reaktion auf Payment-Nachrichten
+		\item Skalierung als Reaktion auf direkte Anweisungen durch den Benutzer
+	\end{itemize}
+	\item Latenzzeit als Durchschnitt über alle erhaltenen Werte
+	\begin{itemize}
+		\item Node.js -- 38.4 Sekunden
+		\item Spring Boot -- 61.8 Sekunden
+	\end{itemize}
+	\item Nachrichteneingang
+	\begin{itemize}
+		\item Node.js -- 35.0 Sekunden
+		\item Spring Boot -- 58.8 Sekunden
+	\end{itemize}
+	\item Verarbeitungsdauer
+	\begin{itemize}
+		\item Node.js -- 388 Millisekunden
+		\item Spring Boot -- 29 Millisekunden
+	\end{itemize}
+	\item Skalierungsdauer beschreibt Zeitraum zum Hochfahren eines Containers einer Technologie
+	\begin{itemize}
+		\item Aufschlüsselung nach Services beschreibt die gesamtdurchschnittliche Dauer
+		\item Aufschlüsselung nach Skalierungsstufe beschreibt die durchschnittliche Dauer nach Größe des Bursts
+		\item Aufschlüsselung nach Containeranzahl beschreibt die durchschnittliche Dauer pro Containeranzahl
+		\item in allen Kategorien sind die Initialisierungszeiten der Node.js Technologie geringer als die der Spring Boot Technologie
+	\end{itemize}
+\end{itemize}
 
 
 \section{Analyse}
@@ -275,6 +309,7 @@ Die Aussage, dass die Spring-Komponente durchschnittliche 13 Mal schneller arbei
 Der Fokus der Thesis liegt auf dem Start-up-Verhalten der Komponenten. Hierbei ist festzustellen, dass Node.js einen deutlichen Vorteil gegenüber dem Spring-Boot-Framework vorzuweisen hat. Im Banking-Bereich ist dies unabdingbar. Die Performanz lässt sich allerdings zum gegenwärtigen Zeitpunkt nur eingeschränkt beurteilen. Mit den erhaltenen Daten zeichnet sich hierbei im Gesamtbild für den Anwendungsfall des Unternehmens jedoch eine Empfehlung für die Verwendung neuwertiger Skript-Technologien aus. 
 
 
+\begin{minipage}{\textwidth}
 \subsection{Zusammenfassung}
 
 Es folgt eine kurze Zusammenfassung des letzten Abschnitts.
@@ -298,3 +333,4 @@ Es folgt eine kurze Zusammenfassung des letzten Abschnitts.
 	\end{itemize}
 	\item Finale Beurteilung: beschriebene Vorteile von Skript-Technologien überwiegen
 \end{itemize}
+\end{minipage}
