@@ -306,9 +306,9 @@ Wie im UML-Diagramm zu erkennen, werden aus der erhaltenen Instruktionsinstanz �
 In dem beschriebenen Listing ist zu erkennen, wie diese Generatoren genutzt werden. Sie extrahieren aus der gegebenen Instruktionsinstanz die jeweils relevanten Werte für ihren Anwendungsfall (Zeile 5 -- 9) und können bei der Erstellung der Nachrichten als Callback verwendet werden, und dynamisch neue Werte erstellen (Zeile 16 -- 21). Hierbei wurde auf diese Callback-Struktur zurückgegriffen, da die gegebenen Werte in der Instruktion selbst als Instruktionen verstanden werden sollen.
 
 \paragraph{Beispiel xPathSupplier} 
-Der XPath gibt an, welches XML-Element bei der Verarbeitung durch den Konsumer im Detail extrahiert werden soll (bspw. IBAN, Betrag etc.). Es ist jedoch auch möglich, dass der Benutzer bei der API-Anfrage hierbei keinen genauen XPath angibt sondern möchte, dass hierbei ein beliebiges Element extrahiert werden soll. Dazu wird der Wert "\emph{Randomize}" in die Instruktion eingetragen. Dies ist sinnvoll um etwas Variation in die spätere Verarbeitung zu bekommen um bessere Messwerte erzielen zu könnnen. Im System wurden hierfür beispielhaft einige XPath Pfade manuell hinterlegt. Der Supplier hat intern Zugriff auf diese Sammlung. Je nachdem ob ein spezifischer Wert ausgegeben werden oder dieser variieren soll, wird stets der selbe Wert oder aber unterschiedliche Werte ausgegeben. Ähnliches gilt für die anderen verfügbaren Generator-Instanzen.
+Der XPath gibt an, welches XML-Element bei der Verarbeitung durch den Consumer im Detail extrahiert werden soll (bspw. IBAN, Betrag etc.). Es ist jedoch auch möglich, dass der Benutzer bei der API-Anfrage hierbei keinen genauen XPath angibt sondern möchte, dass hierbei ein beliebiges Element extrahiert werden soll. Dazu wird der Wert "\emph{Randomize}" in die Instruktion eingetragen. Dies ist sinnvoll um etwas Variation in die spätere Verarbeitung zu bekommen um bessere Messwerte erzielen zu könnnen. Im System wurden hierfür beispielhaft einige XPath Pfade manuell hinterlegt. Der Supplier hat intern Zugriff auf diese Sammlung. Je nachdem ob ein spezifischer Wert ausgegeben werden oder dieser variieren soll, wird stets der selbe Wert oder aber unterschiedliche Werte ausgegeben. Ähnliches gilt für die anderen verfügbaren Generator-Instanzen.
 
-\subsection{Konsumer-Komponente}
+\subsection{Consumer-Komponente}
 
 Im folgenden UML-Diagramm ist die grundlegende Klassenstruktur der beteiligten Logikbausteine des Spring-Konsumenten zu erkennen. Da das Node.js-Projekt einen sehr ähnlichen Aufbau besitzt, wird im Folgenden lediglich der Ablauf der Spring Komponente zusammengefasst. Sämtliche Informationen lassen sich jedoch nahtlos auf die Node.js-Umgebung übertragen. 
 
@@ -322,7 +322,7 @@ Der Einstiegspunkt für den Spring-Konsumenten stellt der \emph{AmqService} dar.
 \end{figure}
 
 \begin{minipage}{\linewidth}
-\begin{lstlisting}[style=javaStyle,caption={WorkerService - Konsumer Logik},label=lst:consumerLogic]
+\begin{lstlisting}[style=javaStyle,caption={WorkerService - Consumer Logik},label=lst:consumerLogic]
 
   ...
 
@@ -400,7 +400,7 @@ Diese Tabelle bestimmt das Skalierungsverhalten des Systems. Aus ihr werden die 
 \end{verbatim}
 
 
-Auf der horizontalen Achse wird die aktuelle Containeranzahl eines Systems in verschiedene Zustände eingeteilt. \emph{CL0} bis \emph{Cl3} beschreibt hierbei das sogenannte \emph{Container Level}. Diese, Level geben Abschnitte an, in denen sich die Containeranzahl zum aktuellen Zeitpunkt befinden kann. Diese Grenzen wurde, mithilfe von Variablen festgelegt und mit dem Kürzel \emph{CB0} bis \emph{CB2} versehen, dies steht für den Begriff "\emph{Container Bound}". Die aktuelle Containeranzahl (engl. \emph{container Count}) selbst wurde in der Tabelle mit \emph{CC} abgekürzt. Wenn im System zu einem betrachteten Zeitraum beispielsweise fünf Containerinstanzen einer Konsumenten-Komponente laufen (im nachfolgenden stets als \emph{Consumer-Container} bezeichnet), dann befindet sich das System im Zustand \emph{Container Level 1}, da die untere Grenze des Intervals mit \emph{CB0} auf 1 und die obere auf 5 gesetzt wurde. 
+Auf der horizontalen Achse wird die aktuelle Containeranzahl eines Systems in verschiedene Zustände eingeteilt. \emph{CL0} bis \emph{Cl3} beschreibt hierbei das sogenannte \emph{Container Level}. Diese, Level geben Abschnitte an, in denen sich die Containeranzahl zum aktuellen Zeitpunkt befinden kann. Diese Grenzen wurde, mithilfe von Variablen festgelegt und mit dem Kürzel \emph{CB0} bis \emph{CB2} versehen, dies steht für den Begriff "\emph{Container Bound}". Die aktuelle Containeranzahl (engl. \emph{Container Count}) selbst wurde in der Tabelle mit \emph{CC} abgekürzt. Wenn im System zu einem betrachteten Zeitraum beispielsweise fünf Containerinstanzen einer Konsumenten-Komponente laufen (im nachfolgenden stets als \emph{Consumer-Container} bezeichnet), dann befindet sich das System im Zustand \emph{Container Level 1}, da die untere Grenze des Intervalls mit \emph{CB0} auf 1 und die obere auf 5 gesetzt wurde. 
 
 Eine ähnliche Eingrenzung gibt es ebenfalls bezüglich der vertikalen Achse, wobei die unbeantworteten Nachrichten einer Warteschlange in einem Message-Broker betrachtet werden. Hierbei steht das \emph{QL0} bis \emph{Ql3} für das sogenannte "\emph{Queue Level}". Über die \emph{Queue Bound} (kurz \emph{QB0} bis \emph{QB3}) werden hierbei die Grenzen der Intervalle festgelegt. Wenn beispielsweise 101 unbeantwortete Nachrichten in der Warteschlange residieren, befindet sich das System im Zustand \emph{QL3}, da die \emph{Queue Count} (kurz \emph{QC}) größer ist als die Grenze \emph{QB2} (festgelegt auf 100).
 
@@ -763,7 +763,7 @@ Die Konfigurationsdatei wurde im yaml Dateiformat erfasst, wobei es hier ein Key
   \item \emph{environment}: hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen. Es ist irrelevant, ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13), für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
 \end{itemize}
 
-Neben den wesentlichen beschriebenen Konfigurationsparametern gilt es noch die \emph{volume} Definition (siehe Listing \ref{lst:composeVolumes} \nameref{lst:composeVolumes}) zu erwähnen. 
+Neben den wesentlichen beschriebenen Konfigurationsparametern gilt es noch die \emph{Volume} Definition (siehe Listing \ref{lst:composeVolumes} \nameref{lst:composeVolumes}) zu erwähnen. 
 
 
 \begin{lstlisting}[style=bashStyle,caption={Docker Compose - Volume Definition},label=lst:composeVolumes]
