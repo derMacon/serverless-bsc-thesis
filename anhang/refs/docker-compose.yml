@@ -1,0 +1,258 @@
+version: '3.7'
+
+services:
+
+  activemq:
+    image: bwolf/activemq-prometheus
+    deploy:
+      replicas: 1
+    networks:
+      - scaler
+    ports:
+      - "61616:61616"
+      - "61613:61613"
+      - "8161:8161"
+      - "8080:8080"
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    networks:
+      - scaler
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_LISTEN_PORT=${PGADMIN_LISTEN_PORT}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_LISTEN_PORT}:5050"
+
+  consumer-db:
+    image: postgres:13-alpine
+    container_name: consumer-db
+    ports:
+      - "${CONSUMER_DATABASE_PORT}:${CONSUMER_DATABASE_PORT}"
+    command: -p ${CONSUMER_DATABASE_PORT}
+    networks:
+      - scaler
+    environment:
+      - DEBUG=false
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=consumer-db
+    volumes:
+      - consumer-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  history-db:
+    image: postgres:13-alpine
+    ports:
+      - "${SUPPLIER_DATABASE_PORT}:${SUPPLIER_DATABASE_PORT}"
+    command: -p ${SUPPLIER_DATABASE_PORT}
+    environment:
+      - DEBUG=false
+      - POSTGRES_USER=${SUPPLIER_USER_NAME}
+      - POSTGRES_PASSWORD=${SUPPLIER_USER_PASSWORD}
+      - POSTGRES_DB=${SUPPLIER_DATABASE_NAME}
+    networks:
+      - scaler
+    volumes:
+      - history-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  consumer-persistence:
+    image: consumer-persistence
+    build: consumer-persistence/
+    ports:
+      - "${CONSUMER_PERSISTENCE_SERVER_PORT}:${CONSUMER_PERSISTENCE_SERVER_PORT}"
+    restart: unless-stopped
+    networks:
+      - scaler
+    environment:
+      - DATABASE_HOST=consumer-db
+      - DATABASE_USER=${CONSUMER_USER_NAME}
+      - DATABASE_PASSWORD=${CONSUMER_USER_PASSWORD}
+      - DATABASE_NAME=${CONSUMER_DATABASE_NAME}
+      - DATABASE_PORT=${CONSUMER_DATABASE_PORT}
+      - AMQ_NODE_QUEUE_NAME=${AMQ_NODE_QUEUE_NAME}
+      - AMQ_CONSUMER_PERSISTENCE_QUEUE=${AMQ_CONSUMER_PERSISTENCE_QUEUE}
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_BROKER_PORT=${AMQ_TCP_PORT}
+      - SERVER_PORT=${CONSUMER_PERSISTENCE_SERVER_PORT}
+      - "SPRING_PROFILES_ACTIVE=prod"
+
+  supplier-backend:
+    image: supplier-backend
+    build: supplier-backend/
+    ports:
+      - "${SUPPLIER_BACKEND_PORT}:${SUPPLIER_BACKEND_PORT}"
+    restart: unless-stopped
+    networks:
+      - scaler
+    environment:
+      - DATABASE_HOST=history-db
+      - DATABASE_USER=${SUPPLIER_USER_NAME}
+      - DATABASE_PASSWORD=${SUPPLIER_USER_PASSWORD}
+      - DATABASE_NAME=${SUPPLIER_DATABASE_NAME}
+      - DATABASE_PORT=${SUPPLIER_DATABASE_PORT}
+      - AMQ_NODE_QUEUE_NAME=${AMQ_NODE_QUEUE_NAME}
+      - AMQ_SPRING_QUEUE_NAME=${AMQ_SPRING_QUEUE_NAME}
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_BROKER_PORT=${AMQ_TCP_PORT}
+      - SERVER_PORT=${SUPPLIER_BACKEND_PORT}
+      - "SPRING_PROFILES_ACTIVE=prod"
+
+  supplier-frontend:
+    image: supplier-frontend
+    build: supplier-frontend/
+    networks:
+      - scaler
+    deploy:
+      replicas: 1
+    ports:
+      - "${SUPPLIER_FRONTEND_PORT}:80"
+    restart: unless-stopped
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - API_HOSTNAME=supplier-backend
+      - API_PORT=${SUPPLIER_BACKEND_PORT}
+
+  node-consumer:
+    image: node-consumer:latest
+    networks:
+      - scaler
+    build: node-consumer/
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+    environment:
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_STOMP_PORT=${AMQ_STOMP_PORT}
+      - AMQ_USER_NAME=${AMQ_USER_NAME}
+      - AMQ_USER_PASS=${AMQ_USER_PASS}
+      - AMQ_NODE_QUEUE_NAME=${AMQ_NODE_QUEUE_NAME}
+      - AMQ_NODE_ACK_QUEUE=${AMQ_NODE_ACK_QUEUE}
+      - AMQ_CONSUMER_PERSISTENCE_QUEUE=${AMQ_CONSUMER_PERSISTENCE_QUEUE}
+
+  spring-consumer:
+    image: spring-consumer
+    build: spring-consumer/
+    ports:
+      - "${SPRING_SERVER_PORT}:${SPRING_SERVER_PORT}"
+    restart: unless-stopped
+    networks:
+      - scaler
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
+      - DATABASE_HOST=spring-db
+      - DATABASE_USER=${SPRING_USER_NAME}
+      - DATABASE_PASSWORD=${SPRING_USER_PASSWORD}
+      - DATABASE_NAME=${SPRING_DATABASE_NAME}
+      - DATABASE_PORT=${SPRING_DATABASE_PORT}
+      - AMQ_SPRING_QUEUE_NAME=${AMQ_SPRING_QUEUE_NAME}
+      - AMQ_BROKER_HOSTNAME=activemq
+      - AMQ_BROKER_PORT=${AMQ_TCP_PORT}
+      - SERVER_PORT=${SPRING_SERVER_PORT}
+
+  scaler-proxy:
+    image: scaler-proxy
+    build: scaler-proxy/
+    deploy:
+      replicas: 1
+    networks:
+      - scaler
+    ports:
+      - "9245:9245"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
+      - DELEGATION_HOSTNAME=scaler
+      - DATABASE_HOST=history-db
+      - DATABASE_USER=${SUPPLIER_USER_NAME}
+      - DATABASE_PASSWORD=${SUPPLIER_USER_PASSWORD}
+      - DATABASE_NAME=${SUPPLIER_DATABASE_NAME}
+      - DATABASE_PORT=${SUPPLIER_DATABASE_PORT}
+      - AMQ_NODE_ACK_QUEUE=${AMQ_NODE_ACK_QUEUE}
+      - AMQ_SPRING_ACK_QUEUE=${AMQ_SPRING_ACK_QUEUE}
+      - SCALING_QB0=${SCALING_QB0}
+      - SCALING_QB1=${SCALING_QB1}
+      - SCALING_QB2=${SCALING_QB2}
+      - SCALING_CB0=${SCALING_CB0}
+      - SCALING_CB1=${SCALING_CB1}
+      - SCALING_CB2=${SCALING_CB2}
+      - SCALING_CB3=${SCALING_CB3}
+
+  scaler:
+    image: thomasjpfan/docker-scaler:${TAG:-master}
+    environment:
+      - ALERTMANAGER_ADDRESS=http://alert-manager:9093
+      - SERVER_PREFIX=/scaler
+      - DEFAULT_MAX_REPLICAS=150
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8743:8080"
+    networks:
+      - scaler
+    deploy:
+      replicas: 1
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/scaler
+        - com.df.port=8080
+      placement:
+        constraints: [ node.role == manager ]
+
+  alertmanager:
+    image: prom/alertmanager:v0.20.0
+    deploy:
+      replicas: 1
+    ports:
+      - 9093:9093
+    networks:
+      - scaler
+    command:
+      - '--log.level=debug'
+      - '--config.file=/alertmanager.yml'
+      - '--web.external-url=http://localhost:9093/'
+    volumes:
+      - ./data/alertmanager/alertmanager.yml:/alertmanager.yml
+
+  prometheus:
+    image: prom/prometheus:v2.21.0
+    deploy:
+      replicas: 1
+    ports:
+      - 9000:9090
+    networks:
+      - scaler
+    volumes:
+      - ./data/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    networks:
+      - scaler
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD="admin"
+      - GF_SECURITY_ADMIN_USER="admin"
+
+networks:
+  scaler:
+    external: true
+
+volumes:
+  prometheus-data:
+  pgadmin-data:
+  history-db:
+  consumer-db:
