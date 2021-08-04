@@ -718,7 +718,7 @@ Um den Stack zu starten wird auf verschiedene Skripte sowie Beschreibungsdateien
 Es ist möglich, ein Netzwerk von Containern manuell über das CLI der Docker-Engine zu starten, hierbei können Mounts bestimmter Verzeichnisse angelegt, Kommunikations-Netzwerke definiert und Ports freigegeben werden. Mithilfe von Shell-Skripten wäre es möglich, diese Schritte zu automatisieren. Dieses Vorgehen erscheint aber schon bei kleineren Projekten sehr unpraktikabel und unübersichtlich, hierbei wird daher auf Werkzeuge wie zum Beispiel \emph{Docker-Compose}\footnote{\url{https://github.com/docker/compose}} zurückgegriffen. Dieses Tool bietet die Möglichkeit, über eine Beschreibungssprache einen Stack zu definieren, in dem sämtliche Abhängigkeiten bereits aufgelöst werden können. 
 
 \paragraph{Container Networking}
-Container werden hierbei in Clustern organisiert, die es ermöglichen, mithilfe des \emph{Docker-Link}-Mechanismus die Container über ein definiertes Netzwerk miteinander in Verbindung treten zu lassen. "\emph{The Docker server acts as a virtual bridge and the containers are clients behind it}" \cite[Seite~13]{oreilly-docker}. Jeder Container besitzt ein eigenes virtuelles Ethernet Interface, das eine eigene IP-Adresse allokiert und mit der beschriebenen Docker-Bridge verbunden ist. "\emph{Docker lets you bind ports on the host to the container so that the outside world can reach your container}". Hierbei wird ein lokales Netzwerk allokiert, über das alle Container direkt miteinander kommunizieren können.
+Container werden hierbei in Clustern organisiert, die es ermöglichen, mithilfe des \emph{Docker-Link}-Mechanismus die Container über ein definiertes Netzwerk miteinander in Verbindung treten zu lassen. "\emph{The Docker server acts as a virtual bridge and the containers are clients behind it}" \cite[Seite~13]{oreilly-docker}. Jeder Container besitzt ein eigenes virtuelles Ethernet Interface, das eine eigene IP-Adresse allokiert und mit der beschriebenen Docker-Bridge verbunden ist. "\emph{Docker lets you bind ports on the host to the container so that the outside world can reach your container}" \cite{oreilly-docker}. Hierbei wird ein lokales Netzwerk allokiert, über das alle Container direkt miteinander kommunizieren können.
 
 \paragraph{Stack-Konfiguration}
 Um beim Beispiel des \emph{Suppliers} zu bleiben, folgt eine kurze Zusammenfassung der Stack-Konfiguration für den Spring-Supplier-Container. Die gesamte Docker-Compose Konfigurationsdatei befindet sich ebenfalls im Anhang (siehe Listing \ref{lst:dockerCompose} \nameref{lst:dockerCompose}).
@@ -757,10 +757,10 @@ Um beim Beispiel des \emph{Suppliers} zu bleiben, folgt eine kurze Zusammenfassu
 Die Konfigurationsdatei wurde im yaml Dateiformat erfasst, wobei es hier ein Key-Value Mapping zwischen dem Namen eines zu setzenden Konfigurationsparameters und dem definierten Wert gibt.
 
 \begin{itemize}
-  \item \emph{image}: über diesen Schlüsselwert wird der Name des zugrunde liegenden Images für den zu erstellenden Container gesetzt.
-  \item \emph{build}: gibt an, in welchem Verzeichnis die Quelltextdateien liegen. Über das CLI des Compose-Werkzeugs ist es möglich, nicht auf das vorhandene Image bei Containererstellung zurückzugreifen, sondern das Image neu zu bauen. Hierbei wird auf diesen Konfigurationsparameter zurückgegriffen.
-  \item \emph{networks}: es wird ein Netzwerk referenziert, in dem dieser Container agieren soll. Alle Container, mit denen kommuniziert wird, werden über einen Identifier dem gleichen Netzwerk übergeben. 
-  \item \emph{environment}: hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen. Es ist irrelevant, ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13), für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
+  \item \emph{image}: Über diesen Schlüsselwert wird der Name des zugrunde liegenden Images für den zu erstellenden Container gesetzt.
+  \item \emph{build}: Dieser Wert gibt an, in welchem Verzeichnis die Quelltextdateien liegen. Über das CLI des Compose-Werkzeugs ist es möglich, nicht auf das vorhandene Image bei der Containererstellung zurückzugreifen, sondern das Image neu zu bauen. Hierbei wird auf diesen Konfigurationsparameter zurückgegriffen.
+  \item \emph{networks}: Es wird ein Netzwerk referenziert, in dem dieser Container agieren soll. Alle Container, mit denen kommuniziert wird, werden über einen Identifier dem gleichen Netzwerk übergeben. 
+  \item \emph{environment}: Hierbei werden die aufgeführten Umgebungsvariablen in den Container geladen. Es ist irrelevant, ob es sich im Build-Kontext um tatsächliche Umgebungsvariablen handelt (siehe Zeile 14) oder ob die Werte an dieser Stelle erst definiert werden (siehe Zeile 13); für eine ausgeführte Anwendung innerhalb des Containers lässt sich kein Unterschied feststellen.
 \end{itemize}
 
 Neben den wesentlichen beschriebenen Konfigurationsparametern gilt es noch die \emph{Volume} Definition (siehe Listing \ref{lst:composeVolumes} \nameref{lst:composeVolumes}) zu erwähnen. 
@@ -771,7 +771,7 @@ Neben den wesentlichen beschriebenen Konfigurationsparametern gilt es noch die \
     - consumer-db:/var/lib/postgresql/dat
 \end{lstlisting}
 
-Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts zu persistieren. Das folgende Schaubild gibt einen Überblick über die verfügbaren Varianten.
+Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts zu persistieren. Das folgende Schaubild gibt einen Überblick über die verfügbaren Varianten:
 
 \begin{figure}[ht!]
 	\centering
@@ -780,17 +780,17 @@ Volumes stellen eine Möglichkeit dar, um Daten auf dem Datenträger des Hosts z
 	\label{fig:dockerImage}
 \end{figure}
 
-Daten, die über Volumes persistiert werden, sind vom Betriebssystem des Hosts komplett unabhängig. Die Daten können dabei entweder in dem \emph{writeable layer} des Containers selbst gespeichert werden\footnote{Erinnerung: Alle Schichten des Images werden als \emph{read-only} Systeme deployed, erst während der Initialisierungsphase des Containers wird eine weitere Schicht hinzugefügt, die während der Containerlaufzeit bearbeitet werden kann.}. Diese Daten werden allerdings verworfen, sobald der Container gelöscht wird. Um Daten auch weiterhin zu behalten und in neue Container-Instanzen laden zu können, wird hierbei auf Volumes zurückgegriffen. Es gibt zwei Varianten von Volumes \cite[Kapitel~/storage/volumes]{docker-doc}: 
+Daten, die über Volumes persistiert werden, sind vom Betriebssystem des Hosts komplett unabhängig. Die Daten können dabei in dem \emph{writeable layer} des Containers selbst gespeichert werden\footnote{Erinnerung: Alle Schichten des Images werden als \emph{read-only} Systeme deployed, erst während der Initialisierungsphase des Containers wird eine weitere Schicht hinzugefügt, die während der Containerlaufzeit bearbeitet werden kann.}. Diese Daten werden allerdings verworfen, sobald der Container gelöscht wird. Um Daten auch weiterhin zu behalten und in neue Container-Instanzen laden zu können, wird hierbei auf Volumes zurückgegriffen. Es gibt zwei Varianten von Volumes \cite[Kapitel~/storage/volumes]{docker-doc}: 
 
 \begin{enumerate}
   \item \emph{Named volumes}: have a specific source from outside the container, for example \verb+awesome:/bar+.
   \item \emph{Anonymous volumes}: have no specific source so when the container is deleted, instruct the Docker Engine daemon to remove them.
 \end{enumerate}
 
-Im Projekt wurde auf anonyme Volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes} \nameref{lst:composeVolumes}). Diese werden direkt vom Docker-Daeomon verwaltet, wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit, sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, welches auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
+Im Projekt wurde auf anonyme Volumes zurückgegriffen (siehe Listing \ref{lst:composeVolumes} \nameref{lst:composeVolumes}). Diese werden direkt vom Docker-Daemon verwaltet, wobei sich der Anwender damit nicht zu beschäftigen braucht. Neben den genannten Volume-Varianten gibt es ebenfalls die Möglichkeit, sogenannte \emph{bind mounts} zu verwenden. Diese sind jedoch abhängig von der Verzeichnisstruktur des Hosts sowie vom Betriebssystem, welches auf dem Host ausgeführt wird und gelten deshalb als veraltet. In der Dokumentation von Docker selbst wird empfohlen Volumes zu verwenden.
 
 \paragraph{Docker Swarm}
-Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform} \nameref{sec:anforderungPlattform}}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Dabei können mehrere Maschinen derartig agieren, dass es für den Anwender den Anschein erweckt, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das Skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren, ohne dass die restlichen Stack-Komponenten hiervon beeinflusst werden. Um dies nutzen zu können, muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm-Werkzeug allerdings lediglich teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das Setzen von Umgebungsvariablen mithilfe definierter Variablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben, Umgebungsvariablen über Variablen des Buildsystems zu definieren, die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich sensitiver Daten, zum Beispiel bei Anmeldedaten für Datenbanken etc., katastrophal. Um dennoch in der Lage zu sein bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit das Docker-Compose-Werkzeug selbst als Präprozessor zu verwenden. Dabei wird das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umgewandelt und die Umgebungsvariablen direkt mit den im System hinterlegten Werten ausgewechselt (siehe Schaubild \ref{fig:dockerComposeOverview} \nameref{fig:dockerComposeOverview}). Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein Swarm auf der Hostmaschine initialisiert und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert\footnote{kompletter Dateiinhalt unter folgender Url einsehbar: \url{https://github.com/derMacon/serverless-bsc-thesis/blob/main/anhang/refs/start-stack-services.sh}}.
+Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer skalierten Umgebung darzustellen. Das Tool agiert als Orchestrator\footnote{Begriffserklärung siehe Abschnitt \ref{sec:anforderungPlattform} \nameref{sec:anforderungPlattform}.}. Die Container agieren hierbei im sogenannten "\emph{Swarm Mode}". Dabei können mehrere Maschinen derartig agieren, dass es für den Anwender den Anschein erweckt, als würde er lokal auf der eigenen Maschine arbeiten, wenn in Wirklichkeit ein ganzes Rechner-Netzwerk mit dem Hosten der Container betraut werden kann. Im Zusammenhang mit dieser Thesis ist allerdings das Skalieren einzelner Services der primäre Vorteil des Tools. Es ist möglich mehrere sogenannte \emph{Replicas} zu starten und auch wieder herunterzufahren, ohne dass die restlichen Stack-Komponenten hiervon beeinflusst werden. Um dies nutzen zu können, muss der definierte Stack von diesem Werkzeug übernommen werden. Zum gegenwärtigen Zeitpunkt bietet das Swarm-Werkzeug allerdings lediglich teilweise Unterstützung für das Einlesen der docker-compose Beschreibungsdatei. Vor allem wird das Setzen von Umgebungsvariablen mithilfe definierter Variablen des Buildsystems nicht unterstützt. In einer Produktivumgebung muss es jedoch die Möglichkeit geben, Umgebungsvariablen über Variablen des Buildsystems zu definieren; die Alternative wäre ansonsten auf \emph{hardcoded values} zurückzugreifen. Dies ist gerade hinsichtlich sensitiver Daten, zum Beispiel bei Anmeldedaten für Datenbanken etc., katastrophal. Um dennoch in der Lage zu sein, bestimmte Konfigurationsparameter mit Umgebungsvariablen füllen zu können, gibt es die Möglichkeit, das Docker-Compose-Werkzeug selbst als Präprozessor zu verwenden. Dabei wird das tool-konforme docker-compose Skript in ein Swarm-konformes Skript umgewandelt und die Umgebungsvariablen direkt mit den im System hinterlegten Werten ausgewechselt (siehe Schaubild \ref{fig:dockerComposeOverview} \nameref{fig:dockerComposeOverview}). Hierfür reicht ein entsprechender Aufruf über das CLI der Docker-Engine. Anschließend kann ein Swarm auf der Hostmaschine initialisiert und die Stack-Konfiguration deployed werden. In der Ausführung wird hierfür wieder auf ein Skript zurückgegriffen, was diese manuellen Shell-Befehle automatisiert\footnote{kompletter Dateiinhalt unter folgender Url einsehbar: \url{https://github.com/derMacon/serverless-bsc-thesis/blob/main/anhang/refs/start-stack-services.sh}}.
 
 \begin{figure}[ht!]
 	\centering
@@ -799,6 +799,7 @@ Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer s
 	\label{fig:dockerComposeOverview}
 \end{figure}
 
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[style=bashStyle,caption={start-stack-services.sh},label=lst:summary-start-stack-services]
 
   ...
@@ -815,6 +816,7 @@ Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer s
   docker stack rm vossibility
   docker stack deploy --compose-file $STACK_DIR/docker-compose-parsed.yaml vossibility
 \end{lstlisting}
+\end{minipage}
 
 Über den Befehl \verb+docker stack services vossibility+ lässt sich anschließend kontrollieren, ob der Stack gestartet ist und wie viele Serviceinstanzen jeder Komponente aktiv laufen. Die Ausgabe ist in Listing \ref{lst:supplierDockerfile} zu erkennen.
 
@@ -843,7 +845,7 @@ Mit diesem Werkzeug ist es möglich, den definierten Komponentenstack in einer s
 Nachdem im letzten Abschnitt auf die Konfiguration des Stacks eingegangen wurde, wird im Folgenden erklärt, welche Szenarien für die Messdatenerhebung durchgeführt wurden und unter welchen Bedingungen das System diese bearbeitet hat.
 
 \subsection{Testszenarien}
-Für die Erhebung der Messdaten wurde auf die in \ref{ss:Input} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese der Reihe nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit weniger Nachrichten in das System eingepflegt wurden, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueues} \nameref{fig:benchmarkQueues}) zeigt die Daten des Message Brokers. 
+Für die Erhebung der Messdaten wurde auf die in Abschnitt \ref{ss:Input} beschriebenen Skripte zurückgegriffen. Es wurde ein Aufruf des Skripts \emph{generate-traffic.sh} durchgeführt. Dieser sammelt im ausgeführten Verzeichnis rekursiv alle verfügbaren \emph{.benchmark} Dateien und schickt diese der Reihe nach über das \emph{curl-benchmark.sh} Skript an die Supplier-Schnittstelle. Die Skripte wurden dabei derartig organisiert, dass zu Beginn Skripte mit weniger Nachrichten in das System eingepflegt wurden, sodass es zu kleineren Skalierungssprüngen kam. Im späteren Verlauf wurde die Nachrichtenanzahl jedoch stetig erhöht, was wiederum in einem größeren Skalierungsaufkommen resultierte. Die folgende Abbildung (siehe \ref{fig:benchmarkQueues} \nameref{fig:benchmarkQueues}) zeigt die Daten des Message Brokers. 
 
 \begin{figure}[ht!]
 	\centering
@@ -852,11 +854,11 @@ Für die Erhebung der Messdaten wurde auf die in \ref{ss:Input} beschriebenen Sk
 	\label{fig:benchmarkQueues}
 \end{figure}
 
-Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bearbeitet. Dies ist daran zu erkennen, dass die \emph{persistencequeue} entsprechend viele Einträge verwaltet hat. Die Hälfte wurde jeweils von der Node.js- sowie Spring-Boot-Komponente bearbeitet (siehe \emph{nodequeue} sowie \emph{springqueue}). In der Praxis muss ein System allerdings eine deutlich höhere Last verarbeiten können. Das Produktivsystem des Unternehmens ist in der Lage 1000 Nachrichten pro Sekunde verarbeiten zu können. In entsprechenden Lasttests wird dies über einen Zeitraum von einer Stunde oder mehr getestet. Für diesen Prototypen ist die genannte Anzahl allerdings völlig ausreichend um einen Überblick über das System zu bekommen. Außerdem wurde in den verarbeitenden Komponenten des Prototypens eine künstliche Verlangsamung hinzugefügt um eine bessere Nachvollziehbarkeit zu gewährleisten, welche in der Produktivumgebung natürlich entfällt.
+Es wurden für dieses Testszenario insgesamt 5530 Nachrichten verschickt und bearbeitet. Dies ist daran zu erkennen, dass die \emph{persistencequeue} entsprechend viele Einträge verwaltet hat. Die Hälfte wurde jeweils von der Node.js- sowie Spring-Boot-Komponente bearbeitet (siehe \emph{nodequeue} sowie \emph{springqueue}). In der Praxis muss ein System allerdings eine deutlich höhere Last verarbeiten können. Das Produktivsystem des Unternehmens ist in der Lage, 1000 Nachrichten pro Sekunde verarbeiten zu können. In entsprechenden Lasttests wird dies über einen Zeitraum von einer Stunde oder mehr getestet. Für diesen Prototypen ist die genannte Anzahl allerdings völlig ausreichend, um einen Überblick über das System zu bekommen. Außerdem wurde in den verarbeitenden Komponenten vom Prototypen eine künstliche Verlangsamung in Form eines Sleep-Aufrufs am Ende des Arbeitsflusses hinzugefügt, um eine bessere Nachvollziehbarkeit zu gewährleisten, welche in der Produktivumgebung natürlich entfällt.
 
-Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu \ref{ss:bash} \nameref{ss:bash}).
+Der primäre Unterschied der beiden Services zeigt sich jedoch in der hochgefahrenen Containeranzahl. Um dem System mitzuteilen, dass ein neuer Container erfolgreich hochgefahren ist, setzt dieser eine Nachricht in die \emph{nodeack} beziehungsweise die \emph{springack} Warteschlange ab. Wie zu erkennen ist, wurden insgesamt 205 Node.js-Container und 263 Spring Boot Container über den gesamten Zeitraum des Testszenarios hochgefahren. Dieser Unterschied lässt sich mit der unterschiedlich langen Initialisierungsphase der Komponenten begründen (mehr dazu Abschnitt \ref{ss:bash} \nameref{ss:bash}).
 
-Das zweite Testszenario betrifft die direkte Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe \ref{ss:bash} \nameref{ss:bash}). Der Aufruf wurde mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insgesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
+Das zweite Testszenario betrifft die direkte Skalierung mithilfe des Skripts \emph{direct-scaling.sh}. Hierbei wird die Proxy-Scaler Komponente direkt angesprochen (Erklärung siehe Abschnitt\ref{ss:bash} \nameref{ss:bash}). Der Aufruf wurde mit einem \emph{Offset} Parameter von 29 und einer Wiederholungsanzahl von 10 getätigt. Insgesamt wurden für dieses Testszenario demnach 290 Skalierungsanfragen pro Service an die Proxy-Komponente geleitet. Beide Services wurden hierbei 4350 Mal neu hochgefahren\footnote{Summe 1 bis 29 = 435, jeder Skalierungsschritt wurde 10 Mal wiederholt: 435 * 10 = 4350}.
 
 \subsection{Testbedingungen}
 % \begin{itemize}
@@ -866,7 +868,7 @@ Das zweite Testszenario betrifft die direkte Skalierung mithilfe des Skripts \em
 %   \item chaos monkey / Stoerfaelle erlaeutern
 % \end{itemize}
 
-Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wurde. 
+Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folgenden Tabelle beschrieben wird. 
 
 \renewcommand\theadalign{bc}
 \renewcommand\theadfont{\bfseries}
@@ -892,3 +894,7 @@ Sämtliche erhobenen Daten werden auf einem System getestet, wie es in der folge
   \caption{Server Specs}
   \label{tab:serverSpecs}
 \end{table}
+
+
+\subsection{Zusammenfassung}
+Da sich dieser Abschnitt in erster Linie auf die Implementierung der einzelnen Komponenten konzentriert, wird im Folgenden auf eine detailliertere Zusammenfassung verzichtet. 
