@@ -4,7 +4,7 @@
 %   \item einmal als spring boot und einer weiteren variante mit einer cloud-native technologie -> hier wurde vorgegeben mit serverless zu arbeiten.
 % \end{itemize}
 
-Bei diesem Projekt soll sowohl eine Orchestrierungsplattform evaluiert als auch ein entsprechendes Framework hinsichtlich der Eignung im Kontext der Kernziele der Thesis verglichen werden (siehe Abschnitt \ref{ss:kernziele} \nameref{ss:kernziele}). 
+Bei diesem Projekt soll sowohl eine Orchestrierungsplattform evaluiert als auch ein entsprechendes Framework  bezüglich der Eignung im Kontext der Kernziele der Thesis verglichen werden (siehe Abschnitt \ref{ss:kernziele} \nameref{ss:kernziele}). 
 
 Hinsichtlich der Skalierung soll es beispielsweise möglich sein, anhand festgelegter Regeln eine automatische \emph{horizontale} Skalierung bestimmter Komponenten vorzunehmen. Dieses Verhalten soll sowohl in hinterlegten Datensätzen als auch mithilfe eines eigens dafür eingerichteten Dashboards nachvollziehbar dargestellt werden. Auf welche Technologien sowohl bei der Skalierung als auch der Darstellung beziehungsweise bei der Berechnung der Metriken zurückgegriffen wird, wird vom Arbeitgeber nicht vorgegeben. Lediglich hinsichtlich der Komponenten zur Verarbeitung der Businesslogik wurde eine Vorauswahl getroffen. 
 
@@ -17,7 +17,21 @@ Der Prototyp soll eine bereits bestehende Applikation nachbilden, welche die Zah
 
 Da der Fokus auf der Untersuchung der Start-up-Zeit der Komponenten liegt, wird lediglich eine minimale, beispielhafte Implementierung erfolgen, welche die Arbeitsschritte der eigentlichen Applikation vereinfacht darstellen soll. Es soll im Rahmen dieser Arbeit eher als ein \emph{proof of concept} gelten. Allerdings werden im System konkrete Nachrichten im XML Format vermittelt, welche einer XSD-Spezifikation folgen wie sie im realen Umfeld ebenfalls genutzt wird (siehe Listing \ref{lst:paymentXml} \nameref{lst:paymentXml}).
 
-\begin{minipage}{\linewidth}
+
+Sobald eine neue Nachricht eingetroffen ist, sollen drei Arbeitsschritte ausgeführt werden:
+
+\begin{enumerate}
+
+  \item Es soll geprüft werden, ob das eingegangene XML der in den Metainformationen angegebenen XSD-Spezifikation folgt. Wenn dies nicht der Fall sein sollte, wird die Nachricht zwar bestätigt (engl. \emph{acknowledged}), sodass sie aus der Eingangsqueue im Message Broker entfernt, allerdings bei der weiteren Verarbeitung ignoriert wird.
+
+  \item Falls es sich um valides XML-Format handelt, wird ein Feld aus dem XML-Inhalt ausgelesen.
+
+  \item In einem letzten Schritt wird das extrahierte Element in eine Datenbank geschrieben, damit auch eine Persistenz-Operation in die Verarbeitungszeit einfließt.
+
+\end{enumerate}
+
+\newpage
+
 \begin{lstlisting}[style=xmlStyle,caption={Payment Format},label=lst:paymentXml]
   <?xml version="1.0" encoding="UTF-8"?>
   <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09">
@@ -42,20 +56,7 @@ Da der Fokus auf der Untersuchung der Start-up-Zeit der Komponenten liegt, wird 
 
 </Document>
 \end{lstlisting}
-\end{minipage}
 
-
-Sobald eine neue Nachricht eingetroffen ist, sollen drei Arbeitsschritte ausgeführt werden:
-
-\begin{enumerate}
-
-  \item Es soll geprüft werden, ob das eingegangene XML der in den Metainformationen angegebenen XSD-Spezifikation folgt. Wenn dies nicht der Fall sein sollte, wird die Nachricht zwar bestätigt (engl. \emph{acknowledged}), sodass sie aus der Eingangsqueue im Message Broker entfernt, allerdings bei der weiteren Verarbeitung ignoriert wird.
-
-  \item Falls es sich um valides XML-Format handelt, wird ein Feld aus dem XML-Inhalt ausgelesen.
-
-  \item In einem letzten Schritt wird das extrahierte Element in eine Datenbank geschrieben, damit auch eine Persistenz-Operation in die Verarbeitungszeit einfließt.
-
-\end{enumerate}
 
 \subsection{Artefaktbasierte Technologie}
 Wie bereits angedeutet, wird die aktuell laufende Java-Enterprise Applikation mit einer Implementierung basierend auf dem moderneren Spring Boot Framework ersetzt. Spring Boot bietet im Kern eine sehr ähnliche Funktion und kann in gewisser Hinsicht als eine modernere Version des JEE Standards angesehen werden. Der Austausch ist vor allem hinsichtlich der zu gewinnenden Messwerte / Ergebnisse sinnvoll, um einen aktuelleren Referenzpunkt bezüglich der service-basierten Struktur zu erlangen.
@@ -74,7 +75,7 @@ Um bezüglich des Spring Boot Frameworks einen sinnvollen Vergleichspunkt anzuse
 
 Unter dem Begriff des "\emph{Containers}" wird in der Entwickler-Community meist ein "\emph{Docker-Container}" verstanden. Allgemein beschreibt dieser Begriff in der Softwareentwicklung ein abstraktes Konzept auf Betriebssystem-Level zur Virtualisierung oder Prozessisolation. Es gibt zahlreiche Implementierungen wie beispielsweise CoreOS's "\emph{rkt}" oder Microsoft's "\emph{Hyper-V}". Docker stellt hierbei lediglich eine weitere Implementierung dieser Technologie dar \cite[Seite~63 ff.]{continuous-delivery}. Dennoch hat sich Docker gegenüber anderen Implementierungen vor allem über die einfache Benutzerführung sowie die zentralisierten Mechanismen zum \emph{Teilen}, \emph{Pullen} und \emph{Pushen} durchgesetzt. Die generelle Funktionsweise sowie die Vorteile von Docker wurden bereits ausführlich erläutert. Da die Docker Technologie von allen vorgestellten Implementierungen am weitesten verbreitet ist, soll diese auch im Prototypen Verwendung finden. 
 
-Eine Containerplattform zeichnet sich allerdings neben der genutzten Implementierung über weitere Komponenten aus. Eine der Wichtigsten stellt hierbei der Orchestrator dar. "\emph{This component is responsible for starting, stopping, and managing the container processes. This technology is often referred to as container infrastructure as a service (CIaaS), and in the Docker ecostystem this is typically provided by Docker Swarm or Kubernetes}" \cite[Seite~64 ff.]{continuous-delivery}. Hierbei wird auch die Portabilität sowie die Reproduzierbarkeit eines Systems als eine wesentliche Anforderung vorausgesetzt \cite[Kapitel Orchestration]{docker-doc}. Da Kubernetes im Unternehmen bereits Anwendung findet, wurde sich hierbei auf Docker Swarm festgelegt, um ein Demo-Projekt auszuarbeiten, an dem sich in Zukunft andere Projekte orientieren können. Swarm grenzt sich gegenüber anderen Technologien vor allem durch den nativen Support innerhalb des Docker Ökosystems ab. Man benötigt keine weiteren externen Tools, sofern eine Docker Installation vorliegt \cite[Seite~10 ff.]{soppelsaswarm}. Des Weiteren ist es möglich Images in einem skalierten System zu deployen ohne weitere Anpassungen am Image selbst vornehmen zu müssen. Diese Images können außerdem in Clustern organisiert werden, welche direkt über ein alternatives Tool namens "\emph{Docker Compose}" konfiguriert werden können.
+Eine Containerplattform zeichnet sich allerdings neben der genutzten Implementierung über weitere Komponenten aus. Eine der Wichtigsten stellt hierbei der Orchestrator dar. "\emph{This component is responsible for starting, stopping, and managing the container processes. This technology is often referred to as container infrastructure as a service (CIaaS), and in the Docker ecosystem this is typically provided by Docker Swarm or Kubernetes}" \cite[Seite~64 ff.]{continuous-delivery}. Hierbei wird auch die Portabilität sowie die Reproduzierbarkeit eines Systems als eine wesentliche Anforderung vorausgesetzt \cite[Kapitel Orchestration]{docker-doc}. Da Kubernetes im Unternehmen bereits Anwendung findet, wurde sich hierbei auf Docker Swarm festgelegt, um ein Demo-Projekt auszuarbeiten, an dem sich in Zukunft andere Projekte orientieren können. Swarm grenzt sich gegenüber anderen Technologien vor allem durch den nativen Support innerhalb des Docker Ökosystems ab. Man benötigt keine weiteren externen Tools, sofern eine Docker Installation vorliegt \cite[Seite~10 ff.]{soppelsaswarm}. Des Weiteren ist es möglich Images in einem skalierten System zu deployen ohne weitere Anpassungen am Image selbst vornehmen zu müssen. Diese Images können außerdem in Clustern organisiert werden, welche direkt über ein alternatives Tool namens "\emph{Docker Compose}" konfiguriert werden können.
 
 "\emph{Docker Compose allows the declarative specification of applications/services and associated dependencies and data stores. This pattern does allow for the flexible execution of a collection of dependent services on a local development machine}" \cite[Seite~173]{continuous-delivery}. Um diese Spezifikation auch in einer produktiven Umgebung auszuführen, wird auf einen Orchestrator wie zum Beispiel \emph{Docker Swarm} zurückgegriffen. Das Swarm Tool wird hierbei massiv in Produktions-Umgebungen eingesetzt, da es in der Lage ist Tausende von Containern zeitgleich zu verwalten und über einen dezentralen Discovery Service anzusteuern. 
 
@@ -86,6 +87,7 @@ Es soll möglich sein, das System in einem einheitlichen Format mit Nachrichten 
 \section{Anforderungen die Visualisierung und das Monitoring zur Unterstützung der Auswertung}
 Es soll möglich sein, Messwerte automatisch vom System generieren zu lassen. Dazu müssen die Datensätze persistent hinterlegt werden, um auch im Nachhinein nachvollziehen zu können wie die Metriken entstanden sind. Außerdem muss eine grafische Aufarbeitung erfolgen. Diese Visualisierung soll in Echtzeit oder einem zeitlich festgelegten Intervall aktualisiert werden können. Bezüglich des genauen Werkzeugs werden keinerlei Vorgaben gegeben, um dem Benutzer jedoch jeglichen Installationsaufwand zu ersparen wäre eine webbasierte Darstellung von Vorteil.
 
+\newpage
 
 \section{Zusammenfassung}
 
