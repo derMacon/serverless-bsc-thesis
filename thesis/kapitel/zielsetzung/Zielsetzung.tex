@@ -1,13 +1,6 @@
 \chapter{Zielsetzung}
 
-Nachdem im letzten Kapitel ein kurzer Einblick in die Motivation für die Portierung alter JEE Technologie in moderner IT-Infrastruktur beschrieben wurde, wird im Folgenden darauf eingegangen, welcher wesentlichen Problemstellung sich die DPS gegenüber konfrontiert sieht und wie ich dies untersuchen werde.
-
-% \section{Problemstellung}
-% \begin{itemize}
-%   \item Vergleich der Startup-Zeit einer containerbasierten Cloudanwendung bei steigender Last. Es soll auf Unterschiede zwischen Spring und Node eingegangen werden.
-%   \item insbesondere auf Durchsatz der Instant Payments eingehen
-%   \item da anwendung in spring boot ist nicht cloud-fähig weil zu lange für startup, dadurch riskieren wir timeouts also rejects – das ist die besonderheit der anwendung…- ..neuer container muss sofort verfügbar sein! Eine alternative wird gesucht: serverless vespricht minimale startup zeiten!....
-% \end{itemize}
+Nachdem im letzten Kapitel ein kurzer Einblick in die Motivation für die Portierung alter JEE-Technologie in moderner IT-Infrastruktur beschrieben wurde, wird im Folgenden darauf eingegangen, welcher wesentlichen Problemstellung sich die DPS gegenüber konfrontiert sieht und wie ich dies untersuchen werde.
 
 \section{Begriffserklärungen}
 
@@ -16,7 +9,7 @@ Der Begriff "\emph{Cloud-Infrastruktur}" wird oft auch unter dem Namen "\emph{In
 
 \begin{enumerate}
   \item \emph{Private Cloud:} Hauseigene Hardware wird virtualisiert in eigenen Rechenzentren betrieben. Hierbei werden die Server beispielsweise als virtuelle Maschine eingerichtet, anstatt auf einer "\emph{Baremetal-Lösung}" zu basieren, bei der keinerlei Abstrahierung verbaut wurde. Die Grenze zur traditionellen Infrastruktur wird hierbei dadurch gezogen, wie diese Infrastruktur verwaltet wird. Wenn dies durch API-Schnittstellen oder SDKs wie zum Beispiel VMware oder vSphere geschieht, spricht man von der \emph{Cloud}. 
-  \item \emph{Public Cloud:} Bei der privaten Cloud ist das Unternehmen allerdings noch selbst für die Wartung und Instandhaltung der tatsächlich involvierten Hardware zuständig. Bei der Public-Cloud wird dies an externe Dienstleister wie zum Beispiel Amazon (AWS) oder Microsoft (Azure) ausgelagert. Hierbei kommt insbesondere der Begriff \emph{IaaS} zum Tragen, da diese Dienstleistung als ein Service betrachtet wird, welcher vom Benutzer nur noch verwendet wird, dessen Ausführung allerdings völlig irrelevant ist.
+  \item \emph{Public Cloud:} Bei der privaten Cloud ist das Unternehmen allerdings noch selbst für die Wartung und Instandhaltung der tatsächlich involvierten Hardware zuständig. Bei der Public-Cloud wird dies an externe Dienstleister wie zum Beispiel Amazon (AWS) oder Microsoft (Azure) ausgelagert. Hierbei kommt insbesondere der Begriff \emph{IaaS} zum Tragen, da diese Dienstleistung als ein Service betrachtet wird, welcher vom Benutzer nur noch verwendet wird, dessen interne Funktionsweise allerdings völlig irrelevant ist.
   \item \emph{Hybrid Cloud:} dieser Begriff beschreibt eine Mischung der beiden Varianten.
 \end{enumerate}
 
@@ -34,7 +27,7 @@ Serverless Umgebungen bilden eine weitere Abstraktionsstufe zu IaaS Plattformen 
 
 \section{Kernziele}
 \label{ss:kernziele}
-Da das Unternehmen im Banking Bereich tätig ist, stellt eine hohe Verfügbarkeit der Komponenten eines der wesentlichen Kernziele dar. Auf die neuen Technologien bezogen bedeutet dies, dass es zu ermitteln gilt, wie viel Zeit ein Skalierungsprozess in einem orchestrierten Komponentenstack im Detail braucht. Dazu müssen diverse Metriken erhoben werden, welche im Kapitel \ref{sec:startupAnforderungen} beschrieben werden. Wichtig an dieser Stelle: Es soll vor allem untersucht werden, inwiefern eine Java-Anwendung als cloudfähig bezeichnet werden kann. Denn wenn die Initialisierungsphase zu viel Zeit in Anspruch nimmt, werden Timeouts riskiert, was es unter allen Umständen zu vermeiden gilt. Eine Alternative versprechen serverless Technologien, welche sich vor allem durch ihre minimale Startzeit für diesen Usecase qualifizieren.
+Da das Unternehmen im Banking Bereich tätig ist, stellt eine hohe Verfügbarkeit der Komponenten eines der wesentlichen Kernziele dar. Auf die neuen Technologien bezogen bedeutet dies, dass es zu ermitteln gilt, wie viel Zeit ein Skalierungsprozess in einem orchestrierten Komponentenstack im Detail braucht. Dazu müssen diverse Metriken erhoben werden, welche im Kapitel \ref{sec:startupAnforderungen} beschrieben werden. Wichtig an dieser Stelle: Es soll vor allem untersucht werden, inwiefern eine Java-Anwendung als cloudfähig bezeichnet werden kann. Denn wenn die Initialisierungsphase zu viel Zeit in Anspruch nimmt, werden Timeouts riskiert, was es unter allen Umständen zu vermeiden gilt. Eine Alternative versprechen Serverless-Technologien, welche sich vor allem durch ihre minimale Startzeit für diesen Usecase qualifizieren.
 
 Zusammengefassung: 
 \begin{itemize}

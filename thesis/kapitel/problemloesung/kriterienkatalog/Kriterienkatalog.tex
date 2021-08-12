@@ -26,7 +26,7 @@ Auf Werkzeuge wie zum Beispiel \emph{Gatling}\footnote{\url{https://gatling.io/}
 
 
 \subsection{Skalierbarkeit}
-Da es sich bei dem Projekt um eine containerisierte Cloud-Anwendung handelt, muss hierbei eine \emph{vertikale Skalierung} stattfinden. Um möglichst akkurate Werte zu erreichen, müssen die zu skalierenden Container in engem Austausch mit dem System stehen. Es muss festgehalten werden, wann genau der Befehl zum Skalieren getätigt wird und wann die Initialisierungsphase eines entsprechenden Containers abgeschlossen wurde. Als vollkommen initialisiert gilt ein Container, wenn neben dem eigenen Filesystem auch sämtliche relevante Kommunikationsschnittstellen gestartet sind und benötigte Datenverbindungen bestehen. Darüber hinaus sei noch erwähnt, dass die erhobenen Metriken jeweils getrennt pro Backend-Technologie erhoben werden sollen, damit eine Gegenüberstellung gewährleistet werden kann.
+Da es sich bei dem Projekt um eine containerbasierte Cloud-Anwendung handelt, muss hierbei eine \emph{vertikale Skalierung} stattfinden. Um möglichst akkurate Werte zu erreichen, müssen die zu skalierenden Container in engem Austausch mit dem System stehen. Es muss festgehalten werden, wann genau der Befehl zum Skalieren getätigt wird und wann die Initialisierungsphase eines entsprechenden Containers abgeschlossen wurde. Als vollkommen initialisiert gilt ein Container, wenn neben dem eigenen Filesystem auch sämtliche relevante Kommunikationsschnittstellen gestartet sind und benötigte Datenverbindungen bestehen. Darüber hinaus sei noch erwähnt, dass die erhobenen Metriken jeweils getrennt pro Backend-Technologie erhoben werden sollen, damit eine Gegenüberstellung gewährleistet werden kann.
 
 Bezüglich der Skalierung gilt, dass insbesondere ein vorausschauendes Regelmodell entworfen werden soll, das die Container stufenweise erst dann skaliert, wenn eine Vielzahl von Nachrichten eine gewisse Latenzzeit überschreiten oder der Message Broker (Definition siehe \ref{ss:broker} \nameref{ss:broker}) eine entsprechende Menge an unbeantworteten Nachrichten hält. Hierbei soll eine sinnvolle Festlegung von Grenzwerten gefunden werden. Um im Nachhinein genaue Vergleichswerte ermitteln zu können, sollen lediglich die Container der Konsumenten-Instanzen skaliert werden. Die restlichen Stackkomponenten laufen jeweils als eine Singleton-Instanz. Der Skalierungsprozess soll sowohl mit eingegangenen Nachrichten, als auch durch spezifische Benutzeranfragen gestartet werden können. Diese Unterteilung soll in den persistierten Datensätzen erkennbar sein.
 
@@ -47,7 +47,7 @@ Der Übersichtlichkeit halber hier noch einmal eine stichwortartige Zusammenfass
   \end{itemize}
   \item Skalierungsdauer jeweils pro verwendeter Backend-Technologie festzuhalten
   \begin{itemize}
-    \item Skalierung anhand eingehender Nachrichten mithilfe Stufenmodell
+    \item Skalierung anhand eingehender Nachrichten mithilfe von Stufenmodell
     \item Skalierung mittels direkter Benutzeranfrage (ohne eingehende Nachrichten)
     \item Metriken als Datensätze in einer Datenbank hinterlegt
     \item Durchschnittliche Startzeit pro Containeranzahl 
